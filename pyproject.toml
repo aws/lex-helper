@@ -1,0 +1,66 @@
+[project]
+name = "lex-helper"
+version = "0.0.9"
+description = ""
+authors = [
+    {name = "Ken Erwin",email = "kenerw@amazon.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12, <4.0"
+dependencies = [
+    "pydantic (>2.0.0,<3.0.0)",
+    "loguru (>=0.7.3,<0.8.0)"
+]
+license = "Apache-2.0"
+
+[tool.poetry]
+packages = [{include = "lex_helper", from = "."}]
+exclude = ["examples"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+ruff = "^0.9.6"
+pytest-cov = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+select = ["I001", "I002", "F401", "N802"]
+ignore = ["E501", "E722", "E402", "E731", "F811"]
+target-version = "py311"
+
+
+[tool.black]
+line-length = 125
+
+[tool.pyright]
+include = [
+  "./lex_helper",
+]
+
+
+defineConstant = { DEBUG = true }
+
+
+typeCheckingMode = "strict"
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportUnknownParameterType = true
+reportUnknownArgumentType = false
+reportUnknownMemberType = false
+reportUnusedImport = false
+reportUnusedClass = true
+reportUnusedFunction = true
+reportUnusedVariable = true
+reportConstantRedefinition = true
+reportDeprecated = true
+reportUnnecessaryContains = true
+reportUnnecessaryComparison = true
+reportMatchNotExhaustive = true
+reportCallInDefaultInitializer = true

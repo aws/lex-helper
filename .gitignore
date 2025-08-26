@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VSCoded
+.vscode/
+
+# VSCode Settings
+settings.json
+
+# Mac
+.DS_Store
+
+# Linux
+.cache/
+.config/
+
+# Pypi
+dist/
+build/
+*.egg-info/
+
+# Pytest
+.pytest_cache/
+
+# Pytest Coverage
+.coverage/
+
+
+# Virtual Environment
+.venv/
