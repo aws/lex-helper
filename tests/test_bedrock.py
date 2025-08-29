@@ -3,8 +3,9 @@
 Test script for invoke_bedrock functionality.
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 from lex_helper.core.invoke_bedrock import BedrockInvocationError, invoke_bedrock
 
@@ -40,10 +41,10 @@ def test_bedrock_invoke_mock(use_converse: bool):
             mock_bedrock.invoke_model.return_value['body'].read.return_value = b'{"completion": "' + mock_response['text'].encode() + b'"}'
         
         response = invoke_bedrock(
-            prompt=prompt, 
-            model_id=model_id, 
-            max_tokens=200, 
-            temperature=0.1, 
+            prompt=prompt,
+            model_id=model_id,
+            max_tokens=200,
+            temperature=0.1,
             use_converse=use_converse
         )
         
