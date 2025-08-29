@@ -20,25 +20,25 @@ from utils.config import initialize_message_manager
 def test_message_manager_initialization():
     """Test MessageManager initialization."""
     logger.info("Testing MessageManager initialization...")
-    
+
     # Mock LexRequest object
     class MockBot:
         localeId = "en_US"
-    
+
     class MockLexRequest:
         bot = MockBot()
-    
+
     try:
         # Test initialization
         mock_request = MockLexRequest()
         initialize_message_manager(mock_request)
         logger.info("MessageManager initialized successfully")
-        
+
         # Test with different locale
         mock_request.bot.localeId = "it_IT"
         initialize_message_manager(mock_request)
         logger.info("MessageManager initialized with Italian locale")
-        
+
     except Exception as e:
         logger.error(f"MessageManager initialization failed: {e}")
         raise
@@ -48,10 +48,10 @@ def test_messages_directory():
     """Test that messages directory exists."""
     current_dir = os.path.dirname(os.path.abspath(__file__))
     messages_dir = os.path.join(current_dir, "messages")
-    
+
     if os.path.exists(messages_dir):
         logger.info(f"Messages directory exists at {messages_dir}")
-        
+
         # Check for message files
         for locale in ["en_US", "it_IT"]:
             msg_file = os.path.join(messages_dir, f"messages_{locale}.yaml")
