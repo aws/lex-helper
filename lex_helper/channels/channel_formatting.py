@@ -21,7 +21,7 @@ T = TypeVar("T", bound=SessionAttributes)
 
 
 def format_for_channel(response: LexResponse[T], channel_string: str = "lex"):
-    CONTENT_PROCESS_MAP: dict[type, Callable[[Any, Channel, list[str], list[Any]], list[Any]]] = {
+    content_process_map: dict[type, Callable[[Any, Channel, list[str], list[Any]], list[Any]]] = {
         PlainText: _format_plain_text,
         LexPlainText: _format_plain_text,
         LexImageResponseCard: _format_image_card,
@@ -32,7 +32,7 @@ def format_for_channel(response: LexResponse[T], channel_string: str = "lex"):
     formatted_messages = []
     options_provided = []
     for message in response.messages:
-        fn = CONTENT_PROCESS_MAP.get(type(message))
+        fn = content_process_map.get(type(message))
         if fn is not None:
             formatted_messages = fn(message, channel, options_provided, formatted_messages)
         else:

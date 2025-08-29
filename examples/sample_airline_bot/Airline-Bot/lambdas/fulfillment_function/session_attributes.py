@@ -6,6 +6,7 @@ in the Amazon Lex bot. These attributes store user data and conversation state
 to enable multi-turn conversations and context awareness.
 """
 from pydantic import Field
+
 from lex_helper import SessionAttributes
 
 
@@ -42,85 +43,85 @@ class AirlineBotSessionAttributes(SessionAttributes):
         # Error handling attributes
         error_count: Count of consecutive errors for unknown slot choices
     """
-    
+
     # Common interaction attributes
     common_greeting_count: int = Field(
-        default=0, 
+        default=0,
         description="Counter for greeting interactions"
     )
-    
+
     # Flight booking attributes
     origin_city: str = Field(
-        default="", 
+        default="",
         description="The departure city for flight booking"
     )
     destination_city: str = Field(
-        default="", 
+        default="",
         description="The arrival city for flight booking"
     )
     departure_date: str = Field(
-        default="", 
+        default="",
         description="The departure date for flight booking"
     )
     return_date: str = Field(
-        default="", 
+        default="",
         description="The return date for round-trip bookings (optional)"
     )
     number_of_passengers: int = Field(
-        default=1, 
+        default=1,
         description="Number of passengers for the booking"
     )
     trip_type: str = Field(
-        default="one-way", 
+        default="one-way",
         description="Type of trip (one-way or round-trip)"
     )
-    
+
     # Flight management attributes
     reservation_number: str = Field(
-        default="", 
+        default="",
         description="Confirmation number for flight operations"
     )
     flight_number: str = Field(
-        default="", 
+        default="",
         description="Flight number for status inquiries"
     )
     departure_airport: str = Field(
-        default="", 
+        default="",
         description="Airport code for flight status updates"
     )
-    
+
     # Authentication and callback attributes
     user_authenticated: bool = Field(
-        default=False, 
+        default=False,
         description="Whether the user has been authenticated"
     )
     callback_handler: str = Field(
-        default="", 
+        default="",
         description="Original intent handler for post-authentication callback"
     )
     callback_event: str = Field(
-        default="", 
+        default="",
         description="Serialized original request for callback processing"
     )
-    
+
     # Error handling attributes
     error_count: int = Field(
-        default=0, 
+        default=0,
         description="Count of consecutive errors for unknown slot choices"
     )
-    
+
     # IATA airport code attributes
     origin_iata_code: str = Field(
-        default="", 
+        default="",
         description="IATA airport code for origin city"
     )
     destination_iata_code: str = Field(
-        default="", 
+        default="",
         description="IATA airport code for destination city"
     )
-    
+
     # Internationalization attributes
     user_locale: str = Field(
-        default="en_US", 
+        default="en_US",
         description="User's preferred locale for messages"
     )

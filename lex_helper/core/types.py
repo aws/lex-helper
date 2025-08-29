@@ -8,7 +8,6 @@ from typing import (
     Any,
     Generic,
     Literal,
-    Optional,
     TypeVar,
     cast,
 )
@@ -21,13 +20,13 @@ from lex_helper.formatters.buttons import Button
 class ImageResponseCard(BaseModel):
     title: str
     subtitle: str = " "
-    imageUrl: str | None = None
+    imageUrl: str | None = None  # noqa: N815
     buttons: list[Button] = []
 
 
 class LexPlainText(BaseModel):
     content: str | None = ""
-    contentType: Literal["PlainText"] = "PlainText"
+    contentType: Literal["PlainText"] = "PlainText"  # noqa: N815
 
 
 class PlainText(BaseModel):
@@ -123,7 +122,7 @@ class ProposedNextState(BaseModel):
     dialogAction: DialogAction
 
 
-ActiveContexts = Optional[list[dict[str, Any]]]
+ActiveContexts = list[dict[str, Any]] | None
 
 
 APIFailMethod = Literal[

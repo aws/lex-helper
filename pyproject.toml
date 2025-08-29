@@ -61,6 +61,11 @@ ignore = [
     "E402",  # module level import not at top of file
     "E731",  # do not assign a lambda expression, use a def
     "F811",  # redefinition of unused name
+    "N815",  # mixed-case variable in class scope (intentional for Lex API compatibility)
+    "UP046", # non-PEP695 generic classes (requires Python 3.12+)
+    "UP047", # non-PEP695 generic functions (requires Python 3.12+)
+    "W293",  # blank line contains whitespace (in examples)
+    "C901",  # complex structure (acceptable in examples)
 ]
 
 [tool.ruff.lint.mccabe]

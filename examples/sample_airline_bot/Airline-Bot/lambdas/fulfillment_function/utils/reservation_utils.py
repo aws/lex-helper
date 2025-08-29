@@ -4,25 +4,26 @@ Reservation utilities for flight booking operations.
 This module provides utilities for airport resolution, city-to-IATA code conversion,
 and other reservation-related operations used across multiple intents.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog,  get_message, invoke_bedrock_converse
-from lex_helper.core.bedrock_model_configs import BedrockModel
-
-from loguru import logger
 import json
 import re
+
+from loguru import logger
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message, invoke_bedrock_converse
+from lex_helper.core.bedrock_model_configs import BedrockModel
 
 from ..session_attributes import AirlineBotSessionAttributes
 
 
 class ReservationUtils:
     """Utility class for reservation-related operations."""
-    
+
     @staticmethod
     def handle_city_resolution(
-        city: str, 
-        slot_name_city: str, 
-        slot_name_code: str, 
-        session_attr: str, 
+        city: str,
+        slot_name_city: str,
+        slot_name_code: str,
+        session_attr: str,
         lex_request: LexRequest[AirlineBotSessionAttributes]
     ) -> LexResponse[AirlineBotSessionAttributes] | None:
         """
@@ -40,16 +41,16 @@ class ReservationUtils:
         """
         locale = lex_request.bot.localeId
         iata_result = ReservationUtils._resolve_city_to_iata(city, locale)
-        
+
         if not isinstance(iata_result, dict) or "status" not in iata_result:
             logger.warning(f"Invalid response from city resolution: {iata_result}")
             return dialog.delegate(lex_request=lex_request)
-        
+
         if iata_result["status"] == "multiple":
             options = "\n".join([f"- {opt}" for opt in iata_result.get("options", [])])
             message = f"I found multiple airports for {city}. Please choose one:\n{options}"
             message = get_message("book_flight.elicit_airport_code_selection")
-            
+
             return dialog.elicit_slot(
                 slot_to_elicit=slot_name_code,
                 messages=[LexPlainText(content=message)],
@@ -65,7 +66,7 @@ class ReservationUtils:
                         "originalValue": city,
                         "resolvedValues": [iata_result["city"]],
                     }
-                }  
+                }
                 lex_request.sessionState.intent.slots[slot_name_code] = {
                     "value": {
                         "interpretedValue": iata_result["code"],
@@ -98,10 +99,10 @@ class ReservationUtils:
             dict: {"city":"YYY", "status": "resolved|multiple|none", "code": "XXX", "options": [...]}
         """
         # Adjust language based on locale
-        
+
         language_instruction = f"""Respond in the language of this {locale} with the language specific city names."""
-        
-            
+
+
         system_prompt = f"""You are an airport code resolver. Return ONLY valid JSON. {language_instruction}
 
 Rules:
@@ -121,18 +122,18 @@ JSON ONLY."""
 
         messages = [
             {"role": "user", "content": [{"text": f"Find airports for: {city_input}"}]}
-        ] 
-        
+        ]
+
         try:
             response = invoke_bedrock_converse(
-                messages=messages, 
-                model_id=BedrockModel.CLAUDE_3_HAIKU, 
-                max_tokens=300, 
-                temperature=0.0, 
+                messages=messages,
+                model_id=BedrockModel.CLAUDE_3_HAIKU,
+                max_tokens=300,
+                temperature=0.0,
                 system_prompt=system_prompt
             )
             logger.debug(f"Bedrock response for '{city_input}': {response}")
-            
+
             # Extract JSON from the text field if response is a dict
             if isinstance(response, dict) and 'text' in response:
                 text_content = response['text'].strip()
@@ -142,7 +143,7 @@ JSON ONLY."""
                     # Fallback: parse natural language response
                     logger.warning(f"Non-JSON response from Bedrock: {text_content}")
                     return ReservationUtils._parse_natural_language_response(text_content, city_input)
-            
+
             # Fallback for other response formats
             if isinstance(response, dict):
                 return response
@@ -170,16 +171,16 @@ JSON ONLY."""
         """
         # Look for 3-letter airport codes in the response
         airport_codes = re.findall(r'\b[A-Z]{3}\b', text)
-        
+
         if airport_codes:
             # Use the first found airport code
             code = airport_codes[0]
             return {
                 "city": city_input.title(),
-                "status": "resolved", 
+                "status": "resolved",
                 "code": code
             }
-        
+
         return {"status": "error"}
 
     @staticmethod

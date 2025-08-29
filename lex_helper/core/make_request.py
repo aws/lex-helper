@@ -9,7 +9,7 @@ from loguru import logger
 
 
 def make_request(url: str, headers: dict[str, Any]) -> Any:
-    INVALID_TOKEN_RESPONSE = "oauth.v2.InvalidAccessToken"
+    invalid_token_response = "oauth.v2.InvalidAccessToken"
     try:
         response = requests.get(
             url, headers=headers, timeout=(5, 15)
@@ -17,7 +17,7 @@ def make_request(url: str, headers: dict[str, Any]) -> Any:
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
-        if INVALID_TOKEN_RESPONSE in str(e):
+        if invalid_token_response in str(e):
             return "retry"
         else:
             handle_error(str(e))

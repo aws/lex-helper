@@ -54,9 +54,9 @@ class LexHelper(Generic[T]):
             dict[str, Any]: A formatted response ready to be sent back to Amazon Lex.
         """
         logger.trace("START")
-        sessionAttributes: T = self.config.session_attributes
-        logger.debug(f"SessionAttributes type: {type(sessionAttributes)}")
-        lex_payload: LexRequest[T] = parse_lex_request(event, sessionAttributes)
+        session_attributes: T = self.config.session_attributes
+        logger.debug(f"SessionAttributes type: {type(session_attributes)}")
+        lex_payload: LexRequest[T] = parse_lex_request(event, session_attributes)
         with logger.contextualize(
             sessionId=lex_payload.sessionId,
             utterance=lex_payload.inputTranscript,

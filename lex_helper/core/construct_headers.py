@@ -7,14 +7,14 @@ from uuid import uuid4
 
 
 def construct_headers(token: str) -> dict[str, Any]:
-    APP_ID = "BOT"  # Replace with actual values
-    CHANNEL_ID = "CHATBOT"
+    app_id = "BOT"  # Replace with actual values
+    channel_id = "CHATBOT"
     return {
         "Authorization": f"Bearer {token}",
         "Accept": "application/json",
         "Content-Type": "application/json",
         "Date": datetime.now().isoformat(),
-        "X-App-Id": APP_ID,
-        "X-Channel-Id": CHANNEL_ID,
+        "X-App-Id": app_id,
+        "X-Channel-Id": channel_id,
         "X-Request-Id": str(uuid4()),
     }

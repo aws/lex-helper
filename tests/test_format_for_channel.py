@@ -33,7 +33,7 @@ def test_format_for_channel_sms():
 def get_sample_lex_response(
     *args: LexBaseResponse | PlainText,
 ) -> LexResponse[SessionAttributes]:
-    messages: LexMessages = [card for card in args]
+    messages: LexMessages = list(args)
 
     return LexResponse(
         sessionState=SessionState(

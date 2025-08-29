@@ -16,8 +16,8 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     set_locale(locale)
 
     # Use messages in your handler
-    welcome_msg = get_message("welcome", "Welcome!")
-    error_msg = get_message("error.general", "Something went wrong")
+    _welcome_msg = get_message("welcome", "Welcome!")
+    _error_msg = get_message("error.general", "Something went wrong")
 
     config = Config(session_attributes=SessionAttributes(), package_name="your_project.intents")
 

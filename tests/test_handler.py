@@ -120,7 +120,7 @@ def test_handler_input_validation():
     invalid_event = {"invalid": "event"}
     context = {}
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         lambda_handler(invalid_event, context)
 
 

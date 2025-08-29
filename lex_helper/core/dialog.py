@@ -209,7 +209,9 @@ def elicit_slot(slot_to_elicit: LexSlot | str, messages: LexMessages, lex_reques
     if not isinstance(slot_to_elicit, str):
         slot_name = slot_to_elicit.value
 
-    session_attributes.previous_slot_to_elicit = (intent.name.replace("_", "") + "Slot") + "." + str(slot_name).upper()
+    session_attributes.previous_slot_to_elicit = (
+        (intent.name.replace("_", "") + "Slot") + "." + str(slot_name).upper()
+    )
 
     if "." in str(slot_name):
         raise Exception("SLOT PARSED INCORRECTLY")
@@ -326,20 +328,22 @@ def get_slot(slot_name: LexSlot | str, intent: Intent, **kwargs: Any):
         return None
 
 
-def get_composite_slot(slot_name: str, intent: Intent, preference: str | None = None) -> dict[str, str | None] | None:
+def get_composite_slot(
+    slot_name: str, intent: Intent, preference: str | None = None
+) -> dict[str, str | None] | None:
     """
     Retrieves the values from sub-slots of a given slot from an intent.
 
     Args:
         slot_name (str): Name of the slot to be fetched.
         intent (Intent): Intent object containing the slot.
-        preference (Optional[str], default=None): Preference for value type ('interpretedValue' or 'originalValue').
-                                                  If no preference is provided and 'interpretedValue' is available, it's used.
-                                                  Otherwise, 'originalValue' is used.
+        preference (Optional[str], default=None): Preference for value type ('interpretedValue' or
+            'originalValue'). If no preference is provided and 'interpretedValue' is available,
+            it's used. Otherwise, 'originalValue' is used.
 
     Returns:
-        Dict[str, Union[str, None]] or None: Dictionary containing the subslot names and their corresponding values,
-                                             or None if the slot or subslots don't exist.
+        Dict[str, Union[str, None]] or None: Dictionary containing the subslot names and their
+            corresponding values, or None if the slot or subslots don't exist.
 
     Raises:
         Exception: Any exception that occurs while fetching the slot.
@@ -468,7 +472,9 @@ def set_slot(slot_name: LexSlot, slot_value: str | None, intent: Intent) -> Inte
     return intent
 
 
-def get_composite_slot_subslot(composite_slot: LexSlot, sub_slot: Any, intent: Intent, **kwargs: Any) -> str | None:
+def get_composite_slot_subslot(
+    composite_slot: LexSlot, sub_slot: Any, intent: Intent, **kwargs: Any
+) -> str | None:
     """
     Retrieves the value of a subslot from a composite slot in an intent.
 
@@ -589,7 +595,11 @@ def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
         return False
 
     # Extract actual slot name from the stored format
-    slot_name = previous_slot_to_elicit.split(".")[-1].lower() if "." in previous_slot_to_elicit else previous_slot_to_elicit
+    slot_name = (
+        previous_slot_to_elicit.split(".")[-1].lower()
+        if "." in previous_slot_to_elicit
+        else previous_slot_to_elicit
+    )
 
     # Check if the slot exists and has a value
     slot_data = intent.slots.get(slot_name)
@@ -675,7 +685,9 @@ def unknown_choice_handler(
     return delegate(lex_request=lex_request)
 
 
-def callback_original_intent_handler(lex_request: LexRequest[T], messages: LexMessages | None = None) -> LexResponse[T]:
+def callback_original_intent_handler(
+    lex_request: LexRequest[T], messages: LexMessages | None = None
+) -> LexResponse[T]:
     """
 
     Handles switching the conversation flow to an initial intent.
@@ -829,7 +841,7 @@ def parse_req_sess_attrs(lex_payload: LexRequest[T]) -> LexRequest[T]:
 
 def parse_lex_request(
     data: dict[str, Any],
-    sessionAttributes: T,
+    session_attributes: T,
 ) -> LexRequest[T]:
     """
     Use this to parse a Lambda event into a LexRequest object.
@@ -848,13 +860,13 @@ def parse_lex_request(
     if data_copy.get("sessionState", {}).get("sessionAttributes"):
         event_attrs = data_copy["sessionState"]["sessionAttributes"]
         # Create a new instance of the session attributes model with the event data
-        model_attrs = type(sessionAttributes)(**event_attrs)
+        model_attrs = type(session_attributes)(**event_attrs)
         data_copy["sessionState"]["sessionAttributes"] = model_attrs
     else:
         # If no session attributes in event, use the provided ones
         if "sessionState" not in data_copy:
             data_copy["sessionState"] = {}
-        data_copy["sessionState"]["sessionAttributes"] = sessionAttributes
+        data_copy["sessionState"]["sessionAttributes"] = session_attributes
 
     lex_request: LexRequest[T] = LexRequest(**data_copy)
     lex_request.sessionState.activeContexts = remove_inactive_context(lex_request)  # Remove inactive contexts

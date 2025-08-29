@@ -32,7 +32,7 @@ def call_handler_for_file(intent_name: str, lex_request: LexRequest[T], package_
         module = importlib.import_module(file_to_import)
     except ImportError as e:
         logger.exception(f'Error: Import module {file_to_import} failed due to the error "{e}"')
-        raise IntentNotFoundError("Unable to find handler for intent")
+        raise IntentNotFoundError("Unable to find handler for intent") from e
 
     # Get the "handler" function from the module
     if hasattr(module, "handler") and inspect.isfunction(module.handler):

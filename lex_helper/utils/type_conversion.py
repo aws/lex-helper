@@ -45,7 +45,7 @@ def safe_int(value: Any, default: int | None = None) -> int | None:
     try:
         if isinstance(value, bool):
             return int(value)
-        if isinstance(value, (int, float)):
+        if isinstance(value, int | float):
             return int(value)
         if isinstance(value, str):
             return int(float(value))
@@ -73,7 +73,7 @@ def safe_float(value: Any, default: float | None = None) -> float | None:
     try:
         if isinstance(value, bool):
             return float(value)
-        if isinstance(value, (int, float)):
+        if isinstance(value, int | float):
             return float(value)
         if isinstance(value, str):
             return float(value)
@@ -125,7 +125,7 @@ def to_list(value: Any) -> list[Any]:
     """
     if value is None:
         return []
-    if isinstance(value, (list, tuple, set)):
+    if isinstance(value, list | tuple | set):
         return list(value)
     return [value]
 
@@ -147,7 +147,7 @@ def to_dict(value: Any) -> dict[str, Any]:
     """
     if isinstance(value, dict):
         return dict(value)
-    if isinstance(value, (list, tuple)) and all(isinstance(item, tuple) and len(item) == 2 for item in value):  # type: ignore
+    if isinstance(value, list | tuple) and all(isinstance(item, tuple) and len(item) == 2 for item in value):  # type: ignore
         return dict(value)
     if hasattr(value, "__dict__"):
         return value.__dict__

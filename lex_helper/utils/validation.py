@@ -27,7 +27,7 @@ def is_value_set(value: Any) -> bool:
     """
     if value is None:
         return False
-    if isinstance(value, (str, list, dict, set, tuple)):
+    if isinstance(value, str | list | dict | set | tuple):
         return bool(value)
     return True
 
@@ -51,7 +51,7 @@ def is_numeric(value: Any) -> bool:
         >>> is_numeric("abc")
         False
     """
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return True
     if isinstance(value, str):
         try:

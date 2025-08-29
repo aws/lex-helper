@@ -1,8 +1,9 @@
 """
 Handler for the CancelFlight intent using MessageManager.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 from loguru import logger
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 from ..session_attributes import AirlineBotSessionAttributes
 
@@ -20,20 +21,20 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
         The Lex response with localized messages
     """
     logger.debug("CancelFlight intent handler called")
-    
+
     # Get MessageManager singleton (initialized in lambda_function.py with user's locale)
     # from lex_helper import MessageManager
     # msg_manager = MessageManager.get_instance()
-    
+
     # Extract slot values from the intent
     intent = dialog.get_intent(lex_request)
     reservation_number = dialog.get_slot(intent=intent, slot_name="ReservationNumber")
-    
+
     logger.debug(f"Slot values: reservation_number={reservation_number}")
-    
+
     # Persist data in session for multi-turn conversations
     lex_request.sessionState.sessionAttributes.reservation_number = reservation_number
-    
+
     # STEP 1: Slot elicitation - ask for missing reservation number
     if not reservation_number:
         message = "What is your reservation number?"
@@ -47,7 +48,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             messages=[LexPlainText(content=message)],
             lex_request=lex_request
         )
-    
+
     # STEP 2: Input validation - check reservation number format
     if not _is_valid_reservation_number(reservation_number):
         message = "Please provide a valid reservation number. It should be in the format ABC123."
@@ -61,10 +62,10 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             messages=[LexPlainText(content=message)],
             lex_request=lex_request
         )
-    
+
     # STEP 3: Business logic - lookup reservation in system
     reservation_found = _lookup_reservation(reservation_number)
-    
+
     # STEP 4: Generate response based on lookup result
     if reservation_found:
         message = f"I've cancelled your reservation {reservation_number}. You will receive a confirmation email shortly."
@@ -82,7 +83,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
         except Exception as e:
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Cancellation error: {message}")
-    
+
     # Close dialog with final localized response
     return dialog.close(
         messages=[LexPlainText(content=message)],
@@ -101,8 +102,8 @@ def _is_valid_reservation_number(reservation_number: str) -> bool:
         bool: True if valid format, False otherwise
     """
     # Simple validation: should be 6 characters, alphanumeric
-    return (reservation_number and 
-            len(reservation_number) == 6 and 
+    return (reservation_number and
+            len(reservation_number) == 6 and
             reservation_number.isalnum())
 
 
