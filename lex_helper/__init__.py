@@ -14,6 +14,13 @@ from lex_helper.channels.lex import LexChannel
 from lex_helper.channels.sms import SMSChannel
 from lex_helper.core import dialog
 from lex_helper.core.handler import Config, LexHelper
+from lex_helper.core.invoke_bedrock import (
+    BedrockInvocationError,
+    invoke_bedrock,
+    invoke_bedrock_converse,
+    invoke_bedrock_simple_converse,
+)
+from lex_helper.core.message_manager import MessageManager, get_message, set_locale
 from lex_helper.core.types import (
     Bot,
     DialogAction,
@@ -39,33 +46,39 @@ from lex_helper.exceptions.handlers import handle_exceptions
 from lex_helper.formatters.buttons import Button
 
 __all__ = [
-    'format_for_channel',
-    'PlainText',
-    'dialog',
-    'LexBaseResponse',
-    'DialogAction',
+    'BedrockInvocationError',
     'Bot',
+    'Button',
     'Channel',
     'Config',
-    'LexHelper',
-    'LexSlot',
+    'DialogAction',
+    'dialog',
+    'format_for_channel',
+    'get_message',
+    'handle_exceptions',
+    'ImageResponseCard',
     'Intent',
     'Interpretation',
-    'ImageResponseCard',
+    'invoke_bedrock',
+    'invoke_bedrock_converse',
+    'invoke_bedrock_simple_converse',
+    'LexBaseResponse',
     'LexChannel',
     'LexCustomPayload',
+    'LexHelper',
     'LexImageResponseCard',
     'LexMessages',
     'LexPlainText',
     'LexRequest',
     'LexResponse',
-    'SessionAttributes',
-    'SessionState',
+    'LexSlot',
+    'MessageManager',
+    'PlainText',
     'SentimentResponse',
     'SentimentScore',
+    'SessionAttributes',
+    'SessionState',
+    'set_locale',
     'SMSChannel',
     'Transcription',
-    'Button',
-    'handle_exceptions',
-
 ]

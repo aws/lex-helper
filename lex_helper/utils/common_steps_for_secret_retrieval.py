@@ -3,7 +3,7 @@
 
 import configparser
 import os
-from typing import Optional
+from typing import Dict, Optional
 
 
 def common_steps_for_secret_retrieval(
@@ -17,11 +17,11 @@ def common_steps_for_secret_retrieval(
         configparser.ConfigParser: The configuration object.
     """
 
-    account_environment_map = {"90723193": "pentest"}
+    account_environment_map: Dict[str, str] = {}  # Configure this for your environment
 
     config_obj = configparser.ConfigParser()
     if account_id is None:
-        env = os.environ.get("APP_NAME", "dev")
+        env: str = os.environ.get("APP_NAME", "dev")
         if env not in ["dev", "si", "prd"]:
             env = "dev"
     else:

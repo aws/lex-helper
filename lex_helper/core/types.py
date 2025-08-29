@@ -167,8 +167,10 @@ class SessionAttributes(BaseModel):
     user_authenticated: bool = False  # User is authenticated?
 
     error_number: Optional[str] = None  # What is the error number?
-    previous_dialog_action_type: str = ""  # What was the last dialog action type?
-    previous_slot_to_elicit: str = ""  # What was the last slot to elicit?
+    previous_dialog_action_type: Optional[str] = None  # What was the last dialog action type?
+    previous_slot_to_elicit: Optional[str] = None  # What was the last slot to elicit?
+    previous_intent: Optional[str] = None  # To identify intent switch
+    previous_message: Optional[str] = None  # Needed for reprompt
     options_provided: Optional[str] = None  # Options provided for "case options"
 
     language: Optional[str] = None  # What language is the user using?
@@ -181,7 +183,7 @@ class SessionAttributes(BaseModel):
     slot_error_count: int = (
         0  # How many times have we errored on a slot?
     )
-    previous_message: Optional[str] = None  # Needed for reprompt
+    
 
     # Agent Escalation
     escalate_to_agent_non_english: bool = True
@@ -207,8 +209,7 @@ class SessionAttributes(BaseModel):
     channel: str = "lex"
 
     user_text: Optional[str] = ""
-    previous_intent: Optional[str] = None  # To identify intent switch
-
+    
     def to_cmd_response(self):
         response = ""
         self_dict = self.model_dump()

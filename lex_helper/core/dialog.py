@@ -194,9 +194,7 @@ def elicit_slot(slot_to_elicit: LexSlot | str, messages: LexMessages, lex_reques
     Returns:
     LexResponse: The response object to be sent back to Lex.
     """
-    intent = lex_request.sessionState.intent
-    session_attributes = lex_request.sessionState.sessionAttributes
-
+    intent, active_contexts, session_attributes, _ = get_request_components(lex_request=lex_request)
     active_contexts = remove_inactive_context(lex_request)
     intent.state = "InProgress"
 
@@ -205,7 +203,7 @@ def elicit_slot(slot_to_elicit: LexSlot | str, messages: LexMessages, lex_reques
     session_attributes.options_provided = get_provided_options(messages)
     session_attributes.previous_intent = intent.name
     session_attributes.previous_message = json.dumps(messages, cls=PydanticEncoder)
-    session_attributes.previous_dialog_action_type = "ElicitSlot"
+    #session_attributes.previous_dialog_action_type = "ElicitSlot"
     slot_name = slot_to_elicit
 
     if not isinstance(slot_to_elicit, str):
@@ -564,7 +562,15 @@ def get_request_components(
 
 def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
     """
-    Checks if there are any unknown slot choices in the LexRequest.
+    Checks if the user provided an invalid response to a previous slot elicitation.
+    
+    Use this function at the beginning of your intent handlers to detect when users
+    respond with unrecognized choices (e.g., "X" when options were "A, B, C").
+    
+    Usage:
+        if dialog.any_unknown_slot_choices(lex_request):
+            return dialog.handle_any_unknown_slot_choice(lex_request)
+        # Continue with normal intent logic
 
     Parameters:
     lex_request (LexRequest): The LexRequest object containing session state.
@@ -574,33 +580,41 @@ def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
     """
     intent, _, session_attributes, _ = get_request_components(lex_request)
 
-    if "ElicitSlot" == session_attributes.previous_dialog_action_type:
-        logger.debug("ElicitSlot is the previous dialog action")
+    if "ElicitSlot" != session_attributes.previous_dialog_action_type:
+        lex_request.sessionState.sessionAttributes.error_count = 0
+        return False
 
-        intent = get_intent(lex_request)
-        previous_slot_to_elicit = session_attributes.previous_slot_to_elicit
-        slot_name = previous_slot_to_elicit
+    logger.debug("ElicitSlot is the previous dialog action")
+    previous_slot_to_elicit = session_attributes.previous_slot_to_elicit
+    
+    if not previous_slot_to_elicit:
+        return False
 
-        choice = get_slot(slot_name, intent)
-        if not choice:
-            logger.debug("Unknown slot choice")
-            choice = "Unknown"
-        logger.debug("Parsed choice: " + str(choice))
-
-        if isinstance(choice, str):
-            logger.debug("Slot recognized correctly, letting Lex continue with the conversation")
-            lex_request.sessionState.sessionAttributes.error_count = 0
-            return False
-
+    # Extract actual slot name from the stored format
+    slot_name = previous_slot_to_elicit.split(".")[-1].lower() if "." in previous_slot_to_elicit else previous_slot_to_elicit
+    
+    # Check if the slot exists and has a value
+    slot_data = intent.slots.get(slot_name)
+    if not slot_data or not slot_data.get("value"):
+        logger.debug(f"Unknown slot choice - no value for slot: {slot_name}")
         return True
 
+    # If slot has a value, it was recognized
+    logger.debug("Slot recognized correctly, letting Lex continue with the conversation")
     lex_request.sessionState.sessionAttributes.error_count = 0
     return False
 
 
 def handle_any_unknown_slot_choice(lex_request: LexRequest[T]) -> LexResponse[T]:
     """
-    Handles any unknown slot choice in the LexRequest.
+    Automatically handles invalid slot responses by delegating back to Lex or using custom logic.
+    
+    This function processes the invalid choice and either continues the conversation
+    or triggers custom error handling via unknown_choice_handler.
+    
+    Usage:
+        if dialog.any_unknown_slot_choices(lex_request):
+            return dialog.handle_any_unknown_slot_choice(lex_request)
 
     Parameters:
     lex_request (LexRequest): The LexRequest object containing session state.
@@ -635,11 +649,24 @@ def unknown_choice_handler(
     next_invo_label: Optional[str] = "",
 ) -> LexResponse[T]:
     """
-    Handles an unknown choice in the LexRequest.
+    Customizable handler for processing invalid user choices.
+    
+    Override this function or call it directly to implement custom logic when users
+    provide invalid responses to slot elicitations (buttons, multiple choice, etc.).
+    
+    Usage:
+        # Custom handling
+        return dialog.unknown_choice_handler(
+            lex_request=lex_request,
+            choice="invalid_response",
+            next_intent="clarification_intent"
+        )
+        
+        # Or override the function entirely for global custom behavior
 
     Parameters:
     lex_request (LexRequest): The LexRequest object containing session state.
-    choice (str | LexSlot | None): The choice to handle.
+    choice (str | LexSlot | None): The invalid choice provided by the user.
     handle_unknown (Optional[bool]): Whether to handle unknown choices.
     next_intent (Optional[str]): The next intent to transition to.
     next_invo_label (Optional[str]): The next invocation label.
@@ -650,27 +677,71 @@ def unknown_choice_handler(
     return delegate(lex_request=lex_request)
 
 
-# def string_to_lex_slot(value: str) -> LexSlot:
-#     """
-#     Converts a string to a LexSlot enum member.
 
-#     Parameters:
-#     value (str): The string representation of the LexSlot.
+def callback_original_intent_handler(lex_request: LexRequest[T], messages: Optional[LexMessages] = None) -> LexResponse[T]:
+    """
+    
+    Handles switching the conversation flow to an initial intent.
+    Assume a scenario in which the conversation flow starts with intent A, 
+    transitions to intent B, returns to intent A after fulfilling the steps in intent B. 
+    
+    For instance, from a MakeReservation intent to an Authenticate intent
+    and back to the MakeReservation intent. 
+    
+    This method assumes that the session attributes callback_event and callback_handler have been
+    populated from the calling intent A as in the example below. 
+    
+        lex_request.sessionState.sessionAttributes.callback_handler = lex_request.sessionState.intent.name
+        lex_request.sessionState.sessionAttributes.callback_event = json.dumps(lex_request, default=str)
+        message = (
+            f"Before I can help your reservation, you will need to authenticate. "
+        )
+        return dialog.transition_to_intent(
+            intent_name="Authenticate",
+            lex_request=lex_request,
+            messages=[LexPlainText(content=message)]
+        )
+    
+    Invoke callback_original_intent_handler from intent B to switch back to the original intent. 
+    
+    
+    Args:
+        lex_request (LexRequest[T]): _description_
 
-#     Returns:
-#     LexSlot: The corresponding LexSlot enum member.
+    Returns:
+        LexResponse[T]: _description_
+    """
+    logger.debug("CALLING BACK ORIGINAL HANDLER")
 
-#     Raises:
-#     ValueError: If no enum class is found for the given string.
-#     """
-#     class_name, member_name = value.split(".")
-#     enum_class = LexSlot_Classes.get(class_name)
+    callback_event = lex_request.sessionState.sessionAttributes.callback_event
+    callback_handler = lex_request.sessionState.sessionAttributes.callback_handler or ""
+    if not callback_event and not callback_handler:
+        logger.debug("NO CALLBACK EVENT OR HANDLER")
+        lex_request.sessionState.intent.name = "greeting"
+        return call_handler_for_file("greeting", lex_request)
 
-#     if not enum_class:
-#         raise ValueError(f"No enum class named '{class_name}' found.")
+    if callback_event:
+        callback_request = json.loads(callback_event)
+        logger.debug("Callback request {}".format(callback_request))
+        del lex_request.sessionState.sessionAttributes.callback_event
+        del lex_request.sessionState.sessionAttributes.callback_handler
+        lex_payload: LexRequest[T] = LexRequest(**callback_request)
+        
+        logger.debug("MERGING SESSION ATTRIBUTES")
+        merged_attrs = lex_payload.sessionState.sessionAttributes.model_dump()
+        merged_attrs.update({k: v for k, v in lex_request.sessionState.sessionAttributes.model_dump().items() if v is not None})
+        lex_payload.sessionState.sessionAttributes = type(lex_payload.sessionState.sessionAttributes)(**merged_attrs)
+    else:
+        lex_payload = lex_request
+        lex_payload.sessionState.intent.slots = {}
+        lex_payload.sessionState.intent.name = callback_handler
 
-#     member = enum_class[member_name]
-#     return member
+    response = call_handler_for_file(callback_handler, lex_payload)
+    
+    if messages:
+        response.messages = list(messages) + list(response.messages)
+    
+    return response
 
 
 def reprompt_slot(lex_request: LexRequest[T]) -> LexResponse[T]:

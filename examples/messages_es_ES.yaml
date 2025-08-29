@@ -1,0 +1,10 @@
+welcome: "¡Hola! ¿Cómo puedo ayudarte hoy?"
+greeting:
+  welcome: "¡Bienvenido a nuestro servicio!"
+  goodbye: "¡Gracias por usar nuestro servicio!"
+error:
+  general: "Lo siento, algo salió mal. Por favor, inténtalo de nuevo."
+  validation: "Por favor, proporciona una entrada válida."
+confirmation:
+  yes: "¡Perfecto! Procederé con eso."
+  no: "No hay problema, avísame si necesitas algo más."
