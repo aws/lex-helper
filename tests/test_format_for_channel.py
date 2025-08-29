@@ -1,7 +1,6 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Union
 
 from lex_helper import (
     Intent,
@@ -21,9 +20,7 @@ def test_format_for_channel_sms():
         LexPlainText(content="Next message is a hyperlink"),
         LexPlainText(content="https://examplehyperlink"),
     )
-    formatted_for_sms = format_for_channel(
-        response=sample_response_with_href, channel_string="sms"
-    )
+    formatted_for_sms = format_for_channel(response=sample_response_with_href, channel_string="sms")
     received_messages = formatted_for_sms["messages"]
     expected_messages = [
         {"content": "Next message is a hyperlink", "contentType": "PlainText"},
@@ -34,10 +31,7 @@ def test_format_for_channel_sms():
 
 
 def get_sample_lex_response(
-    *args: Union[
-        LexBaseResponse,
-        PlainText,
-    ],
+    *args: LexBaseResponse | PlainText,
 ) -> LexResponse[SessionAttributes]:
     messages: LexMessages = [card for card in args]
 

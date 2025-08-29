@@ -37,9 +37,9 @@ def test_elicit_missing_slot():
     # Create request without required slot
     request_dict = create_test_request(slots={})
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     response = handle_booking_intent(lex_request)
-    
+
     # Verify slot elicitation
     assert response.sessionState.dialogAction.type == "ElicitSlot"
     assert response.sessionState.dialogAction.slotToElicit == "destination"
@@ -52,9 +52,9 @@ def test_slot_validation():
     slots = {"email": {"value": {"originalValue": "invalid-email"}}}
     request_dict = create_test_request(slots=slots)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     response = handle_booking_intent(lex_request)
-    
+
     # Should re-elicit the slot
     assert response.sessionState.dialogAction.type == "ElicitSlot"
     assert response.sessionState.dialogAction.slotToElicit == "email"
@@ -68,9 +68,9 @@ def test_all_slots_filled():
     }
     request_dict = create_test_request(slots=slots)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     response = handle_booking_intent(lex_request)
-    
+
     # Should delegate or close
     assert response.sessionState.dialogAction.type in ["Delegate", "Close"]
 ```
@@ -84,14 +84,14 @@ def test_intent_transition():
     """Test transitioning between intents"""
     request_dict = create_test_request()
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     # Simulate transition to authentication
     response = dialog.transition_to_intent(
         intent_name="authenticate",
         lex_request=lex_request,
         messages=[LexPlainText(content="Please authenticate")]
     )
-    
+
     assert response.sessionState.intent.name == "authenticate"
     assert len(response.messages) > 0
     assert response.messages[0].content == "Please authenticate"
@@ -101,13 +101,13 @@ def test_callback_pattern():
     # Set up callback
     request_dict = create_test_request()
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     lex_request.sessionState.sessionAttributes.callback_handler = "BookingIntent"
     lex_request.sessionState.sessionAttributes.callback_event = json.dumps(lex_request, default=str)
-    
+
     # Test callback handler
     response = dialog.callback_original_intent_handler(lex_request)
-    
+
     assert response is not None
     # Verify session attributes were merged properly
 ```
@@ -129,7 +129,7 @@ def test_unknown_slot_choice_detection():
         session_attrs=session_attrs
     )
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     # Should detect unknown choice
     assert dialog.any_unknown_slot_choices(lex_request) == True
 
@@ -142,7 +142,7 @@ def test_valid_slot_choice():
     slots = {"destination": {"value": {"originalValue": "Paris"}}}
     request_dict = create_test_request(slots=slots, session_attrs=session_attrs)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     # Should not detect unknown choice
     assert dialog.any_unknown_slot_choices(lex_request) == False
 
@@ -155,9 +155,9 @@ def test_error_count_increment():
     }
     request_dict = create_test_request(slots={}, session_attrs=session_attrs)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     dialog.any_unknown_slot_choices(lex_request)
-    
+
     # Error count should increment
     assert lex_request.sessionState.sessionAttributes.error_count == 2
 ```
@@ -172,19 +172,19 @@ def test_complete_booking_flow():
     # Step 1: Initial request
     request_dict = create_test_request()
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     response1 = handle_booking_intent(lex_request)
     assert response1.sessionState.dialogAction.type == "ElicitSlot"
-    
+
     # Step 2: Provide destination
     slots = {"destination": {"value": {"originalValue": "Paris"}}}
     request_dict = create_test_request(slots=slots)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     response2 = handle_booking_intent(lex_request)
     # Should elicit next slot (date)
     assert response2.sessionState.dialogAction.slotToElicit == "date"
-    
+
     # Step 3: Complete all slots
     slots = {
         "destination": {"value": {"originalValue": "Paris"}},
@@ -193,7 +193,7 @@ def test_complete_booking_flow():
     }
     request_dict = create_test_request(slots=slots)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     response3 = handle_booking_intent(lex_request)
     assert response3.sessionState.dialogAction.type in ["Delegate", "Close"]
 ```
@@ -208,12 +208,12 @@ def test_session_attribute_persistence():
     session_attrs = {"user_name": "John", "visit_count": 1}
     request_dict = create_test_request(session_attrs=session_attrs)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     # Modify session attributes
     lex_request.sessionState.sessionAttributes.visit_count += 1
-    
+
     response = handle_booking_intent(lex_request)
-    
+
     # Verify attributes are maintained
     assert response.sessionState.sessionAttributes.user_name == "John"
     assert response.sessionState.sessionAttributes.visit_count == 2
@@ -223,7 +223,7 @@ def test_session_attribute_merging():
     # Create original request with callback data
     original_attrs = {"user_name": "John", "booking_id": "123"}
     callback_event = json.dumps(create_test_request(session_attrs=original_attrs), default=str)
-    
+
     # Create current request with additional attributes
     current_attrs = {
         "callback_event": callback_event,
@@ -232,9 +232,9 @@ def test_session_attribute_merging():
     }
     request_dict = create_test_request(session_attrs=current_attrs)
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     response = dialog.callback_original_intent_handler(lex_request)
-    
+
     # Both original and current attributes should be present
     assert hasattr(response.sessionState.sessionAttributes, 'user_name')
     assert hasattr(response.sessionState.sessionAttributes, 'auth_token')
@@ -251,9 +251,9 @@ def test_message_loading():
         {"contentType": "PlainText", "content": "Hello!"},
         {"contentType": "ImageResponseCard", "imageResponseCard": {"title": "Test"}}
     ]'''
-    
+
     messages = dialog.load_messages(messages_json)
-    
+
     assert len(messages) == 2
     assert isinstance(messages[0], LexPlainText)
     assert messages[0].content == "Hello!"
@@ -262,9 +262,9 @@ def test_message_prepending():
     """Test that messages are properly prepended in transitions"""
     request_dict = create_test_request()
     lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
-    
+
     input_messages = [LexPlainText(content="Transition message")]
-    
+
     # Mock the handler to return a response with messages
     def mock_handler(intent_name, lex_request):
         return dialog.LexResponse(
@@ -272,14 +272,14 @@ def test_message_prepending():
             messages=[LexPlainText(content="Handler message")],
             requestAttributes={}
         )
-    
+
     # Test message prepending
     response = dialog.transition_to_intent(
         intent_name="test_intent",
         lex_request=lex_request,
         messages=input_messages
     )
-    
+
     # Input messages should come first
     assert len(response.messages) >= 1
     assert response.messages[0].content == "Transition message"
@@ -296,12 +296,12 @@ def test_message_loading():
     set_locale("en_US")
     greeting = get_message("greeting")
     assert "Hello" in greeting
-    
+
     # Test Spanish messages
     set_locale("es_ES")
     spanish_greeting = get_message("greeting")
     assert "Hola" in spanish_greeting
-    
+
     # Test fallback to default
     fallback_message = get_message("nonexistent.key", "Default message")
     assert fallback_message == "Default message"
@@ -309,13 +309,13 @@ def test_message_loading():
 def test_locale_override():
     """Test locale override in get_message"""
     set_locale("en_US")
-    
+
     # Get message in current locale
     english_msg = get_message("greeting")
-    
+
     # Override locale for specific message
     spanish_msg = get_message("greeting", locale="es_ES")
-    
+
     assert english_msg != spanish_msg
     assert "Hello" in english_msg
     assert "Hola" in spanish_msg
@@ -324,9 +324,9 @@ def test_message_manager_singleton():
     """Test MessageManager singleton behavior"""
     manager1 = MessageManager()
     manager2 = MessageManager()
-    
+
     assert manager1 is manager2
-    
+
     # Test that locale changes affect all instances
     manager1.set_locale("fr_FR")
     french_msg = manager2.get_message("greeting")
@@ -335,11 +335,11 @@ def test_message_manager_singleton():
 def test_nested_message_keys():
     """Test nested message key access"""
     set_locale("en_US")
-    
+
     # Test nested key access
     agent_confirmation = get_message("agent.confirmation")
     error_general = get_message("error.general")
-    
+
     assert agent_confirmation != "Message not found: agent.confirmation"
     assert error_general != "Message not found: error.general"
 ```

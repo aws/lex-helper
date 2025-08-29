@@ -1,7 +1,8 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Any, Callable, Generic, Optional, TypeVar
+from collections.abc import Callable
+from typing import Any, Generic, TypeVar
 
 from loguru import logger
 from pydantic import BaseModel
@@ -27,7 +28,10 @@ T = TypeVar("T", bound=SessionAttributes)
 
 class Config(BaseModel, Generic[T]):
     session_attributes: T
-    package_name: Optional[str] = "fulfillment_function" # This is the name of the package to import the intents from.  Should be the same as the name of the package you're running the handler from.
+    package_name: str | None = (
+        "fulfillment_function"  # This is the name of the package to import the intents from.  Should be the same as the name of the package you're running the handler from.
+    )
+
 
 class LexHelper(Generic[T]):
     def __init__(self, config: Config[T]):
@@ -49,7 +53,7 @@ class LexHelper(Generic[T]):
         Returns:
             dict[str, Any]: A formatted response ready to be sent back to Amazon Lex.
         """
-        logger.trace(f"START")
+        logger.trace("START")
         sessionAttributes: T = self.config.session_attributes
         logger.debug(f"SessionAttributes type: {type(sessionAttributes)}")
         lex_payload: LexRequest[T] = parse_lex_request(event, sessionAttributes)
@@ -82,7 +86,7 @@ class LexHelper(Generic[T]):
         logger.debug(f"Lex-Intent : {lex_intent_name}")
 
         # Handlers is a list of functions that take a LexRequest and return a LexResponse
-        handlers: list[Callable[[LexRequest[T]], Optional[LexResponse[T]]]] = [
+        handlers: list[Callable[[LexRequest[T]], LexResponse[T] | None]] = [
             self.regular_intent_handler,
         ]
 
@@ -115,7 +119,9 @@ class LexHelper(Generic[T]):
                 callback_name = response.requestAttributes["callback"]
                 logger.debug(f"CALLBACK FOUND : {callback_name}")
                 response.requestAttributes.pop("callback")
-                response = call_handler_for_file(intent_name=callback_name, lex_request=lex_payload, package_name=self.config.package_name)
+                response = call_handler_for_file(
+                    intent_name=callback_name, lex_request=lex_payload, package_name=self.config.package_name
+                )
                 lex_payload.sessionState = response.sessionState
                 messages += response.messages
             response.messages = messages
@@ -135,7 +141,7 @@ class LexHelper(Generic[T]):
             logger.exception(e)
             raise e
 
-    def regular_intent_handler(self, lex_payload: LexRequest[T]) -> Optional[LexResponse[T]]:
+    def regular_intent_handler(self, lex_payload: LexRequest[T]) -> LexResponse[T] | None:
         """
         Route the incoming request based on intent.
         The JSON body of the request is provided in the event slot.
@@ -145,7 +151,7 @@ class LexHelper(Generic[T]):
         intent_name = intent.name
         lex_payload.sessionState.sessionAttributes.lex_intent = intent.name
 
-        response: Optional[LexResponse[T]] = None
+        response: LexResponse[T] | None = None
 
         if not intent_name.__contains__("Common_Exit_Feedback"):
             lex_payload.sessionState.activeContexts = [
@@ -162,5 +168,7 @@ class LexHelper(Generic[T]):
         else:
             intent_name = lex_payload.sessionState.intent.name
             logger.debug(f"Calling handler for intent : {intent_name}")
-            response = call_handler_for_file(intent_name=intent_name, lex_request=lex_payload, package_name=self.config.package_name)
+            response = call_handler_for_file(
+                intent_name=intent_name, lex_request=lex_payload, package_name=self.config.package_name
+            )
         return response

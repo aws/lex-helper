@@ -11,6 +11,8 @@ from lex_helper.core.types import LexRequest, SessionAttributes
 from lex_helper.utils.string import title_to_snake
 
 T = TypeVar("T", bound=SessionAttributes)
+
+
 def call_method_for_file(intent_name: str, lex_request: LexRequest[T], method: str):
     # Determine the file to import based on intent_name
     if "_" in intent_name:

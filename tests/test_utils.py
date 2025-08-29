@@ -22,7 +22,6 @@ def test_find_digit():
     assert find_digit("multiple 123 456") == 1
 
 
-
 def test_title_to_snake():
     """Test converting title case to snake case"""
     assert title_to_snake("HelloWorld") == "hello_world"
@@ -37,4 +36,3 @@ def test_str_to_bool():
     assert str_to_bool("1") is True
     assert str_to_bool("0") is False
     assert str_to_bool("invalid") is False
-

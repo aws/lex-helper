@@ -7,7 +7,7 @@ Standard util methods to manage dialog state
 
 import json
 import logging
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 from pydantic import BaseModel
 
@@ -40,7 +40,7 @@ class PydanticEncoder(json.JSONEncoder):
 T = TypeVar("T", bound=SessionAttributes)
 
 
-def get_sentiment(lex_request: LexRequest[T]) -> Optional[str]:
+def get_sentiment(lex_request: LexRequest[T]) -> str | None:
     """
     Extracts the sentiment from the first interpretation in a LexRequest.
 
@@ -203,7 +203,7 @@ def elicit_slot(slot_to_elicit: LexSlot | str, messages: LexMessages, lex_reques
     session_attributes.options_provided = get_provided_options(messages)
     session_attributes.previous_intent = intent.name
     session_attributes.previous_message = json.dumps(messages, cls=PydanticEncoder)
-    #session_attributes.previous_dialog_action_type = "ElicitSlot"
+    # session_attributes.previous_dialog_action_type = "ElicitSlot"
     slot_name = slot_to_elicit
 
     if not isinstance(slot_to_elicit, str):
@@ -326,9 +326,7 @@ def get_slot(slot_name: LexSlot | str, intent: Intent, **kwargs: Any):
         return None
 
 
-def get_composite_slot(
-    slot_name: str, intent: Intent, preference: Optional[str] = None
-) -> Optional[Dict[str, Union[str, None]]]:
+def get_composite_slot(slot_name: str, intent: Intent, preference: str | None = None) -> dict[str, str | None] | None:
     """
     Retrieves the values from sub-slots of a given slot from an intent.
 
@@ -409,7 +407,7 @@ def get_slot_value(slot: dict[str, Any], **kwargs: Any):
 def set_subslot(
     composite_slot_name: LexSlot,
     subslot_name: str,
-    subslot_value: Optional[Any],
+    subslot_value: Any | None,
     intent: Intent,
 ) -> Intent:
     """
@@ -448,7 +446,7 @@ def set_subslot(
     return intent
 
 
-def set_slot(slot_name: LexSlot, slot_value: Optional[str], intent: Intent) -> Intent:
+def set_slot(slot_name: LexSlot, slot_value: str | None, intent: Intent) -> Intent:
     """
     Sets a slot value in the given intent.
 
@@ -470,7 +468,7 @@ def set_slot(slot_name: LexSlot, slot_value: Optional[str], intent: Intent) -> I
     return intent
 
 
-def get_composite_slot_subslot(composite_slot: LexSlot, sub_slot: Any, intent: Intent, **kwargs: Any) -> Optional[str]:
+def get_composite_slot_subslot(composite_slot: LexSlot, sub_slot: Any, intent: Intent, **kwargs: Any) -> str | None:
     """
     Retrieves the value of a subslot from a composite slot in an intent.
 
@@ -509,7 +507,7 @@ def get_active_contexts(lex_request: LexRequest[T]) -> ActiveContexts:
         return []
 
 
-def get_invocation_label(lex_request: LexRequest[T]) -> Optional[str]:
+def get_invocation_label(lex_request: LexRequest[T]) -> str | None:
     """
     Retrieves the invocation label from a LexRequest.
 
@@ -534,7 +532,7 @@ def safe_delete_session_attribute(lex_request: LexRequest[T], attribute: str) ->
     Returns:
     LexRequest: The updated LexRequest with the attribute deleted.
     """
-    logger.debug("Deleting session attribute {}".format(attribute))
+    logger.debug(f"Deleting session attribute {attribute}")
     if lex_request.sessionState.sessionAttributes and getattr(lex_request.sessionState.sessionAttributes, attribute):
         setattr(lex_request.sessionState.sessionAttributes, attribute, None)
     return lex_request
@@ -542,7 +540,7 @@ def safe_delete_session_attribute(lex_request: LexRequest[T], attribute: str) ->
 
 def get_request_components(
     lex_request: LexRequest[T],
-) -> tuple[Intent, ActiveContexts, T, Optional[str]]:
+) -> tuple[Intent, ActiveContexts, T, str | None]:
     """
     Extracts common components from the intent request.
 
@@ -563,10 +561,10 @@ def get_request_components(
 def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
     """
     Checks if the user provided an invalid response to a previous slot elicitation.
-    
+
     Use this function at the beginning of your intent handlers to detect when users
     respond with unrecognized choices (e.g., "X" when options were "A, B, C").
-    
+
     Usage:
         if dialog.any_unknown_slot_choices(lex_request):
             return dialog.handle_any_unknown_slot_choice(lex_request)
@@ -586,13 +584,13 @@ def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
 
     logger.debug("ElicitSlot is the previous dialog action")
     previous_slot_to_elicit = session_attributes.previous_slot_to_elicit
-    
+
     if not previous_slot_to_elicit:
         return False
 
     # Extract actual slot name from the stored format
     slot_name = previous_slot_to_elicit.split(".")[-1].lower() if "." in previous_slot_to_elicit else previous_slot_to_elicit
-    
+
     # Check if the slot exists and has a value
     slot_data = intent.slots.get(slot_name)
     if not slot_data or not slot_data.get("value"):
@@ -608,10 +606,10 @@ def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
 def handle_any_unknown_slot_choice(lex_request: LexRequest[T]) -> LexResponse[T]:
     """
     Automatically handles invalid slot responses by delegating back to Lex or using custom logic.
-    
+
     This function processes the invalid choice and either continues the conversation
     or triggers custom error handling via unknown_choice_handler.
-    
+
     Usage:
         if dialog.any_unknown_slot_choices(lex_request):
             return dialog.handle_any_unknown_slot_choice(lex_request)
@@ -631,10 +629,10 @@ def handle_any_unknown_slot_choice(lex_request: LexRequest[T]) -> LexResponse[T]
     logger.debug("Unparsed slot name: " + previous_slot_to_elicit)
     slot_name = previous_slot_to_elicit
 
-    logger.debug("IDENTIFIER FOR BAD SLOT {}".format(slot_name))
+    logger.debug(f"IDENTIFIER FOR BAD SLOT {slot_name}")
 
     choice = get_slot(slot_name, intent, preference="interpretedValue")
-    logger.debug("BAD CHOICE IS {}".format(choice))
+    logger.debug(f"BAD CHOICE IS {choice}")
     if not isinstance(choice, str):
         logger.debug("Bad slot choice")
         return unknown_choice_handler(lex_request=lex_request, choice=choice)
@@ -644,16 +642,16 @@ def handle_any_unknown_slot_choice(lex_request: LexRequest[T]) -> LexResponse[T]
 def unknown_choice_handler(
     lex_request: LexRequest[T],
     choice: str | LexSlot | None,
-    handle_unknown: Optional[bool] = True,
-    next_intent: Optional[str] = None,
-    next_invo_label: Optional[str] = "",
+    handle_unknown: bool | None = True,
+    next_intent: str | None = None,
+    next_invo_label: str | None = "",
 ) -> LexResponse[T]:
     """
     Customizable handler for processing invalid user choices.
-    
+
     Override this function or call it directly to implement custom logic when users
     provide invalid responses to slot elicitations (buttons, multiple choice, etc.).
-    
+
     Usage:
         # Custom handling
         return dialog.unknown_choice_handler(
@@ -661,7 +659,7 @@ def unknown_choice_handler(
             choice="invalid_response",
             next_intent="clarification_intent"
         )
-        
+
         # Or override the function entirely for global custom behavior
 
     Parameters:
@@ -677,20 +675,19 @@ def unknown_choice_handler(
     return delegate(lex_request=lex_request)
 
 
-
-def callback_original_intent_handler(lex_request: LexRequest[T], messages: Optional[LexMessages] = None) -> LexResponse[T]:
+def callback_original_intent_handler(lex_request: LexRequest[T], messages: LexMessages | None = None) -> LexResponse[T]:
     """
-    
+
     Handles switching the conversation flow to an initial intent.
-    Assume a scenario in which the conversation flow starts with intent A, 
-    transitions to intent B, returns to intent A after fulfilling the steps in intent B. 
-    
+    Assume a scenario in which the conversation flow starts with intent A,
+    transitions to intent B, returns to intent A after fulfilling the steps in intent B.
+
     For instance, from a MakeReservation intent to an Authenticate intent
-    and back to the MakeReservation intent. 
-    
+    and back to the MakeReservation intent.
+
     This method assumes that the session attributes callback_event and callback_handler have been
-    populated from the calling intent A as in the example below. 
-    
+    populated from the calling intent A as in the example below.
+
         lex_request.sessionState.sessionAttributes.callback_handler = lex_request.sessionState.intent.name
         lex_request.sessionState.sessionAttributes.callback_event = json.dumps(lex_request, default=str)
         message = (
@@ -701,10 +698,10 @@ def callback_original_intent_handler(lex_request: LexRequest[T], messages: Optio
             lex_request=lex_request,
             messages=[LexPlainText(content=message)]
         )
-    
-    Invoke callback_original_intent_handler from intent B to switch back to the original intent. 
-    
-    
+
+    Invoke callback_original_intent_handler from intent B to switch back to the original intent.
+
+
     Args:
         lex_request (LexRequest[T]): _description_
 
@@ -722,14 +719,16 @@ def callback_original_intent_handler(lex_request: LexRequest[T], messages: Optio
 
     if callback_event:
         callback_request = json.loads(callback_event)
-        logger.debug("Callback request {}".format(callback_request))
+        logger.debug(f"Callback request {callback_request}")
         del lex_request.sessionState.sessionAttributes.callback_event
         del lex_request.sessionState.sessionAttributes.callback_handler
         lex_payload: LexRequest[T] = LexRequest(**callback_request)
-        
+
         logger.debug("MERGING SESSION ATTRIBUTES")
         merged_attrs = lex_payload.sessionState.sessionAttributes.model_dump()
-        merged_attrs.update({k: v for k, v in lex_request.sessionState.sessionAttributes.model_dump().items() if v is not None})
+        merged_attrs.update(
+            {k: v for k, v in lex_request.sessionState.sessionAttributes.model_dump().items() if v is not None}
+        )
         lex_payload.sessionState.sessionAttributes = type(lex_payload.sessionState.sessionAttributes)(**merged_attrs)
     else:
         lex_payload = lex_request
@@ -737,10 +736,10 @@ def callback_original_intent_handler(lex_request: LexRequest[T], messages: Optio
         lex_payload.sessionState.intent.name = callback_handler
 
     response = call_handler_for_file(callback_handler, lex_payload)
-    
+
     if messages:
         response.messages = list(messages) + list(response.messages)
-    
+
     return response
 
 
@@ -762,12 +761,11 @@ def reprompt_slot(lex_request: LexRequest[T]) -> LexResponse[T]:
         return delegate(lex_request)
     logger.debug("Unparsed slot name: " + previous_slot_to_elicit)
     slot_name = previous_slot_to_elicit
-    logger.debug("IDENTIFIER 3 {}".format(slot_name))
+    logger.debug(f"IDENTIFIER 3 {slot_name}")
     messages = []
-    logger.debug("Reprompt-Messages :: {}".format(messages))
+    logger.debug(f"Reprompt-Messages :: {messages}")
 
     return elicit_slot(slot_to_elicit=slot_name, messages=messages, lex_request=lex_request)
-
 
 
 def load_messages(messages: str) -> LexMessages:
@@ -845,7 +843,7 @@ def parse_lex_request(
     """
     # Create a copy of the data to modify
     data_copy = data.copy()
-    
+
     # If there are session attributes in the event, convert them to the proper model
     if data_copy.get("sessionState", {}).get("sessionAttributes"):
         event_attrs = data_copy["sessionState"]["sessionAttributes"]
@@ -868,7 +866,7 @@ def transition_to_intent(
     intent_name: str,
     lex_request: LexRequest[T],
     messages: LexMessages,
-    invocation_label: Optional[str] = None,
+    invocation_label: str | None = None,
     clear_slots: bool = True,
 ) -> LexResponse[T]:
     if clear_slots:
@@ -877,7 +875,7 @@ def transition_to_intent(
     # logger.debug(f"TRANSITION :: SESS-STATE : {lex_request.sessionState.sessionAttributes}")
     # Call the intent handler and get its response
     response = call_handler_for_file(intent_name=intent_name, lex_request=lex_request)
-    
+
     # Prepend the messages passed to transition_to_intent to the response messages
     if messages:
         response.messages = list(messages) + list(response.messages)
@@ -900,7 +898,7 @@ def transition_to_callback(
     )
 
 
-def _clear_slots(intent_name: str, lex_request: LexRequest[T], invocation_label: Optional[str] = None):
+def _clear_slots(intent_name: str, lex_request: LexRequest[T], invocation_label: str | None = None):
     lex_request.sessionState.intent.slots = {}
     lex_request.sessionState.intent.name = intent_name
 

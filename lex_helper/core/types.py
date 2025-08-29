@@ -1,6 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+from collections.abc import Sequence
 from enum import Enum
 from typing import (
     Annotated,
@@ -8,14 +9,11 @@ from typing import (
     Generic,
     Literal,
     Optional,
-    Sequence,
     TypeVar,
-    Union,
     cast,
 )
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
-from typing_extensions import Annotated
 
 from lex_helper.formatters.buttons import Button
 
@@ -23,20 +21,20 @@ from lex_helper.formatters.buttons import Button
 class ImageResponseCard(BaseModel):
     title: str
     subtitle: str = " "
-    imageUrl: Optional[str] = None
+    imageUrl: str | None = None
     buttons: list[Button] = []
 
 
 class LexPlainText(BaseModel):
-    content: Optional[str] = ""
+    content: str | None = ""
     contentType: Literal["PlainText"] = "PlainText"
 
 
 class PlainText(BaseModel):
-    content: Optional[str] = ""
+    content: str | None = ""
     contentType: Literal["PlainText"] = "PlainText"
-    title: Optional[str] = ""
-    subtitle: Optional[str] = ""
+    title: str | None = ""
+    subtitle: str | None = ""
 
 
 class LexCustomPayload(BaseModel):
@@ -50,25 +48,18 @@ class LexImageResponseCard(BaseModel):
 
 
 LexBaseResponse = Annotated[
-    Union[LexPlainText, LexImageResponseCard, LexCustomPayload],
+    LexPlainText | LexImageResponseCard | LexCustomPayload,
     Field(discriminator="contentType"),
 ]
 
 
 # Web Image Carousel
 class CustomPayloadImageCarousel(BaseModel):
-    customContentType: Literal["CustomPayloadImageCarousel"] = (
-        "CustomPayloadImageCarousel"
-    )
+    customContentType: Literal["CustomPayloadImageCarousel"] = "CustomPayloadImageCarousel"
     imageList: list[str] = []
 
 
-LexMessages = Sequence[
-    Union[
-        LexBaseResponse,
-        PlainText,
-    ]
-]
+LexMessages = Sequence[LexBaseResponse | PlainText]
 
 
 def parse_lex_response(data: dict[str, Any]) -> LexBaseResponse:
@@ -97,15 +88,15 @@ class SentimentResponse(BaseModel):
 
 class Intent(BaseModel):
     name: str
-    slots: dict[str, Optional[Any]] = {}
-    state: Optional[str] = None
-    confirmationState: Optional[str] = None
+    slots: dict[str, Any | None] = {}
+    state: str | None = None
+    confirmationState: str | None = None
 
 
 class Interpretation(BaseModel):
     intent: Intent
-    sentimentResponse: Optional[SentimentResponse] = None
-    nluConfidence: Optional[float] = None
+    sentimentResponse: SentimentResponse | None = None
+    nluConfidence: float | None = None
 
 
 class Bot(BaseModel):
@@ -122,8 +113,8 @@ class Prompt(BaseModel):
 
 
 class DialogAction(BaseModel):
-    type: Optional[str] = None
-    slotToElicit: Optional[str] = None
+    type: str | None = None
+    slotToElicit: str | None = None
 
 
 class ProposedNextState(BaseModel):
@@ -152,64 +143,55 @@ APIFailMethod = Literal[
 class SessionAttributes(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
 
-    callback_event: Optional[str] = None  # Used for saving the original event to replay
-    callback_handler: Optional[str] = (
-        None  # Used for saving the original event to replay
-    )
+    callback_event: str | None = None  # Used for saving the original event to replay
+    callback_handler: str | None = None  # Used for saving the original event to replay
     error_count: int = 0  # How many times have we errored?
 
     # Authentication Related
-    customer_type: Optional[str] = None
-    imei: Optional[str] = None
-    auth_status: Optional[str] = None
-    consumer_id: Optional[str] = None
+    customer_type: str | None = None
+    imei: str | None = None
+    auth_status: str | None = None
+    consumer_id: str | None = None
     auth_denied: bool = False  # Was the user denied authentication?
     user_authenticated: bool = False  # User is authenticated?
 
-    error_number: Optional[str] = None  # What is the error number?
-    previous_dialog_action_type: Optional[str] = None  # What was the last dialog action type?
-    previous_slot_to_elicit: Optional[str] = None  # What was the last slot to elicit?
-    previous_intent: Optional[str] = None  # To identify intent switch
-    previous_message: Optional[str] = None  # Needed for reprompt
-    options_provided: Optional[str] = None  # Options provided for "case options"
+    error_number: str | None = None  # What is the error number?
+    previous_dialog_action_type: str | None = None  # What was the last dialog action type?
+    previous_slot_to_elicit: str | None = None  # What was the last slot to elicit?
+    previous_intent: str | None = None  # To identify intent switch
+    previous_message: str | None = None  # Needed for reprompt
+    options_provided: str | None = None  # Options provided for "case options"
 
-    language: Optional[str] = None  # What language is the user using?
-    next_routing_dialog: Optional[str] = (
-        None  # What is the next routing dialog action type?
-    )
-    common_greeting_count: int = (
-        0  # How many times have we greeted the user?
-    )
-    slot_error_count: int = (
-        0  # How many times have we errored on a slot?
-    )
-    
+    language: str | None = None  # What language is the user using?
+    next_routing_dialog: str | None = None  # What is the next routing dialog action type?
+    common_greeting_count: int = 0  # How many times have we greeted the user?
+    slot_error_count: int = 0  # How many times have we errored on a slot?
 
     # Agent Escalation
     escalate_to_agent_non_english: bool = True
-    alternate_language: Optional[bool] = (
+    alternate_language: bool | None = (
         True  # to determine if the user wants to continue the conversation in english instead of the original non-english language
     )
 
     # Routing
-    current_form: Optional[Any] = None
-    lex_intent: Optional[str] = None
-    routing_intent: Optional[str] = None
-    routing_dialog: Optional[str] = None
-    is_health_check: Optional[bool] = False
+    current_form: Any | None = None
+    lex_intent: str | None = None
+    routing_intent: str | None = None
+    routing_dialog: str | None = None
+    is_health_check: bool | None = False
 
     # unknown_choice
-    is_lex_retry: Optional[bool] = False
-    unknown_routing_slot: Optional[str] = None
-    unknown_routing_intent: Optional[str] = None
-    is_reprompt: Optional[bool] = False
-    is_auth_request: Optional[bool] = None
-    is_unknown_choice: Optional[bool] = None
+    is_lex_retry: bool | None = False
+    unknown_routing_slot: str | None = None
+    unknown_routing_intent: str | None = None
+    is_reprompt: bool | None = False
+    is_auth_request: bool | None = None
+    is_unknown_choice: bool | None = None
 
     channel: str = "lex"
 
-    user_text: Optional[str] = ""
-    
+    user_text: str | None = ""
+
     def to_cmd_response(self):
         response = ""
         self_dict = self.model_dump()
@@ -226,8 +208,8 @@ class SessionState(BaseModel, Generic[T]):
     activeContexts: ActiveContexts = None
     sessionAttributes: T = cast(T, None)
     intent: Intent
-    originatingRequestId: Optional[str] = None
-    dialogAction: Optional[DialogAction] = None
+    originatingRequestId: str | None = None
+    dialogAction: DialogAction | None = None
 
 
 class ResolvedContext(BaseModel):
@@ -247,14 +229,14 @@ class LexRequest(BaseModel, Generic[T]):
     interpretations: list[Interpretation] = []
     bot: Bot = Bot()
     responseContentType: str = "DEFAULT_RESPONSE_CONTENT_TYPE"
-    proposedNextState: Optional[ProposedNextState] = None
+    proposedNextState: ProposedNextState | None = None
     sessionState: SessionState[T] = SessionState(intent=Intent(name="FallbackIntent"))
     messageVersion: str = "DEFAULT_MESSAGE_VERSION"
     invocationSource: str = "DEFAULT_INVOCATION_SOURCE"
-    invocationLabel: Optional[str] = None
+    invocationLabel: str | None = None
     transcriptions: list[Transcription] = []
     inputMode: str = "DEFAULT_INPUT_MODE"
-    requestAttributes: Optional[dict[str, Any]] = None
+    requestAttributes: dict[str, Any] | None = None
 
 
 class LexResponse(BaseModel, Generic[T]):

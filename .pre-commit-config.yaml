@@ -1,0 +1,40 @@
+repos:
+  # Standard pre-commit hooks for basic file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        description: Trim trailing whitespace
+      - id: end-of-file-fixer
+        description: Ensure files end with a newline
+      - id: check-yaml
+        description: Validate YAML files
+      - id: check-added-large-files
+        description: Prevent large files from being committed
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+        description: Check for merge conflict markers
+      - id: check-toml
+        description: Validate TOML files
+
+  # Ruff for linting and formatting (replacing flake8 + black)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.6
+    hooks:
+      - id: ruff
+        description: Run Ruff linter with auto-fix
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        description: Run Ruff formatter
+
+  # Pyright for type checking
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.390
+    hooks:
+      - id: pyright
+        description: Run pyright type checker
+        additional_dependencies: [
+          "pydantic>2.0.0,<3.0.0",
+          "loguru>=0.7.3,<0.8.0",
+          "PyYAML>=6.0,<7.0"
+        ]

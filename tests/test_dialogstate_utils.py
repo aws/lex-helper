@@ -20,13 +20,7 @@ def test_get_provided_options():
 
     # Test with one LexImageResponseCard with no buttons
     assert (
-        dialog.get_provided_options(
-            [
-                LexImageResponseCard(
-                    imageResponseCard=ImageResponseCard(title="testing", buttons=[])
-                )
-            ]
-        )
+        dialog.get_provided_options([LexImageResponseCard(imageResponseCard=ImageResponseCard(title="testing", buttons=[]))])
         == "[]"
     )
 
@@ -45,7 +39,4 @@ def test_get_provided_options():
             )
         ),
     ]
-    assert (
-        dialog.get_provided_options(messages)
-        == '["Button 1", "Button 2", "Button 3", "Button 4"]'
-    )
+    assert dialog.get_provided_options(messages) == '["Button 1", "Button 2", "Button 3", "Button 4"]'

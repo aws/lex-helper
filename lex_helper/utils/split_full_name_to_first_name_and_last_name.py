@@ -1,10 +1,8 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Optional
 
-
-def split_full_name_to_first_and_last_name(full_name: str) -> tuple[Optional[str] , Optional[str]]:
+def split_full_name_to_first_and_last_name(full_name: str) -> tuple[str | None, str | None]:
     first_name = None
     last_name = None
     words = full_name.split(" ")

@@ -3,18 +3,18 @@
 
 """Validation utilities."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 
 def is_value_set(value: Any) -> bool:
     """Check if a value is set (not None and not empty).
-    
+
     Args:
         value: Value to check
-        
+
     Returns:
         True if value is set, False otherwise
-        
+
     Example:
         >>> is_value_set(None)
         False
@@ -34,13 +34,13 @@ def is_value_set(value: Any) -> bool:
 
 def is_numeric(value: Any) -> bool:
     """Check if a value is numeric.
-    
+
     Args:
         value: Value to check
-        
+
     Returns:
         True if value is numeric, False otherwise
-        
+
     Example:
         >>> is_numeric(123)
         True
@@ -63,20 +63,20 @@ def is_numeric(value: Any) -> bool:
 
 
 def is_within_range(
-    value: Union[int, float],
-    min_value: Optional[Union[int, float]] = None,
-    max_value: Optional[Union[int, float]] = None,
+    value: int | float,
+    min_value: int | float | None = None,
+    max_value: int | float | None = None,
 ) -> bool:
     """Check if a numeric value is within a specified range.
-    
+
     Args:
         value: Value to check
         min_value: Minimum allowed value (inclusive)
         max_value: Maximum allowed value (inclusive)
-        
+
     Returns:
         True if value is within range, False otherwise
-        
+
     Example:
         >>> is_within_range(5, 0, 10)
         True
@@ -90,16 +90,16 @@ def is_within_range(
     return True
 
 
-def has_required_keys(data: Dict[str, Any], required_keys: List[str]) -> bool:
+def has_required_keys(data: dict[str, Any], required_keys: list[str]) -> bool:
     """Check if a dictionary has all required keys.
-    
+
     Args:
         data: Dictionary to check
         required_keys: List of required keys
-        
+
     Returns:
         True if all required keys are present, False otherwise
-        
+
     Example:
         >>> has_required_keys({"name": "John", "age": 30}, ["name"])
         True
@@ -110,20 +110,20 @@ def has_required_keys(data: Dict[str, Any], required_keys: List[str]) -> bool:
 
 
 def is_valid_length(
-    value: Union[str, List[Any], Dict[str, Any]],
-    min_length: Optional[int] = None,
-    max_length: Optional[int] = None,
+    value: str | list[Any] | dict[str, Any],
+    min_length: int | None = None,
+    max_length: int | None = None,
 ) -> bool:
     """Check if a value's length is within specified bounds.
-    
+
     Args:
         value: Value to check length of
         min_length: Minimum allowed length (inclusive)
         max_length: Maximum allowed length (inclusive)
-        
+
     Returns:
         True if length is valid, False otherwise
-        
+
     Example:
         >>> is_valid_length("test", 2, 6)
         True
@@ -138,16 +138,16 @@ def is_valid_length(
     return True
 
 
-def are_types_valid(values: List[Any], expected_type: type) -> bool:
+def are_types_valid(values: list[Any], expected_type: type) -> bool:
     """Check if all values in a list are of the expected type.
-    
+
     Args:
         values: List of values to check
         expected_type: Expected type of values
-        
+
     Returns:
         True if all values are of expected type, False otherwise
-        
+
     Example:
         >>> are_types_valid([1, 2, 3], int)
         True

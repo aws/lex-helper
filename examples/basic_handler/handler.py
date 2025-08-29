@@ -11,8 +11,7 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
 
     # Initialize the LexHelper
     lex_helper = LexHelper(config=config)
-    
+
     # Call the handler, this will convert the event to a LexRequest, dynamically pass it to the matching intent Python file (under "intents/")
     # and return a LexResponse.
     return lex_helper.handler(event, context)
-    

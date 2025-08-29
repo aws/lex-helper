@@ -22,5 +22,5 @@ def substitute_keys_in_text(input_text: str, session_attributes: SessionAttribut
 
 
 def contains_placeholders(response_text: str) -> list[str]:
-    pattern = "\{([a-zA-Z]+)\}"  # type: ignore
+    pattern = r"\{([a-zA-Z]+)\}"  # type: ignore
     return re.findall(pattern, response_text)

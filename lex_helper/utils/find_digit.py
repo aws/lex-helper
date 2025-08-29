@@ -1,10 +1,8 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Optional
 
-
-def find_digit(s: Optional[str]) -> Optional[int]:
+def find_digit(s: str | None) -> int | None:
     """Finds the first digit in the given string and returns it."""
 
     if s is None:

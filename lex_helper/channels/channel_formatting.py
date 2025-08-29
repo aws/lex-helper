@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 from lex_helper.channels.base import Channel
 from lex_helper.channels.lex import LexChannel
@@ -20,9 +21,7 @@ T = TypeVar("T", bound=SessionAttributes)
 
 
 def format_for_channel(response: LexResponse[T], channel_string: str = "lex"):
-    CONTENT_PROCESS_MAP: dict[
-        type, Callable[[Any, Channel, list[str], list[Any]], list[Any]]
-    ] = {
+    CONTENT_PROCESS_MAP: dict[type, Callable[[Any, Channel, list[str], list[Any]], list[Any]]] = {
         PlainText: _format_plain_text,
         LexPlainText: _format_plain_text,
         LexImageResponseCard: _format_image_card,
@@ -35,17 +34,13 @@ def format_for_channel(response: LexResponse[T], channel_string: str = "lex"):
     for message in response.messages:
         fn = CONTENT_PROCESS_MAP.get(type(message))
         if fn is not None:
-            formatted_messages = fn(
-                message, channel, options_provided, formatted_messages
-            )
+            formatted_messages = fn(message, channel, options_provided, formatted_messages)
         else:
             raise Exception("No formatter was found for this message type")
 
     # If the channel is Lex, and the response only has a single message, if it's an imageResponseCard, prepend a new PlainText message with the imageResponseCard title.
     # This is SPECIFICALLY only for the Lex UI and Recognize Text, as Lex throws an error if you ONLY return an imageResponseCard.  This is NOT what the documentation says.
-    if len(formatted_messages) == 1 and isinstance(
-        formatted_messages[0], LexImageResponseCard
-    ):
+    if len(formatted_messages) == 1 and isinstance(formatted_messages[0], LexImageResponseCard):
         formatted_messages.insert(
             0,
             LexPlainText(
@@ -58,9 +53,7 @@ def format_for_channel(response: LexResponse[T], channel_string: str = "lex"):
         formatted_messages[1].imageResponseCard.title = " "  # type: ignore
 
     if len(options_provided) > 0:
-        formatted_response.sessionState.sessionAttributes.options_provided = (
-            json.dumps(options_provided)
-        )
+        formatted_response.sessionState.sessionAttributes.options_provided = json.dumps(options_provided)
         options_provided.clear()
 
     formatted_response.messages = formatted_messages
@@ -84,9 +77,7 @@ def _get_channel(channel_string: str) -> Channel:
         "sms": SMSChannel,
         "lex": LexChannel,
     }
-    channel = channels.get(
-        channel_string.lower(), LexChannel
-    )  # Get the channel, default to Lex
+    channel = channels.get(channel_string.lower(), LexChannel)  # Get the channel, default to Lex
 
     return channel()  # type: ignore
 
@@ -97,9 +88,7 @@ def _format_plain_text(
     options_provided: list[str],
     formatted_messages: list[Any],
 ) -> list[Any]:
-    return add_to_list(
-        lst=formatted_messages, item=channel.format_plain_text(message)
-    )
+    return add_to_list(lst=formatted_messages, item=channel.format_plain_text(message))
 
 
 def _format_image_card(

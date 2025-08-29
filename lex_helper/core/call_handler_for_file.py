@@ -3,7 +3,7 @@
 
 import importlib
 import inspect
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 from loguru import logger
 
@@ -14,9 +14,7 @@ from lex_helper.utils.string import title_to_snake
 T = TypeVar("T", bound=SessionAttributes)
 
 
-def call_handler_for_file(
-    intent_name: str, lex_request: LexRequest[T], package_name: Optional[str] = None
-) -> LexResponse[T]:
+def call_handler_for_file(intent_name: str, lex_request: LexRequest[T], package_name: str | None = None) -> LexResponse[T]:
     if package_name is None:
         package_name = "fulfillment_function"
     # Determine the file to import based on intent_name
@@ -33,21 +31,15 @@ def call_handler_for_file(
     try:
         module = importlib.import_module(file_to_import)
     except ImportError as e:
-        logger.exception(
-            f'Error: Import module {file_to_import} failed due to the error "{e}"'
-        )
+        logger.exception(f'Error: Import module {file_to_import} failed due to the error "{e}"')
         raise IntentNotFoundError("Unable to find handler for intent")
 
     # Get the "handler" function from the module
     if hasattr(module, "handler") and inspect.isfunction(module.handler):
         handler_func = module.handler
     else:
-        logger.error(
-            f"Error: Unable to load handler, {file_to_import}.py does not have a 'handler' function."
-        )
-        raise ValueError(
-            f"Error: Unable to load handler, {file_to_import}.py does not have a 'handler' function."
-        )
+        logger.error(f"Error: Unable to load handler, {file_to_import}.py does not have a 'handler' function.")
+        raise ValueError(f"Error: Unable to load handler, {file_to_import}.py does not have a 'handler' function.")
 
     # Call the "handler" function with event and context arguments
     try:

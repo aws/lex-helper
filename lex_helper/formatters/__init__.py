@@ -25,24 +25,22 @@ from lex_helper.formatters.url import (
 
 __all__ = [
     # Button formatting
-    'Button',
-    'create_button',
-    'create_buttons',
-    'format_buttons_for_display',
-    'buttons_to_dicts',
-    
+    "Button",
+    "create_button",
+    "create_buttons",
+    "format_buttons_for_display",
+    "buttons_to_dicts",
     # Text formatting
-    'remove_html_tags',
-    'replace_special_characters',
-    'substitute_keys_in_text',
-    'truncate_text',
-    'normalize_whitespace',
-    'split_into_sentences',
-    
+    "remove_html_tags",
+    "replace_special_characters",
+    "substitute_keys_in_text",
+    "truncate_text",
+    "normalize_whitespace",
+    "split_into_sentences",
     # URL formatting
-    'is_valid_url',
-    'normalize_url',
-    'extract_domain',
-    'build_url',
-    'clean_url',
+    "is_valid_url",
+    "normalize_url",
+    "extract_domain",
+    "build_url",
+    "clean_url",
 ]

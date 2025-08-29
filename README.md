@@ -1,8 +1,10 @@
 <h2 align="center">Lex Helper Library</h2>
 
 <p align="center">
+<a href="https://github.com/aws/lex-helper/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/aws/lex-helper/actions/workflows/ci.yml/badge.svg"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"></a>
-<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+<a href="https://github.com/astral-sh/ruff"><img alt="Code style: ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json"></a>
+<a href="https://pypi.org/project/lex-helper/"><img alt="PyPI version" src="https://badge.fury.io/py/lex-helper.svg"></a>
 </p>
 
 > "This is the best thing since sliced bread" - Lex
@@ -37,6 +39,50 @@ pip install lex-helper
 
 For Lambda deployment, see [Lambda Layer Deployment Guide](docs/LAMBDA_LAYER_DEPLOYMENT.md).
 
+## Development Setup
+
+This project uses modern Python tooling for development:
+
+### Prerequisites
+- Python >= 3.12
+- [uv](https://docs.astral.sh/uv/) for dependency management
+
+### Quick Setup
+```bash
+# Install uv (if not already installed)
+pip install uv
+
+# Clone the repository and install dependencies
+git clone <repository-url>
+cd lex-helper
+uv sync --dev
+
+# Install pre-commit hooks for code quality
+uv run pre-commit install
+```
+
+### Development Commands
+```bash
+# Run tests
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=lex_helper
+
+# Code linting and formatting
+uv run ruff check .          # Check for issues
+uv run ruff check --fix .    # Fix issues automatically
+uv run ruff format .         # Format code
+
+# Type checking
+pyright
+
+# Run all quality checks
+uv run pre-commit run --all-files
+```
+
+For detailed migration information from older tooling, see the [Migration Guide](docs/MIGRATION_GUIDE.md).
+
 ## Quick Start
 
 ### 1. Create Session Attributes
@@ -60,7 +106,7 @@ from .session_attributes import CustomSessionAttributes
 
 def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     config = Config(
-        session_attributes=CustomSessionAttributes(), 
+        session_attributes=CustomSessionAttributes(),
         package_name="your_project.intents"
     )
     lex_helper = LexHelper(config=config)
@@ -112,6 +158,10 @@ your_project/
 2. **[Testing Guide](docs/TESTING_GUIDE.md)**: Then learn comprehensive testing strategies for your Lex bots
 3. **[Lambda Layer Deployment](docs/LAMBDA_LAYER_DEPLOYMENT.md)**: Finally, deploy as Lambda layers for better performance
 
+**Development Documentation:**
+- **[Development Guide](docs/DEVELOPMENT.md)**: Complete development workflow, testing, and contribution guidelines
+- **[Migration Guide](docs/MIGRATION_GUIDE.md)**: Complete guide for migrating from Poetry to uv and modern Python tooling
+
 ## Bedrock Usage Examples
 
 ### Basic InvokeModel API
@@ -143,7 +193,7 @@ print(response['text'])
 ## Examples
 
 - **Basic Example**: See `examples/basic_handler/` for a simple implementation
-- **Comprehensive Example**: Check out the [Airline-Bot](https://gitlab.aws.dev/lex/Airline-Bot) for production-ready patterns including:
+- **Comprehensive Example**: For production-ready patterns, see the documentation for:
   - Advanced intent organization and management
   - Complex session attribute handling
   - Multi-turn conversation flows

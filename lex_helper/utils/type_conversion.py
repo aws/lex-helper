@@ -3,18 +3,18 @@
 
 """Type conversion utilities."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 def str_to_bool(value: str) -> bool:
     """Convert a string to a boolean value.
-    
+
     Args:
         value: String to convert
-        
+
     Returns:
         Boolean value
-        
+
     Example:
         >>> str_to_bool("true")
         True
@@ -23,19 +23,19 @@ def str_to_bool(value: str) -> bool:
         >>> str_to_bool("0")
         False
     """
-    return value.lower() in ('true', 'yes', '1', 'on', 't', 'y')
+    return value.lower() in ("true", "yes", "1", "on", "t", "y")
 
 
-def safe_int(value: Any, default: Optional[int] = None) -> Optional[int]:
+def safe_int(value: Any, default: int | None = None) -> int | None:
     """Safely convert a value to integer.
-    
+
     Args:
         value: Value to convert
         default: Default value if conversion fails
-        
+
     Returns:
         Integer value or default if conversion fails
-        
+
     Example:
         >>> safe_int("123")
         123
@@ -54,16 +54,16 @@ def safe_int(value: Any, default: Optional[int] = None) -> Optional[int]:
         return default
 
 
-def safe_float(value: Any, default: Optional[float] = None) -> Optional[float]:
+def safe_float(value: Any, default: float | None = None) -> float | None:
     """Safely convert a value to float.
-    
+
     Args:
         value: Value to convert
         default: Default value if conversion fails
-        
+
     Returns:
         Float value or default if conversion fails
-        
+
     Example:
         >>> safe_float("12.34")
         12.34
@@ -84,14 +84,14 @@ def safe_float(value: Any, default: Optional[float] = None) -> Optional[float]:
 
 def safe_str(value: Any, default: str = "") -> str:
     """Safely convert a value to string.
-    
+
     Args:
         value: Value to convert
         default: Default value if conversion fails
-        
+
     Returns:
         String value or default if conversion fails
-        
+
     Example:
         >>> safe_str(123)
         '123'
@@ -106,15 +106,15 @@ def safe_str(value: Any, default: str = "") -> str:
         return default
 
 
-def to_list(value: Any) -> List[Any]:
+def to_list(value: Any) -> list[Any]:
     """Convert a value to a list.
-    
+
     Args:
         value: Value to convert
-        
+
     Returns:
         List containing the value, or empty list if value is None
-        
+
     Example:
         >>> to_list(123)
         [123]
@@ -130,15 +130,15 @@ def to_list(value: Any) -> List[Any]:
     return [value]
 
 
-def to_dict(value: Any) -> Dict[str, Any]:
+def to_dict(value: Any) -> dict[str, Any]:
     """Convert a value to a dictionary.
-    
+
     Args:
         value: Value to convert
-        
+
     Returns:
         Dictionary representation of the value
-        
+
     Example:
         >>> to_dict({"a": 1})
         {'a': 1}
@@ -149,6 +149,6 @@ def to_dict(value: Any) -> Dict[str, Any]:
         return dict(value)
     if isinstance(value, (list, tuple)) and all(isinstance(item, tuple) and len(item) == 2 for item in value):  # type: ignore
         return dict(value)
-    if hasattr(value, '__dict__'):
+    if hasattr(value, "__dict__"):
         return value.__dict__
     return {}

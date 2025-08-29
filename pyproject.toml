@@ -6,46 +6,85 @@ authors = [
     {name = "Amazon Web Services"}
 ]
 readme = "README.md"
-requires-python = ">=3.12, <4.0"
+requires-python = ">=3.12"
 dependencies = [
-    "pydantic (>2.0.0,<3.0.0)",
-    "loguru (>=0.7.3,<0.8.0)",
-    "PyYAML (>=6.0,<7.0)"
+    "pydantic>2.0.0,<3.0.0",
+    "loguru>=0.7.3,<0.8.0",
+    "PyYAML>=6.0,<7.0",
+    "boto3>=1.26.0",
+    "botocore>=1.29.0"
 ]
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 
 [project.urls]
 Homepage = "https://github.com/aws/lex-helper"
 Documentation = "https://github.com/aws/lex-helper#readme"
 Issues = "https://github.com/aws/lex-helper/issues"
+Repository = "https://github.com/aws/lex-helper"
+Changelog = "https://github.com/aws/lex-helper/blob/main/CHANGELOG.md"
 
-[tool.poetry]
-packages = [{include = "lex_helper", from = "."}]
-exclude = ["examples"]
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-ruff = "^0.9.6"
-pytest-cov = "^6.0.0"
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.9.6",
+    "pytest-cov>=6.0.0",
+    "pre-commit>=3.0.0"
+]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 
-[tool.isort]
-profile = "black"
+
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
+line-length = 125
 
 [tool.ruff.lint]
-select = ["I001", "I002", "F401", "N802"]
-ignore = ["E501", "E722", "E402", "E731", "F811"]
+# Select rule categories - mapping from flake8 configuration
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "N",    # pep8-naming
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "C90",  # mccabe complexity
+]
+
+# Ignore rules - mapping from flake8 ignore list
+ignore = [
+    "E203",  # whitespace before ':'
+    "E266",  # too many leading '#' for block comment
+    "E501",  # line too long (handled by formatter)
+    "E701",  # multiple statements on one line (colon)
+    "B905",  # zip() without an explicit strict= parameter
+    "E722",  # do not use bare 'except'
+    "E402",  # module level import not at top of file
+    "E731",  # do not assign a lambda expression, use a def
+    "F811",  # redefinition of unused name
+]
+
+[tool.ruff.lint.mccabe]
+# Set max complexity to match flake8 configuration
+max-complexity = 18
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+# Use spaces around operators
+indent-style = "space"
+# Respect magic trailing commas
+skip-magic-trailing-comma = false
+# Automatically detect line ending
+line-ending = "auto"
 
 
-[tool.black]
-line-length = 125
+
 
 [tool.pyright]
 include = [
@@ -72,3 +111,8 @@ reportUnnecessaryContains = true
 reportUnnecessaryComparison = true
 reportMatchNotExhaustive = true
 reportCallInDefaultInitializer = true
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=6.2.1",
+]

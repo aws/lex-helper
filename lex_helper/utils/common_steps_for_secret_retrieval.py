@@ -3,11 +3,10 @@
 
 import configparser
 import os
-from typing import Dict, Optional
 
 
 def common_steps_for_secret_retrieval(
-    account_id: Optional[str] = None,
+    account_id: str | None = None,
     path: str = "../properties",
 ) -> configparser.ConfigParser:
     """
@@ -17,7 +16,7 @@ def common_steps_for_secret_retrieval(
         configparser.ConfigParser: The configuration object.
     """
 
-    account_environment_map: Dict[str, str] = {}  # Configure this for your environment
+    account_environment_map: dict[str, str] = {}  # Configure this for your environment
 
     config_obj = configparser.ConfigParser()
     if account_id is None:

@@ -29,7 +29,6 @@ def handler(lex_request: LexRequest[CustomSessionAttributes]) -> LexResponse[Cus
                 lex_request=lex_request,
             )
 
-    
     return dialog.elicit_slot(
         slot_to_elicit="PickUpCity",
         messages=[

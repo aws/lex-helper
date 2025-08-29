@@ -278,7 +278,7 @@ resource "aws_lambda_layer_version" "lex_helper" {
   filename         = "lex-helper-layer.zip"
   layer_name       = "lex-helper-layer"
   description      = "Lex Helper Library with dependencies"
-  
+
   compatible_runtimes      = ["python3.12"]
   compatible_architectures = ["x86_64", "arm64"]
 }
@@ -289,9 +289,9 @@ resource "aws_lambda_function" "lex_bot" {
   role            = aws_iam_role.lambda_role.arn
   handler         = "handler.lambda_handler"
   runtime         = "python3.12"
-  
+
   layers = [aws_lambda_layer_version.lex_helper.arn]
-  
+
   environment {
     variables = {
       MESSAGES_YAML_PATH = "/opt/lambda/config/"

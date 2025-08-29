@@ -7,7 +7,7 @@ with proper error handling and response formatting.
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import boto3
 from botocore.exceptions import ClientError
@@ -20,22 +20,23 @@ logger = logging.getLogger(__name__)
 
 class BedrockInvocationError(Exception):
     """Custom exception for Bedrock invocation errors."""
+
     pass
 
 
 def invoke_bedrock(
     prompt: str,
     model_id: str,
-    max_tokens: Optional[int] = None,
-    temperature: Optional[float] = None,
-    top_p: Optional[float] = None,
-    stop_sequences: Optional[List[str]] = None,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+    top_p: float | None = None,
+    stop_sequences: list[str] | None = None,
     region_name: str = "us-east-1",
-    **kwargs: Any
-) -> Dict[str, Any]:
+    **kwargs: Any,
+) -> dict[str, Any]:
     """
     Invoke Bedrock model using InvokeModel API.
-    
+
     Args:
         prompt: Input prompt
         model_id: Bedrock model identifier
@@ -45,50 +46,46 @@ def invoke_bedrock(
         stop_sequences: Stop generation sequences
         region_name: AWS region
         **kwargs: Additional model parameters
-        
+
     Returns:
         Dict with text, usage, raw_response
     """
     try:
         bedrock_runtime = boto3.client("bedrock-runtime", region_name=region_name)
-        
+
         config = get_model_config(model_id)
-        request_body = config.request_builder(
-            prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs
-        )
-        
+        request_body = config.request_builder(prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs)
+
         response = _try_with_fallback(
-            bedrock_runtime, model_id,
+            bedrock_runtime,
+            model_id,
             lambda mid: bedrock_runtime.invoke_model(
-                modelId=mid,
-                body=json.dumps(request_body),
-                contentType="application/json",
-                accept="application/json"
-            )
+                modelId=mid, body=json.dumps(request_body), contentType="application/json", accept="application/json"
+            ),
         )
-        
+
         response_body = json.loads(response["body"].read())
         return config.response_parser(response_body)
-        
+
     except Exception as e:
         logger.error(f"Bedrock invocation failed: {e}")
         raise BedrockInvocationError(f"Invocation failed: {e}") from e
 
 
 def invoke_bedrock_converse(
-    messages: List[Dict[str, Any]],
+    messages: list[dict[str, Any]],
     model_id: str,
-    max_tokens: Optional[int] = None,
-    temperature: Optional[float] = None,
-    top_p: Optional[float] = None,
-    stop_sequences: Optional[List[str]] = None,
-    system_prompt: Optional[str] = None,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+    top_p: float | None = None,
+    stop_sequences: list[str] | None = None,
+    system_prompt: str | None = None,
     region_name: str = "us-east-1",
-    **kwargs: Any
-) -> Dict[str, Any]:
+    **kwargs: Any,
+) -> dict[str, Any]:
     """
     Invoke Bedrock model using Converse API with full message support.
-    
+
     Args:
         messages: List of message dicts with role and content
         model_id: Bedrock model identifier
@@ -99,10 +96,10 @@ def invoke_bedrock_converse(
         system_prompt: System prompt for conversation
         region_name: AWS region
         **kwargs: Additional parameters
-        
+
     Returns:
         Dict with text, usage, raw_response
-        
+
     Example:
         >>> messages = [
         ...     {"role": "user", "content": [{"text": "Hello"}]},
@@ -117,34 +114,33 @@ def invoke_bedrock_converse(
     """
     try:
         bedrock_runtime = boto3.client("bedrock-runtime", region_name=region_name)
-        
-        inference_config = {k: v for k, v in {
-            "maxTokens": max_tokens or 1000,
-            "temperature": temperature,
-            "topP": top_p,
-            "stopSequences": stop_sequences
-        }.items() if v is not None}
-        
-        converse_params = {
-            "messages": messages,
-            "inferenceConfig": inference_config,
-            **kwargs
+
+        inference_config = {
+            k: v
+            for k, v in {
+                "maxTokens": max_tokens or 1000,
+                "temperature": temperature,
+                "topP": top_p,
+                "stopSequences": stop_sequences,
+            }.items()
+            if v is not None
         }
-        
+
+        converse_params = {"messages": messages, "inferenceConfig": inference_config, **kwargs}
+
         if system_prompt:
             converse_params["system"] = [{"text": system_prompt}]
-        
+
         response = _try_with_fallback(
-            bedrock_runtime, model_id,
-            lambda mid: bedrock_runtime.converse(modelId=mid, **converse_params)
+            bedrock_runtime, model_id, lambda mid: bedrock_runtime.converse(modelId=mid, **converse_params)
         )
-        
+
         return {
             "text": response["output"]["message"]["content"][0]["text"],
             "usage": response.get("usage", {}),
-            "raw_response": response
+            "raw_response": response,
         }
-        
+
     except Exception as e:
         logger.error(f"Bedrock converse failed: {e}")
         raise BedrockInvocationError(f"Converse failed: {e}") from e
@@ -153,28 +149,28 @@ def invoke_bedrock_converse(
 def invoke_bedrock_simple_converse(
     prompt: str,
     model_id: str,
-    max_tokens: Optional[int] = None,
-    temperature: Optional[float] = None,
-    top_p: Optional[float] = None,
-    stop_sequences: Optional[List[str]] = None,
-    system_prompt: Optional[str] = None,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+    top_p: float | None = None,
+    stop_sequences: list[str] | None = None,
+    system_prompt: str | None = None,
     region_name: str = "us-east-1",
-    **kwargs: Any
-) -> Dict[str, Any]:
+    **kwargs: Any,
+) -> dict[str, Any]:
     """
     Simple converse wrapper that converts prompt to messages format.
-    
+
     Args:
         prompt: Single user prompt
         model_id: Bedrock model identifier
         system_prompt: System prompt for conversation
         (other args same as invoke_bedrock_converse)
-        
+
     Returns:
         Dict with text, usage, raw_response
     """
     messages = [{"role": "user", "content": [{"text": prompt}]}]
-    
+
     return invoke_bedrock_converse(
         messages=messages,
         model_id=model_id,
@@ -184,7 +180,7 @@ def invoke_bedrock_simple_converse(
         stop_sequences=stop_sequences,
         system_prompt=system_prompt,
         region_name=region_name,
-        **kwargs
+        **kwargs,
     )
 
 

@@ -51,11 +51,11 @@ def lambda_handler(event, context):
     # Set locale from Lex event
     locale_id = event.get('bot', {}).get('localeId', 'en_US')
     set_locale(locale_id)
-    
+
     # Get localized messages
     greeting = get_message("greeting")
     error_msg = get_message("error.general", "Something went wrong")
-    
+
     # Override locale for specific message
     spanish_greeting = get_message("greeting", locale="es_ES")
 ```
@@ -94,14 +94,14 @@ from lex_helper import dialog, LexPlainText, get_message
 def handle_welcome_intent(lex_request):
     # Set locale from Lex request
     set_locale(lex_request.bot.localeId)
-    
+
     # Check for unknown slot choices first
     if dialog.any_unknown_slot_choices(lex_request):
         return dialog.handle_any_unknown_slot_choice(lex_request)
-    
+
     # Get slot values
     user_name = dialog.get_slot("user_name", dialog.get_intent(lex_request))
-    
+
     if not user_name:
         prompt_message = get_message("prompts.name", "What's your name?")
         return dialog.elicit_slot(
@@ -109,7 +109,7 @@ def handle_welcome_intent(lex_request):
             messages=[LexPlainText(content=prompt_message)],
             lex_request=lex_request
         )
-    
+
     # Set slot values with localized greeting
     greeting_template = get_message("greeting.personalized", "Hello {name}!")
     greeting = greeting_template.format(name=user_name)
@@ -172,7 +172,7 @@ def handle_booking_intent(lex_request):
     # Always check for unknown choices first
     if dialog.any_unknown_slot_choices(lex_request):
         return dialog.handle_any_unknown_slot_choice(lex_request)
-    
+
     # Your intent logic here
     return dialog.delegate(lex_request)
 ```
@@ -238,13 +238,13 @@ return dialog.callback_original_intent_handler(lex_request)
 ```python
 def custom_unknown_choice_handler(lex_request, choice):
     error_count = getattr(lex_request.sessionState.sessionAttributes, 'error_count', 0)
-    
+
     if error_count > 2:
-        return dialog.transition_to_intent("human_agent", lex_request, 
+        return dialog.transition_to_intent("human_agent", lex_request,
                                          [LexPlainText(content="Let me connect you to an agent")])
-    
-    return dialog.elicit_slot("destination", 
-                            [LexPlainText(content="Please choose A, B, or C")], 
+
+    return dialog.elicit_slot("destination",
+                            [LexPlainText(content="Please choose A, B, or C")],
                             lex_request)
 ```
 
@@ -275,8 +275,8 @@ active_contexts = dialog.get_active_contexts(lex_request)
 def validate_email_slot(lex_request):
     email = dialog.get_slot("email", dialog.get_intent(lex_request))
     if email and "@" not in email:
-        return dialog.elicit_slot("email", 
-                                [LexPlainText(content="Please enter a valid email")], 
+        return dialog.elicit_slot("email",
+                                [LexPlainText(content="Please enter a valid email")],
                                 lex_request)
     return dialog.delegate(lex_request)
 ```
