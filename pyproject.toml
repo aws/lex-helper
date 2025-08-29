@@ -23,13 +23,7 @@ Issues = "https://github.com/aws/lex-helper/issues"
 Repository = "https://github.com/aws/lex-helper"
 Changelog = "https://github.com/aws/lex-helper/blob/main/CHANGELOG.md"
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "ruff>=0.9.6",
-    "pytest-cov>=6.0.0",
-    "pre-commit>=3.0.0"
-]
+
 
 [build-system]
 requires = ["hatchling"]
@@ -86,6 +80,16 @@ line-ending = "auto"
 
 
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+# Exclude example directories from test collection
+collect_ignore = [
+    "examples/"
+]
+
 [tool.pyright]
 include = [
   "./lex_helper",
@@ -114,5 +118,8 @@ reportCallInDefaultInitializer = true
 
 [dependency-groups]
 dev = [
-    "pytest-cov>=6.2.1",
+    "pytest>=7.0.0",
+    "ruff>=0.9.6",
+    "pytest-cov>=6.0.0",
+    "pre-commit>=3.0.0"
 ]
