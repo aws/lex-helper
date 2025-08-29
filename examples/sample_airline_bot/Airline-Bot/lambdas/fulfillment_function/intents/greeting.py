@@ -4,6 +4,7 @@ Handler for the Greeting intent.
 This intent handles user greetings and provides a welcoming introduction to the bot's
 capabilities. It tracks greeting count to provide different responses for repeat visitors.
 """
+
 from loguru import logger
 
 from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
@@ -14,14 +15,14 @@ from ..session_attributes import AirlineBotSessionAttributes
 def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse[AirlineBotSessionAttributes]:
     """
     Handle the Greeting intent.
-    
+
     This intent welcomes users to the airline bot and provides an overview of available
     services. It tracks how many times the user has been greeted in the current session
     to provide appropriate responses.
-    
+
     Args:
         lex_request: The Lex request containing user input and session state
-        
+
     Returns:
         LexResponse: The response to send back to Amazon Lex
     """
@@ -52,7 +53,4 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     logger.debug(f"Greeting message: {message}")
 
     # Elicit the user's intent after greeting
-    return dialog.elicit_intent(
-        messages=[LexPlainText(content=message)],
-        lex_request=lex_request
-    )
+    return dialog.elicit_intent(messages=[LexPlainText(content=message)], lex_request=lex_request)

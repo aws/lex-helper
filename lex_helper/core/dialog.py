@@ -209,9 +209,7 @@ def elicit_slot(slot_to_elicit: LexSlot | str, messages: LexMessages, lex_reques
     if not isinstance(slot_to_elicit, str):
         slot_name = slot_to_elicit.value
 
-    session_attributes.previous_slot_to_elicit = (
-        (intent.name.replace("_", "") + "Slot") + "." + str(slot_name).upper()
-    )
+    session_attributes.previous_slot_to_elicit = (intent.name.replace("_", "") + "Slot") + "." + str(slot_name).upper()
 
     if "." in str(slot_name):
         raise Exception("SLOT PARSED INCORRECTLY")
@@ -328,9 +326,7 @@ def get_slot(slot_name: LexSlot | str, intent: Intent, **kwargs: Any):
         return None
 
 
-def get_composite_slot(
-    slot_name: str, intent: Intent, preference: str | None = None
-) -> dict[str, str | None] | None:
+def get_composite_slot(slot_name: str, intent: Intent, preference: str | None = None) -> dict[str, str | None] | None:
     """
     Retrieves the values from sub-slots of a given slot from an intent.
 
@@ -472,9 +468,7 @@ def set_slot(slot_name: LexSlot, slot_value: str | None, intent: Intent) -> Inte
     return intent
 
 
-def get_composite_slot_subslot(
-    composite_slot: LexSlot, sub_slot: Any, intent: Intent, **kwargs: Any
-) -> str | None:
+def get_composite_slot_subslot(composite_slot: LexSlot, sub_slot: Any, intent: Intent, **kwargs: Any) -> str | None:
     """
     Retrieves the value of a subslot from a composite slot in an intent.
 
@@ -595,11 +589,7 @@ def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
         return False
 
     # Extract actual slot name from the stored format
-    slot_name = (
-        previous_slot_to_elicit.split(".")[-1].lower()
-        if "." in previous_slot_to_elicit
-        else previous_slot_to_elicit
-    )
+    slot_name = previous_slot_to_elicit.split(".")[-1].lower() if "." in previous_slot_to_elicit else previous_slot_to_elicit
 
     # Check if the slot exists and has a value
     slot_data = intent.slots.get(slot_name)
@@ -685,9 +675,7 @@ def unknown_choice_handler(
     return delegate(lex_request=lex_request)
 
 
-def callback_original_intent_handler(
-    lex_request: LexRequest[T], messages: LexMessages | None = None
-) -> LexResponse[T]:
+def callback_original_intent_handler(lex_request: LexRequest[T], messages: LexMessages | None = None) -> LexResponse[T]:
     """
 
     Handles switching the conversation flow to an initial intent.

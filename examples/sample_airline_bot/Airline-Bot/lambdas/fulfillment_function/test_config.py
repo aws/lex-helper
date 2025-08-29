@@ -4,6 +4,7 @@ Test script for the configuration utilities.
 This script tests the configuration utilities to ensure they work correctly
 in both local development and simulated Lambda environments.
 """
+
 import os
 import sys
 
@@ -33,7 +34,7 @@ def test_local_development():
     logger.info(f"Local development: Current directory {current_dir} is in Python path")
 
     # Check that the messages directory exists
-    messages_dir = os.path.join(current_dir, 'messages')
+    messages_dir = os.path.join(current_dir, "messages")
     assert os.path.exists(messages_dir), f"Messages directory does not exist: {messages_dir}"
     logger.info(f"Local development: Messages directory exists at {messages_dir}")
 
@@ -50,7 +51,9 @@ def test_custom_messages_dir():
     # Check that MESSAGES_YAML_PATH is set correctly
     assert "MESSAGES_YAML_PATH" in os.environ, "MESSAGES_YAML_PATH not set"
     expected_path = os.path.join(test_path, "messages.yaml")
-    assert os.environ["MESSAGES_YAML_PATH"] == expected_path, f"Expected {expected_path}, got {os.environ['MESSAGES_YAML_PATH']}"
+    assert os.environ["MESSAGES_YAML_PATH"] == expected_path, (
+        f"Expected {expected_path}, got {os.environ['MESSAGES_YAML_PATH']}"
+    )
     logger.info(f"Custom directory: MESSAGES_YAML_PATH set to {os.environ['MESSAGES_YAML_PATH']}")
 
     # Clean up

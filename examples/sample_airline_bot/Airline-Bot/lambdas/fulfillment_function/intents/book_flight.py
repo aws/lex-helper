@@ -13,6 +13,7 @@ Key Features:
 - Localized messaging with get_message() fallbacks
 - Comprehensive error handling and validation
 """
+
 from loguru import logger
 
 from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
@@ -40,9 +41,7 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
         except Exception as e:
             logger.warning(f"Failed to get localized message: {e}")
         return dialog.transition_to_intent(
-            intent_name="Authenticate",
-            lex_request=lex_request,
-            messages=[LexPlainText(content=message)]
+            intent_name="Authenticate", lex_request=lex_request, messages=[LexPlainText(content=message)]
         )
 
     # Get current slot values
@@ -59,19 +58,29 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
     # Handle origin airport code selection
     if origin_airport_code:
         if not origin_city:
-            return ReservationUtils.handle_city_resolution(origin_airport_code, "Origin_Airport_Code", "OriginCity", "origin_city", lex_request)
+            return ReservationUtils.handle_city_resolution(
+                origin_airport_code, "Origin_Airport_Code", "OriginCity", "origin_city", lex_request
+            )
 
-        lex_request.sessionState.sessionAttributes.origin_iata_code = ReservationUtils.parse_airport_code(origin_airport_code)
+        lex_request.sessionState.sessionAttributes.origin_iata_code = ReservationUtils.parse_airport_code(
+            origin_airport_code
+        )
 
     # Handle destination airport code selection
     if destination_airport_code:
         if not destination_city:
-            return ReservationUtils.handle_city_resolution(destination_airport_code, "Destination_Airport_Code", "DestinationCity", "destination_city", lex_request)
-        lex_request.sessionState.sessionAttributes.destination_iata_code = ReservationUtils.parse_airport_code(destination_airport_code)
+            return ReservationUtils.handle_city_resolution(
+                destination_airport_code, "Destination_Airport_Code", "DestinationCity", "destination_city", lex_request
+            )
+        lex_request.sessionState.sessionAttributes.destination_iata_code = ReservationUtils.parse_airport_code(
+            destination_airport_code
+        )
 
-    logger.debug(f"Current slot values: trip_type={trip_type}, origin_city={origin_city}, "
-                f"destination_city={destination_city}, departure_date={departure_date}, "
-                f"return_date={return_date}, number_of_passengers={number_of_passengers}")
+    logger.debug(
+        f"Current slot values: trip_type={trip_type}, origin_city={origin_city}, "
+        f"destination_city={destination_city}, departure_date={departure_date}, "
+        f"return_date={return_date}, number_of_passengers={number_of_passengers}"
+    )
 
     # Elicit missing required slots in order of priority
     if not trip_type:
@@ -82,9 +91,7 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting TripType slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="TripType",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="TripType", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     if not origin_city:
@@ -95,16 +102,15 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting OriginCity slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="OriginCity",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="OriginCity", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
-
 
     # Resolve origin city to IATA code if not already resolved
     if origin_city and not lex_request.sessionState.sessionAttributes.origin_iata_code:
         try:
-            return ReservationUtils.handle_city_resolution(origin_city, "OriginCity", "Origin_Airport_Code", "origin_iata_code", lex_request)
+            return ReservationUtils.handle_city_resolution(
+                origin_city, "OriginCity", "Origin_Airport_Code", "origin_iata_code", lex_request
+            )
         except Exception as e:
             logger.error(f"Error resolving origin city: {e}")
             # Continue without resolution on error
@@ -118,15 +124,15 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting DestinationCity slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="DestinationCity",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="DestinationCity", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     # Resolve destination city to IATA code if not already resolved
     if destination_city and not lex_request.sessionState.sessionAttributes.destination_iata_code:
         try:
-            response = ReservationUtils.handle_city_resolution(destination_city, "DestinationCity", "Destination_Airport_Code", "destination_iata_code", lex_request)
+            response = ReservationUtils.handle_city_resolution(
+                destination_city, "DestinationCity", "Destination_Airport_Code", "destination_iata_code", lex_request
+            )
             if response:
                 return response
         except Exception as e:
@@ -142,9 +148,7 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting DepartureDate slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="DepartureDate",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="DepartureDate", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     # ReturnDate is optional for one-way trips
@@ -157,9 +161,7 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting NumberOfPassengers slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="NumberOfPassengers",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="NumberOfPassengers", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     # All required slots filled, proceed to fulfillment
@@ -167,7 +169,9 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
     return dialog.delegate(lex_request=lex_request)
 
 
-def handle_fulfillment_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse[AirlineBotSessionAttributes]:
+def handle_fulfillment_hook(
+    lex_request: LexRequest[AirlineBotSessionAttributes],
+) -> LexResponse[AirlineBotSessionAttributes]:
     """Handle the fulfillment code hook for the BookFlight intent."""
     logger.debug("BookFlight fulfillment hook called")
 
@@ -180,9 +184,11 @@ def handle_fulfillment_hook(lex_request: LexRequest[AirlineBotSessionAttributes]
     return_date = dialog.get_slot(intent=intent, slot_name="ReturnDate")
     number_of_passengers = dialog.get_slot(intent=intent, slot_name="NumberOfPassengers")
 
-    logger.debug(f"Processing booking with: trip_type={trip_type}, origin_city={origin_city}, "
-                f"destination_city={destination_city}, departure_date={departure_date}, "
-                f"return_date={return_date}, number_of_passengers={number_of_passengers}")
+    logger.debug(
+        f"Processing booking with: trip_type={trip_type}, origin_city={origin_city}, "
+        f"destination_city={destination_city}, departure_date={departure_date}, "
+        f"return_date={return_date}, number_of_passengers={number_of_passengers}"
+    )
 
     # In production, this would integrate with your booking system
     # For demo purposes, generate a mock reservation number
@@ -215,7 +221,7 @@ def handle_fulfillment_hook(lex_request: LexRequest[AirlineBotSessionAttributes]
                 departure_date=departure_date,
                 return_date=return_date,
                 number_of_passengers=number_of_passengers,
-                reservation_number=reservation_number
+                reservation_number=reservation_number,
             )
         except Exception as e:
             logger.warning(f"Failed to get localized message: {e}")
@@ -233,7 +239,7 @@ def handle_fulfillment_hook(lex_request: LexRequest[AirlineBotSessionAttributes]
                 destination_city=f"{destination_city} ({destination_code})",
                 departure_date=departure_date,
                 number_of_passengers=number_of_passengers,
-                reservation_number=reservation_number
+                reservation_number=reservation_number,
             )
         except Exception as e:
             logger.warning(f"Failed to get localized message: {e}")
@@ -242,23 +248,21 @@ def handle_fulfillment_hook(lex_request: LexRequest[AirlineBotSessionAttributes]
 
     # Transition to AnythingElse intent to offer additional assistance
     return dialog.transition_to_intent(
-        intent_name="AnythingElse",
-        lex_request=lex_request,
-        messages=[LexPlainText(content=message)]
+        intent_name="AnythingElse", lex_request=lex_request, messages=[LexPlainText(content=message)]
     )
 
 
 def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse[AirlineBotSessionAttributes]:
     """
     Main handler for the BookFlight intent.
-    
+
     This intent manages the complete flight booking process, including user authentication,
     slot collection for trip details, and booking confirmation. It demonstrates proper
     use of dialog management and intent transitions.
-    
+
     Args:
         lex_request: The Lex request containing user input and session state
-        
+
     Returns:
         LexResponse: The response to send back to Amazon Lex
     """
@@ -270,12 +274,12 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     if invocation_source == InvocationSource.DIALOG_CODE_HOOK.value:
         return handle_dialog_hook(lex_request)
 
-    if (invocation_source == InvocationSource.FULFILLMENT_CODE_HOOK.value or
-        lex_request.sessionState.intent.state == "ReadyForFulfillment"):
+    if (
+        invocation_source == InvocationSource.FULFILLMENT_CODE_HOOK.value
+        or lex_request.sessionState.intent.state == "ReadyForFulfillment"
+    ):
         return handle_fulfillment_hook(lex_request)
 
     # Fallback - should not normally reach here
     logger.warning(f"Unrecognized invocation source: {invocation_source}")
     return dialog.delegate(lex_request=lex_request)
-
-

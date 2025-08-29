@@ -1,6 +1,7 @@
 """
 Handler for the CancelFlight intent using MessageManager.
 """
+
 from loguru import logger
 
 from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
@@ -11,12 +12,12 @@ from ..session_attributes import AirlineBotSessionAttributes
 def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse[AirlineBotSessionAttributes]:
     """
     Handle the CancelFlight intent with internationalization support.
-    
+
     Flow: Elicit reservation number → Validate format → Lookup reservation → Cancel or error
-    
+
     Args:
         lex_request: The Lex request containing user input and session state
-        
+
     Returns:
         The Lex response with localized messages
     """
@@ -44,9 +45,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting ReservationNumber slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     # STEP 2: Input validation - check reservation number format
@@ -58,9 +57,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Invalid reservation format: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     # STEP 3: Business logic - lookup reservation in system
@@ -85,38 +82,33 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
         logger.debug(f"Cancellation error: {message}")
 
     # Close dialog with final localized response
-    return dialog.close(
-        messages=[LexPlainText(content=message)],
-        lex_request=lex_request
-    )
+    return dialog.close(messages=[LexPlainText(content=message)], lex_request=lex_request)
 
 
 def _is_valid_reservation_number(reservation_number: str) -> bool:
     """
     Validate reservation number format.
-    
+
     Args:
         reservation_number: The reservation number to validate
-        
+
     Returns:
         bool: True if valid format, False otherwise
     """
     # Simple validation: should be 6 characters, alphanumeric
-    return (reservation_number and
-            len(reservation_number) == 6 and
-            reservation_number.isalnum())
+    return reservation_number and len(reservation_number) == 6 and reservation_number.isalnum()
 
 
 def _lookup_reservation(reservation_number: str) -> bool:
     """
     Simulate reservation lookup.
-    
+
     Args:
         reservation_number: The reservation number to look up
-        
+
     Returns:
         bool: True if reservation found, False otherwise
     """
     # Mock implementation - in production, this would call a real reservation system
     # For demo purposes, assume reservations starting with 'A' exist
-    return reservation_number.upper().startswith('A')
+    return reservation_number.upper().startswith("A")

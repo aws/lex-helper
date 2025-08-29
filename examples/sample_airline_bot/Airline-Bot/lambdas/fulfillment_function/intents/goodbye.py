@@ -1,6 +1,7 @@
 """
 Handler for the Goodbye intent.
 """
+
 from loguru import logger
 
 from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
@@ -11,10 +12,10 @@ from ..session_attributes import AirlineBotSessionAttributes
 def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse[AirlineBotSessionAttributes]:
     """
     Handle the Goodbye intent.
-    
+
     Args:
         lex_request: The Lex request
-        
+
     Returns:
         The Lex response
     """
@@ -32,11 +33,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     messages = [LexPlainText(content=message)]
 
     # Close the dialog with the correct parameter order
-    response = dialog.close(
-        messages=messages,
-        lex_request=lex_request
-
-    )
+    response = dialog.close(messages=messages, lex_request=lex_request)
 
     logger.debug(f"Response: {response}")
     return response

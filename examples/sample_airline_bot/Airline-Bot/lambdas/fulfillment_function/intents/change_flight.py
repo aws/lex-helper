@@ -1,6 +1,7 @@
 """
 Handler for the ChangeFlight intent.
 """
+
 from loguru import logger
 
 from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
@@ -11,10 +12,10 @@ from ..session_attributes import AirlineBotSessionAttributes
 def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse[AirlineBotSessionAttributes]:
     """
     Handle the ChangeFlight intent.
-    
+
     Args:
         lex_request: The Lex request
-        
+
     Returns:
         The Lex response
     """
@@ -42,18 +43,14 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting ReservationNumber slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     if not new_departure_date:
         message = "What is your new departure date?"
         logger.debug(f"Eliciting NewDepartureDate slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="NewDepartureDate",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="NewDepartureDate", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     # Create the response message
@@ -61,10 +58,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     logger.debug(f"Response message: {message}")
 
     # Close the dialog with the correct parameter order
-    response = dialog.close(
-        messages=[LexPlainText(content=message)],
-        lex_request=lex_request
-    )
+    response = dialog.close(messages=[LexPlainText(content=message)], lex_request=lex_request)
 
     logger.debug(f"Response: {response}")
     return response

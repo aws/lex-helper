@@ -1,6 +1,7 @@
 """
 Handler for the TrackBaggage intent using MessageManager.
 """
+
 from loguru import logger
 
 from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
@@ -11,15 +12,14 @@ from ..session_attributes import AirlineBotSessionAttributes
 def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse[AirlineBotSessionAttributes]:
     """
     Handle the TrackBaggage intent with localized messages.
-    
+
     Args:
         lex_request: The Lex request
-        
+
     Returns:
         The Lex response
     """
     logger.debug("TrackBaggage intent handler called")
-
 
     # Get intent and slots
     intent = dialog.get_intent(lex_request)
@@ -41,9 +41,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             # Keep default fallback message
         logger.debug(f"Eliciting ReservationNumber slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber",
-            messages=[LexPlainText(content=message)],
-            lex_request=lex_request
+            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
     # STEP 2: Business logic - mock baggage lookup
@@ -55,11 +53,8 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
         template = get_message("track_baggage.status_response")
         message = template.format(reservation_number=reservation_number, status=baggage_status)
     except Exception as e:
-            logger.warning(f"Failed to get localized message: {e}")
-            # Keep default fallback message
+        logger.warning(f"Failed to get localized message: {e}")
+        # Keep default fallback message
     logger.debug(f"Response message: {message}")
 
-    return dialog.close(
-        messages=[LexPlainText(content=message)],
-        lex_request=lex_request
-    )
+    return dialog.close(messages=[LexPlainText(content=message)], lex_request=lex_request)
