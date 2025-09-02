@@ -269,7 +269,7 @@ If your CI/CD pipeline fails after migration:
    - poetry install
    - poetry run flake8
    - poetry run black --check
-   
+
    # New (GitHub Actions with uv)
    - name: Install uv
      uses: astral-sh/setup-uv@v3

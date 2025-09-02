@@ -185,7 +185,7 @@ from lex_helper.core.types import LexRequest, LexResponse
 
 class ExampleModel(BaseModel):
     """Example model with proper type hints and docstrings.
-    
+
     Args:
         name: The name field with validation
         count: Optional count with default value
@@ -195,19 +195,19 @@ class ExampleModel(BaseModel):
 
     def process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Process the input data and return results.
-        
+
         Args:
             data: Input data dictionary
-            
+
         Returns:
             Processed data dictionary
-            
+
         Raises:
             ValueError: If data is invalid
         """
         if not data:
             raise ValueError("Data cannot be empty")
-        
+
         return {"processed": True, "original": data}
 ```
 
@@ -224,31 +224,31 @@ from lex_helper.core.types import LexRequest
 
 class TestLexHelper:
     """Test class for LexHelper functionality."""
-    
+
     def setup_method(self):
         """Set up test fixtures before each test method."""
         self.config = Config()
         self.lex_helper = LexHelper(config=self.config)
-    
+
     def test_handler_success(self):
         """Test successful handler execution."""
         # Arrange
         event = {"key": "value"}
         context = Mock()
-        
+
         # Act
         result = self.lex_helper.handler(event, context)
-        
+
         # Assert
         assert result is not None
         assert "statusCode" in result
-    
+
     @patch("lex_helper.core.handler.some_external_call")
     def test_handler_with_mock(self, mock_external):
         """Test handler with mocked external dependencies."""
         # Arrange
         mock_external.return_value = "mocked_result"
-        
+
         # Act & Assert
         # ... test implementation
 ```

@@ -25,10 +25,9 @@ jobs:
           python-version: '3.13'
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
 
       - name: Install dependencies
         run: uv sync --dev
@@ -53,16 +52,16 @@ jobs:
         run: |
           # Wait a bit for the package to be available
           sleep 30
-          
+
           # Create a fresh virtual environment for testing
           python -m venv test_env
           source test_env/bin/activate
-          
+
           # Install from TestPyPI
           pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ lex-helper==${{ github.event.inputs.version }}
-          
+
           # Basic import test
           python -c "import lex_helper; print('✅ Import successful')"
           python -c "from lex_helper import LexHelper, Config; print('✅ Main classes import successful')"
-          
+
           echo "🎉 TestPyPI release and installation test successful!"
