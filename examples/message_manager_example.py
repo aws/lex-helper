@@ -18,7 +18,7 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     # Use messages in your handler
     welcome_msg = get_message("welcome", "Welcome!")
     error_msg = get_message("error.general", "Something went wrong")
-    
+
     # Example usage of the messages
     print(f"Welcome message: {welcome_msg}")
     print(f"Error message: {error_msg}")
