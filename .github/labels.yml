@@ -1,0 +1,152 @@
+# Repository Labels Configuration
+# This file defines the labels used in the repository
+
+# Type Labels
+- name: bug
+  color: d73a4a
+  description: Something isn't working
+
+- name: enhancement
+  color: a2eeef
+  description: New feature or request
+
+- name: documentation
+  color: 0075ca
+  description: Improvements or additions to documentation
+
+- name: tests
+  color: 1d76db
+  description: Testing related changes
+
+- name: refactoring
+  color: fbca04
+  description: Code refactoring without functional changes
+
+- name: maintenance
+  color: 7057ff
+  description: Maintenance tasks and chores
+
+- name: breaking-change
+  color: b60205
+  description: Breaking changes that require major version bump
+
+# Component Labels
+- name: bedrock
+  color: ff6b6b
+  description: Amazon Bedrock integration
+
+- name: dialog
+  color: 4ecdc4
+  description: Dialog state management
+
+- name: channels
+  color: 45b7d1
+  description: Channel formatting (SMS, Web, etc.)
+
+- name: formatting
+  color: 96ceb4
+  description: Message and response formatting
+
+- name: ci/cd
+  color: 6c5ce7
+  description: Continuous integration and deployment
+
+- name: core
+  color: fd79a8
+  description: Core library functionality
+
+- name: utils
+  color: fdcb6e
+  description: Utility functions and helpers
+
+# Priority Labels
+- name: priority/critical
+  color: b60205
+  description: Critical priority
+
+- name: priority/high
+  color: d93f0b
+  description: High priority
+
+- name: priority/medium
+  color: fbca04
+  description: Medium priority
+
+- name: priority/low
+  color: 0e8a16
+  description: Low priority
+
+# Status Labels
+- name: status/needs-review
+  color: fbca04
+  description: Needs review from maintainers
+
+- name: status/needs-work
+  color: d93f0b
+  description: Needs additional work before merge
+
+- name: status/ready-to-merge
+  color: 0e8a16
+  description: Ready to be merged
+
+- name: status/blocked
+  color: b60205
+  description: Blocked by external dependency
+
+- name: status/wip
+  color: fbca04
+  description: Work in progress
+
+# Size Labels
+- name: size/XS
+  color: 3cbf00
+  description: Extra small PR (< 10 lines)
+
+- name: size/S
+  color: 5d9801
+  description: Small PR (10-49 lines)
+
+- name: size/M
+  color: 7f7203
+  description: Medium PR (50-199 lines)
+
+- name: size/L
+  color: a14c09
+  description: Large PR (200-499 lines)
+
+- name: size/XL
+  color: b60205
+  description: Extra large PR (500+ lines)
+
+# Special Labels
+- name: good first issue
+  color: 7057ff
+  description: Good for newcomers
+
+- name: help wanted
+  color: 008672
+  description: Extra attention is needed
+
+- name: question
+  color: d876e3
+  description: Further information is requested
+
+- name: duplicate
+  color: cfd3d7
+  description: This issue or pull request already exists
+
+- name: invalid
+  color: e4e669
+  description: This doesn't seem right
+
+- name: wontfix
+  color: ffffff
+  description: This will not be worked on
+
+- name: dependencies
+  color: 0366d6
+  description: Pull requests that update a dependency file
+
+- name: security
+  color: b60205
+  description: Security related issues

@@ -178,16 +178,11 @@ dependencies = [
     { name = "pyyaml" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
-    { name = "ruff" },
-]
-
-[package.dev-dependencies]
-dev = [
     { name = "ruff" },
 ]
 
@@ -196,17 +191,17 @@ requires-dist = [
     { name = "boto3", specifier = ">=1.26.0" },
     { name = "botocore", specifier = ">=1.29.0" },
     { name = "loguru", specifier = ">=0.7.3,<0.8.0" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0.0" },
     { name = "pydantic", specifier = ">2.0.0,<3.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.2.1" },
     { name = "pyyaml", specifier = ">=6.0,<7.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.9.6" },
 ]
-provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "ruff", specifier = ">=0.12.11" }]
+dev = [
+    { name = "pre-commit", specifier = ">=3.0.0" },
+    { name = "pytest", specifier = ">=7.0.0" },
+    { name = "pytest-cov", specifier = ">=6.2.1" },
+    { name = "ruff", specifier = ">=0.12.11" },
+]
 
 [[package]]
 name = "loguru"

@@ -23,13 +23,7 @@ Issues = "https://github.com/aws/lex-helper/issues"
 Repository = "https://github.com/aws/lex-helper"
 Changelog = "https://github.com/aws/lex-helper/blob/main/CHANGELOG.md"
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "ruff>=0.9.6",
-    "pytest-cov>=6.2.1",
-    "pre-commit>=3.0.0"
-]
+
 
 [build-system]
 requires = ["hatchling"]
@@ -124,5 +118,8 @@ reportCallInDefaultInitializer = true
 
 [dependency-groups]
 dev = [
+    "pytest>=7.0.0",
     "ruff>=0.12.11",
+    "pytest-cov>=6.2.1",
+    "pre-commit>=3.0.0"
 ]
