@@ -82,7 +82,7 @@ Each intent handler follows a consistent pattern:
    ```bash
    # Create the layer directory structure
    mkdir -p layers/lex_helper/python
-   
+
    # Extract the lex-helper package (download from https://github.com/aws/lex-helper)
    unzip layers/lex-helper-v*.zip -d layers/lex_helper/python
    ```
@@ -94,7 +94,7 @@ Each intent handler follows a consistent pattern:
    ```bash
    # Run individual intent handlers for testing
    python -m intents.book_flight
-   
+
    # Test the main lambda handler
    python lambda_function.py
    ```

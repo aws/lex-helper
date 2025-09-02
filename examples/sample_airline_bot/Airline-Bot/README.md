@@ -102,7 +102,7 @@ The Lambda function demonstrates production-ready patterns:
    mkdir -p layers/lex_helper/python
    # Download lex-helper from https://github.com/aws/lex-helper
    unzip lex-helper-v*.zip -d layers/lex_helper/python
-3. Deploy: 
+3. Deploy:
    ```cd cloudformation
    ./deploy_airline_bot.sh
 

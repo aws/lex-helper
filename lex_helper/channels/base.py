@@ -80,8 +80,8 @@ class Channel(ABC):
         Returns:
             The formatted payload text, or None if payload cannot be formatted
         """
-        if isinstance(payload.content, str):  # type: ignore
+        if isinstance(payload.content, str):
             return LexCustomPayload(content=payload.content)
-        if isinstance(payload.content, dict) and "text" in payload.content:
+        elif isinstance(payload.content, dict) and "text" in payload.content:  # type: ignore[unreachable]
             return LexCustomPayload(content=str(payload.content["text"]))
         return LexCustomPayload(content=str(payload.content))

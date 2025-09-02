@@ -37,7 +37,7 @@ class PlainText(BaseModel):
 
 
 class LexCustomPayload(BaseModel):
-    content: str
+    content: str | dict[str, Any]
     contentType: Literal["CustomPayload"] = "CustomPayload"
 
 

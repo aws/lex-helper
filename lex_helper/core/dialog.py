@@ -626,12 +626,12 @@ def handle_any_unknown_slot_choice(lex_request: LexRequest[T]) -> LexResponse[T]
     intent = get_intent(lex_request)
     previous_slot_to_elicit = session_attributes.previous_slot_to_elicit
 
-    logger.debug("Unparsed slot name: " + previous_slot_to_elicit)
+    logger.debug("Unparsed slot name: " + (previous_slot_to_elicit or ""))
     slot_name = previous_slot_to_elicit
 
     logger.debug(f"IDENTIFIER FOR BAD SLOT {slot_name}")
 
-    choice = get_slot(slot_name, intent, preference="interpretedValue")
+    choice = get_slot(slot_name or "", intent, preference="interpretedValue")
     logger.debug(f"BAD CHOICE IS {choice}")
     if not isinstance(choice, str):
         logger.debug("Bad slot choice")

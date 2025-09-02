@@ -8,7 +8,7 @@ cancel_flight:
   cancellation_error: "I'm sorry, I couldn't find a reservation with number {reservation_number}. Please check the number and try again."
   invalid_reservation_format: "Please provide a valid reservation number. It should be in the format ABC123."
 
-# Book Flight Intent Messages  
+# Book Flight Intent Messages
 book_flight:
   authentication_required: "Before I can help with booking a flight, you will need to authenticate."
   elicit_trip_type: "Is this a one-way or round trip?"

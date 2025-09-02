@@ -58,127 +58,215 @@ class ModelFamily(Enum):
         return cls.from_model_id(model_id) is not None
 
 
+def _anthropic_request_builder(
+    prompt: str,
+    max_tokens: int | None,
+    temperature: float | None,
+    top_p: float | None,
+    stop_sequences: list[str] | None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    return {
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_tokens or 1000,
+        "anthropic_version": "bedrock-2023-05-31",
+        **{
+            k: v
+            for k, v in {"temperature": temperature, "top_p": top_p, "stop_sequences": stop_sequences}.items()
+            if v is not None
+        },
+        **kwargs,
+    }
+
+
+def _anthropic_response_parser(r: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "text": r.get("content", [{}])[0].get("text", ""),
+        "usage": r.get("usage", {}),
+        "raw_response": r,
+    }
+
+
+def _titan_request_builder(
+    prompt: str,
+    max_tokens: int | None,
+    temperature: float | None,
+    top_p: float | None,
+    stop_sequences: list[str] | None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    return {
+        "inputText": prompt,
+        "textGenerationConfig": {
+            k: v
+            for k, v in {
+                "maxTokenCount": max_tokens,
+                "temperature": temperature,
+                "topP": top_p,
+                "stopSequences": stop_sequences,
+            }.items()
+            if v is not None
+        },
+        **kwargs,
+    }
+
+
+def _titan_response_parser(r: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "text": r.get("results", [{}])[0].get("outputText", ""),
+        "usage": r.get("inputTextTokenCount", 0) + r.get("results", [{}])[0].get("tokenCount", 0),
+        "raw_response": r,
+    }
+
+
+def _ai21_request_builder(
+    prompt: str,
+    max_tokens: int | None,
+    temperature: float | None,
+    top_p: float | None,
+    stop_sequences: list[str] | None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    return {
+        "prompt": prompt,
+        **{
+            k: v
+            for k, v in {
+                "maxTokens": max_tokens,
+                "temperature": temperature,
+                "topP": top_p,
+                "stopSequences": stop_sequences,
+            }.items()
+            if v is not None
+        },
+        **kwargs,
+    }
+
+
+def _ai21_response_parser(r: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "text": r.get("completions", [{}])[0].get("data", {}).get("text", ""),
+        "usage": r.get("prompt", {}).get("tokens", []),
+        "raw_response": r,
+    }
+
+
+def _cohere_request_builder(
+    prompt: str,
+    max_tokens: int | None,
+    temperature: float | None,
+    top_p: float | None,
+    stop_sequences: list[str] | None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    return {
+        "prompt": prompt,
+        **{
+            k: v
+            for k, v in {
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "p": top_p,
+                "stop_sequences": stop_sequences,
+            }.items()
+            if v is not None
+        },
+        **kwargs,
+    }
+
+
+def _cohere_response_parser(r: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "text": r.get("generations", [{}])[0].get("text", ""),
+        "usage": r.get("meta", {}),
+        "raw_response": r,
+    }
+
+
+def _llama_request_builder(
+    prompt: str,
+    max_tokens: int | None,
+    temperature: float | None,
+    top_p: float | None,
+    stop_sequences: list[str] | None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    return {
+        "prompt": prompt,
+        **{
+            k: v for k, v in {"max_gen_len": max_tokens, "temperature": temperature, "top_p": top_p}.items() if v is not None
+        },
+        **kwargs,
+    }
+
+
+def _llama_response_parser(r: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "text": r.get("generation", ""),
+        "usage": r.get("prompt_token_count", 0) + r.get("generation_token_count", 0),
+        "raw_response": r,
+    }
+
+
 # Model configurations
 MODEL_CONFIGS = {
     ModelFamily.ANTHROPIC_CLAUDE: ModelConfig(
-        request_builder=lambda prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs: {
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": max_tokens or 1000,
-            "anthropic_version": "bedrock-2023-05-31",
-            **{
-                k: v
-                for k, v in {"temperature": temperature, "top_p": top_p, "stop_sequences": stop_sequences}.items()
-                if v is not None
-            },
-            **kwargs,
-        },
-        response_parser=lambda r: {
-            "text": r.get("content", [{}])[0].get("text", ""),
-            "usage": r.get("usage", {}),
-            "raw_response": r,
-        },
+        request_builder=_anthropic_request_builder,
+        response_parser=_anthropic_response_parser,
     ),
     ModelFamily.AMAZON_TITAN: ModelConfig(
-        request_builder=lambda prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs: {
-            "inputText": prompt,
-            "textGenerationConfig": {
-                k: v
-                for k, v in {
-                    "maxTokenCount": max_tokens,
-                    "temperature": temperature,
-                    "topP": top_p,
-                    "stopSequences": stop_sequences,
-                }.items()
-                if v is not None
-            },
-            **kwargs,
-        },
-        response_parser=lambda r: {
-            "text": r.get("results", [{}])[0].get("outputText", ""),
-            "usage": r.get("inputTextTokenCount", 0) + r.get("results", [{}])[0].get("tokenCount", 0),
-            "raw_response": r,
-        },
+        request_builder=_titan_request_builder,
+        response_parser=_titan_response_parser,
     ),
     ModelFamily.AI21_J2: ModelConfig(
-        request_builder=lambda prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs: {
-            "prompt": prompt,
-            **{
-                k: v
-                for k, v in {
-                    "maxTokens": max_tokens,
-                    "temperature": temperature,
-                    "topP": top_p,
-                    "stopSequences": stop_sequences,
-                }.items()
-                if v is not None
-            },
-            **kwargs,
-        },
-        response_parser=lambda r: {
-            "text": r.get("completions", [{}])[0].get("data", {}).get("text", ""),
-            "usage": r.get("prompt", {}).get("tokens", []),
-            "raw_response": r,
-        },
+        request_builder=_ai21_request_builder,
+        response_parser=_ai21_response_parser,
     ),
     ModelFamily.COHERE_COMMAND: ModelConfig(
-        request_builder=lambda prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs: {
-            "prompt": prompt,
-            **{
-                k: v
-                for k, v in {
-                    "max_tokens": max_tokens,
-                    "temperature": temperature,
-                    "p": top_p,
-                    "stop_sequences": stop_sequences,
-                }.items()
-                if v is not None
-            },
-            **kwargs,
-        },
-        response_parser=lambda r: {
-            "text": r.get("generations", [{}])[0].get("text", ""),
-            "usage": r.get("meta", {}),
-            "raw_response": r,
-        },
+        request_builder=_cohere_request_builder,
+        response_parser=_cohere_response_parser,
     ),
     ModelFamily.META_LLAMA: ModelConfig(
-        request_builder=lambda prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs: {
-            "prompt": prompt,
-            **{
-                k: v
-                for k, v in {"max_gen_len": max_tokens, "temperature": temperature, "top_p": top_p}.items()
-                if v is not None
-            },
-            **kwargs,
-        },
-        response_parser=lambda r: {
-            "text": r.get("generation", ""),
-            "usage": r.get("prompt_token_count", 0) + r.get("generation_token_count", 0),
-            "raw_response": r,
-        },
+        request_builder=_llama_request_builder,
+        response_parser=_llama_response_parser,
     ),
 }
+
+
+def _default_request_builder(
+    prompt: str,
+    max_tokens: int | None,
+    temperature: float | None,
+    top_p: float | None,
+    stop_sequences: list[str] | None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    return {
+        "prompt": prompt,
+        **{
+            k: v
+            for k, v in {
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "top_p": top_p,
+                "stop_sequences": stop_sequences,
+            }.items()
+            if v is not None
+        },
+        **kwargs,
+    }
+
+
+def _default_response_parser(r: dict[str, Any]) -> dict[str, Any]:
+    return {"text": str(r), "usage": {}, "raw_response": r}
 
 
 # Default model configuration
 def get_default_model_config() -> ModelConfig:
     """Get default configuration for unknown models."""
     return ModelConfig(
-        request_builder=lambda prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs: {
-            "prompt": prompt,
-            **{
-                k: v
-                for k, v in {
-                    "max_tokens": max_tokens,
-                    "temperature": temperature,
-                    "top_p": top_p,
-                    "stop_sequences": stop_sequences,
-                }.items()
-                if v is not None
-            },
-            **kwargs,
-        },
-        response_parser=lambda r: {"text": str(r), "usage": {}, "raw_response": r},
+        request_builder=_default_request_builder,
+        response_parser=_default_response_parser,
     )
 
 
