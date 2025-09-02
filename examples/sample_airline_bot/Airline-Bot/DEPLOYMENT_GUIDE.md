@@ -94,24 +94,24 @@ If you encounter issues with the Lambda layer:
 2. If you see an error like `No module named 'pydantic_core._pydantic_core'`, this indicates an issue with the pydantic dependency. We've provided three solutions:
 
    **Solution 1: Integrated Dependencies Approach (Recommended)**
-   
+
    The project uses an integrated approach where dependencies are included in the lex-helper layer:
    ```bash
    cd cloudformation/scripts
    ./package-lex-helper-layer.sh
    ```
-   
+
    This creates a layer with the lex-helper module and all necessary dependencies in one place, avoiding conflicts.
    The CloudFormation template has been updated to use this comprehensive layer.
 
    **Solution 2: Updated lex-helper Layer**
-   
+
    The `package-lex-helper-layer.sh` script includes the necessary versions of pydantic and its dependencies:
    ```bash
    cd cloudformation/scripts
    ./package-lex-helper-layer.sh
    ```
-   
+
    This script:
    - Uses the versions from the lex-helper requirements
    - Installs dependencies in the correct Lambda layer structure
@@ -121,18 +121,18 @@ If you encounter issues with the Lambda layer:
    ```bash
    # Create a temporary directory with the correct structure
    mkdir -p temp_layer/python
-   
+
    # Install pydantic and its dependencies with specific versions
    pip install annotated-types==0.7.0 colorama==0.4.6 loguru==0.7.3 \
        pydantic-core==2.27.2 pydantic==2.10.6 typing-extensions==4.12.2 \
        -t temp_layer/python
-   
+
    # Install the lex_helper package
    pip install layers/lex-helper-v0.0.11.zip -t temp_layer/python --no-deps
-   
+
    # Create the zip file
    cd temp_layer && zip -r ../zip/lex_helper_layer.zip .
-   
+
    # Clean up
    cd .. && rm -rf temp_layer
    ```
@@ -162,17 +162,17 @@ If you encounter issues with importing the Lex bot:
    ```bash
    # Get the bot name
    BOT_NAME=$(grep -o '"name":"[^"]*"' "lex-export/LexBot/Bot.json" | cut -d'"' -f4)
-   
+
    # Create the folder structure
    mkdir -p temp_export/$BOT_NAME/$BOT_NAME
-   
+
    # Copy the files
    cp lex-export/Manifest.json temp_export/$BOT_NAME/
    cp -r lex-export/LexBot/* temp_export/$BOT_NAME/$BOT_NAME/
-   
+
    # Create the zip file
    cd temp_export && zip -r ../zip/AirlineBot.zip .
-   
+
    # Clean up
    cd .. && rm -rf temp_export
    ```

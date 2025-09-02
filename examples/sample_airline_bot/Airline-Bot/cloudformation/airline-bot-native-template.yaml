@@ -5,22 +5,22 @@ Parameters:
   S3BucketName:
     Type: String
     Description: S3 bucket containing deployment artifacts
-  
+
   LexHelperLayerKey:
     Type: String
     Description: S3 key for the Lex Helper layer zip file
     Default: lex_helper_layer.zip
-  
+
   LambdaFunctionKey:
     Type: String
     Description: S3 key for the Lambda function zip file
     Default: AirlineBotAPGLambda.zip
-  
+
   BotImportKey:
     Type: String
     Description: S3 key for the Lex bot import zip file
     Default: AirlineBot.zip
-    
+
   BotAliasName:
     Type: String
     Description: Name for the Lex bot alias
@@ -80,10 +80,10 @@ Resources:
                 Action:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
-                Resource: 
+                Resource:
                   - !GetAtt BotLogGroup.Arn
                   - !Sub "${BotLogGroup.Arn}:*"
-                  
+
   # IAM Role for Lex conversation logs
   LexConversationLogsRole:
     Type: AWS::IAM::Role
@@ -110,7 +110,7 @@ Resources:
                 Resource:
                   - !GetAtt BotLogGroup.Arn
                   - !Sub "${BotLogGroup.Arn}:*"
-  
+
   # Lambda Layer for lex_helper
   LexHelperLayer:
     Type: AWS::Lambda::LayerVersion
@@ -123,7 +123,7 @@ Resources:
         S3Bucket: !Ref S3BucketName
         S3Key: !Ref LexHelperLayerKey
       LicenseInfo: Apache-2.0
-  
+
 
   # Lambda function for fulfillment
   AirlineBotFulfillmentFunction:
@@ -250,11 +250,11 @@ Outputs:
   LexHelperLayerArn:
     Description: ARN of the Lex Helper Lambda layer
     Value: !Ref LexHelperLayer
-      
+
   LambdaFunctionArn:
     Description: ARN of the Airline Bot fulfillment Lambda function
     Value: !GetAtt AirlineBotFulfillmentFunction.Arn
-  
+
   BotId:
     Description: ID of the Airline Bot
     Value: !Ref AirlineBot

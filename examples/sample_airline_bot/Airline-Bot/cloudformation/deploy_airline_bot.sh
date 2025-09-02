@@ -121,7 +121,7 @@ if aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION 
   aws cloudformation delete-stack --stack-name $STACK_NAME --region $REGION
   echo "Waiting for stack deletion to complete..."
   aws cloudformation wait stack-delete-complete --stack-name $STACK_NAME --region $REGION
-  
+
   # Add a delay after stack deletion to ensure resources are fully cleaned up
   echo "Adding a delay to ensure all resources are fully deleted..."
   sleep 30
@@ -183,11 +183,11 @@ fi
 # Check the result
 if [ "$STACK_ACTION" = "none" ]; then
     echo "Stack is up to date."
-    
+
     # Get outputs
     LAMBDA_FUNCTION_ARN=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION --query "Stacks[0].Outputs[?OutputKey=='LambdaFunctionArn'].OutputValue" --output text)
     LAMBDA_FUNCTION_NAME=$(echo $LAMBDA_FUNCTION_ARN | awk -F':' '{print $NF}')
-    
+
     echo ""
     echo "========================================================"
     echo "=== Deployment Summary ================================="
@@ -198,20 +198,20 @@ if [ "$STACK_ACTION" = "none" ]; then
 elif [ "$STACK_ACTION" = "create" ] || [ "$STACK_ACTION" = "update" ]; then
     echo "Stack deployment initiated successfully."
     echo "Waiting for stack $STACK_ACTION to complete..."
-    
+
     if [ "$STACK_ACTION" = "create" ]; then
         aws cloudformation wait stack-create-complete --stack-name $STACK_NAME --region $REGION
     else
         aws cloudformation wait stack-update-complete --stack-name $STACK_NAME --region $REGION
     fi
-    
+
     if [ $? -eq 0 ]; then
         echo "Stack deployment completed successfully."
-        
+
         # Get the Lambda function name from the stack outputs
         LAMBDA_FUNCTION_ARN=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION --query "Stacks[0].Outputs[?OutputKey=='LambdaFunctionArn'].OutputValue" --output text)
         LAMBDA_FUNCTION_NAME=$(echo $LAMBDA_FUNCTION_ARN | awk -F':' '{print $NF}')
-        
+
         echo ""
         echo "========================================================"
         echo "=== Deployment Summary ================================="

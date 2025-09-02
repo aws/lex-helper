@@ -31,7 +31,7 @@ Messages are stored in YAML files with hierarchical keys:
 cancel_flight:
   elicit_reservation_number: "What is your reservation number?"
   cancellation_success: "I've cancelled your reservation {reservation_number}."
-  
+
 book_flight:
   elicit_origin_city: "From which city would you like to depart?"
 ```
@@ -57,12 +57,12 @@ import os
 def handler(lex_request):
     # Get locale from request
     locale = getattr(lex_request, 'locale', 'en_US')
-    
+
     # Initialize message manager
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     message_file = os.path.join(project_root, f"messages_{locale}.yaml")
     msg_manager = message_manager.MessageManager(message_file, locale)
-    
+
     # Get message
     message = msg_manager.get_message("cancel_flight.elicit_reservation_number")
 ```
@@ -82,7 +82,7 @@ def handler(lex_request):
     locale = get_user_locale(lex_request)
     message_file = f"messages_{locale}.yaml"
     msg_manager = message_manager.MessageManager(message_file, locale)
-    
+
     message = msg_manager.get_message(
         "cancel_flight.cancellation_success",
         reservation_number="ABC123"
@@ -107,11 +107,11 @@ The `message_config.yaml` file controls message manager behavior:
 default:
   locale: en_US
   fallback_locale: en_US
-  
+
 supported_locales:
   - en_US
   - it_IT
-  
+
 locale_mappings:
   "en": "en_US"      # Map generic 'en' to 'en_US'
   "it": "it_IT"      # Map generic 'it' to 'it_IT'
@@ -148,7 +148,7 @@ Use hierarchical naming with intent prefixes:
 ```yaml
 intent_name:
   action_type: "Message text"
-  
+
 # Examples:
 cancel_flight:
   elicit_reservation_number: "What is your reservation number?"
@@ -196,7 +196,7 @@ def test_cancel_flight_messages():
     lex_request.locale = 'en_US'
     message = get_localized_message(lex_request, 'cancel_flight.elicit_reservation_number')
     assert "What is your reservation number?" in message
-    
+
     # Test Italian
     lex_request.locale = 'it_IT'
     message = get_localized_message(lex_request, 'cancel_flight.elicit_reservation_number')
@@ -213,7 +213,7 @@ aws lexv2-runtime recognize-text \
   --locale-id en_US \
   --text "Cancel my reservation"
 
-# Test with Italian locale  
+# Test with Italian locale
 aws lexv2-runtime recognize-text \
   --bot-id <bot-id> \
   --bot-alias-id <alias-id> \
@@ -235,7 +235,7 @@ Example migration:
 # Before
 message = "What is your reservation number?"
 
-# After  
+# After
 message = get_localized_message(
     lex_request,
     "cancel_flight.elicit_reservation_number"

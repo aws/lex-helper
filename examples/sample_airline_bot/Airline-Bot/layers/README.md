@@ -61,11 +61,11 @@ The main Lambda function (`lambda_function.py`) automatically detects and loads 
 if not os.getenv('AWS_EXECUTION_ENV'):
     # Get the project root directory
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    
+
     # Add layer to Python path
     layer_path = os.path.join(project_root, 'layers', 'lex_helper', 'python')
     sys.path.append(layer_path)
-    
+
     # For versioned packages
     for item in os.listdir(layer_path):
         item_path = os.path.join(layer_path, item)
@@ -124,7 +124,7 @@ aws lambda update-function-configuration \
    ```bash
    # For Python packages
    pip install <package> -t layers/<layer_name>/python/
-   
+
    # Or extract existing packages
    unzip <package>.zip -d layers/<layer_name>/python/
    ```
@@ -148,7 +148,7 @@ aws lambda update-function-configuration \
    ```bash
    # Verify layer structure
    ls -la layers/lex_helper/python/
-   
+
    # Check if lex_helper is properly extracted
    find layers/ -name "*.py" | head -10
    ```
@@ -157,7 +157,7 @@ aws lambda update-function-configuration \
    ```bash
    # List available layers
    aws lambda list-layers
-   
+
    # Check layer versions
    aws lambda list-layer-versions --layer-name lex-helper
    ```
@@ -199,7 +199,7 @@ except ImportError as e:
    ```bash
    # Remove old version
    rm -rf layers/lex_helper/python/*
-   
+
    # Extract new version
    unzip layers/lex-helper-v*.zip -d layers/lex_helper/python/
    ```
@@ -235,4 +235,3 @@ except ImportError as e:
 - [AWS Lambda Layers Documentation](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html)
 - [lex_helper Framework Documentation](https://github.com/aws/lex-helper)
 - [Python Package Management Best Practices](https://packaging.python.org/guides/)
-
