@@ -14,6 +14,4 @@ def format_buttons(buttons: list[Button]) -> list[Button]:
     Returns:
     List[Button]: A list of formatted Button objects.
     """
-    return [
-        Button(text=button.text, value=(button.value if button.value is not None else button.text)) for button in buttons
-    ]
+    return [Button(text=button.text, value=button.value or button.text) for button in buttons]

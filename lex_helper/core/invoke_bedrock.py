@@ -7,6 +7,7 @@ with proper error handling and response formatting.
 
 import json
 import logging
+from collections.abc import Callable
 from typing import Any
 
 import boto3
@@ -51,18 +52,17 @@ def invoke_bedrock(
         Dict with text, usage, raw_response
     """
     try:
-        bedrock_runtime = boto3.client("bedrock-runtime", region_name=region_name)
+        bedrock_runtime = boto3.client("bedrock-runtime", region_name=region_name)  # type: ignore[misc]
 
         config = get_model_config(model_id)
         request_body = config.request_builder(prompt, max_tokens, temperature, top_p, stop_sequences, **kwargs)
 
-        response = _try_with_fallback(
-            bedrock_runtime,
-            model_id,
-            lambda mid: bedrock_runtime.invoke_model(
+        def invoke_func(mid: str) -> dict[str, Any]:
+            return bedrock_runtime.invoke_model(  # type: ignore[misc]
                 modelId=mid, body=json.dumps(request_body), contentType="application/json", accept="application/json"
-            ),
-        )
+            )
+
+        response = _try_with_fallback(bedrock_runtime, model_id, invoke_func)
 
         response_body = json.loads(response["body"].read())
         return config.response_parser(response_body)
@@ -113,7 +113,7 @@ def invoke_bedrock_converse(
         ... )
     """
     try:
-        bedrock_runtime = boto3.client("bedrock-runtime", region_name=region_name)
+        bedrock_runtime = boto3.client("bedrock-runtime", region_name=region_name)  # type: ignore[misc]
 
         inference_config = {
             k: v
@@ -131,9 +131,10 @@ def invoke_bedrock_converse(
         if system_prompt:
             converse_params["system"] = [{"text": system_prompt}]
 
-        response = _try_with_fallback(
-            bedrock_runtime, model_id, lambda mid: bedrock_runtime.converse(modelId=mid, **converse_params)
-        )
+        def converse_func(mid: str) -> dict[str, Any]:
+            return bedrock_runtime.converse(modelId=mid, **converse_params)  # type: ignore[misc]
+
+        response = _try_with_fallback(bedrock_runtime, model_id, converse_func)
 
         return {
             "text": response["output"]["message"]["content"][0]["text"],
@@ -184,7 +185,7 @@ def invoke_bedrock_simple_converse(
     )
 
 
-def _try_with_fallback(bedrock_runtime, model_id: str, invoke_func):
+def _try_with_fallback(bedrock_runtime: Any, model_id: str, invoke_func: Callable[[str], dict[str, Any]]) -> dict[str, Any]:
     """Try invocation with fallback to inference profile if needed."""
     try:
         return invoke_func(model_id)

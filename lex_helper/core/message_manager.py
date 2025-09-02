@@ -40,7 +40,7 @@ class MessageManager:
         return cls._instance
 
     @classmethod
-    def _load_messages(cls, locale: str = None) -> None:
+    def _load_messages(cls, locale: str | None = None) -> None:
         """Load messages from YAML file for specified locale."""
         if locale is None:
             locale = cls._current_locale
@@ -80,7 +80,7 @@ class MessageManager:
 
             if yaml_path:
                 with open(yaml_path, encoding="utf-8") as file:
-                    messages = yaml.safe_load(file) or {}
+                    messages: dict[str, str] = yaml.safe_load(file) or {}
                 cls._messages[locale] = messages
                 logger.info(f"Messages loaded for locale '{locale}' from {yaml_path}")
             else:
@@ -99,7 +99,7 @@ class MessageManager:
             cls._load_messages(locale)
 
     @classmethod
-    def get_message(cls, key: str, default: str | None = None, locale: str = None) -> str:
+    def get_message(cls, key: str, default: str | None = None, locale: str | None = None) -> str:
         """
         Get message by key, supporting nested keys with dot notation.
 
@@ -156,7 +156,7 @@ class MessageManager:
         cls._load_messages()
 
     @classmethod
-    def get_all_messages(cls) -> dict[str, str]:
+    def get_all_messages(cls) -> dict[str, dict[str, str]]:
         """Get all loaded messages."""
         if not cls._messages:
             cls._load_messages()
@@ -169,7 +169,7 @@ def set_locale(locale: str) -> None:
     MessageManager.set_locale(locale)
 
 
-def get_message(key: str, default: str | None = None, locale: str = None) -> str:
+def get_message(key: str, default: str | None = None, locale: str | None = None) -> str:
     """
     Convenience function to get a message.
 
