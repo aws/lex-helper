@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g., 0.1.0-test.1)'
+        description: 'Version to release (e.g., 0.1.0a1, 0.1.0b1, 0.1.0rc1, 0.1.0.dev1)'
         required: true
         type: string
 
@@ -32,11 +32,18 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
-      - name: Update version in pyproject.toml
+      - name: Validate and update version in pyproject.toml
         run: |
+          # Validate version format (basic PEP 440 check)
+          if ! python -c "from packaging.version import Version; Version('${{ github.event.inputs.version }}')"; then
+            echo "❌ Invalid version format: ${{ github.event.inputs.version }}"
+            echo "Please use PEP 440 format like: 0.1.0a1, 0.1.0b1, 0.1.0rc1, or 0.1.0.dev1"
+            exit 1
+          fi
+          
           # Update version for test release
           sed -i 's/version = "[^"]*"/version = "${{ github.event.inputs.version }}"/' pyproject.toml
-          echo "Updated version to ${{ github.event.inputs.version }}"
+          echo "✅ Updated version to ${{ github.event.inputs.version }}"
           grep 'version = ' pyproject.toml
 
       - name: Build package
