@@ -14,6 +14,30 @@ dependencies = [
     "botocore>=1.29.0"
 ]
 license = {text = "Apache-2.0"}
+keywords = [
+    "amazon-lex",
+    "chatbot",
+    "aws",
+    "conversational-ai",
+    "nlp",
+    "voice-assistant",
+    "lambda",
+    "serverless"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Communications :: Chat",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
 
 [project.urls]
 Homepage = "https://github.com/aws/lex-helper"
@@ -21,6 +45,23 @@ Documentation = "https://github.com/aws/lex-helper#readme"
 Issues = "https://github.com/aws/lex-helper/issues"
 Repository = "https://github.com/aws/lex-helper"
 Changelog = "https://github.com/aws/lex-helper/blob/main/CHANGELOG.md"
+"Bug Reports" = "https://github.com/aws/lex-helper/issues"
+"Source Code" = "https://github.com/aws/lex-helper"
+
+[project.optional-dependencies]
+bedrock = [
+    "aws-lambda-powertools>=3.19.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.12.11",
+    "pytest-cov>=6.2.1",
+    "pre-commit>=3.0.0",
+    "fuzzywuzzy>=0.18.0",
+    "aws-lambda-powertools>=3.19.0",
+    "python-levenshtein>=0.27.1",
+    "packaging>=21.0",
+]
 
 
 
@@ -162,14 +203,4 @@ reportUnnecessaryComparison = true
 reportMatchNotExhaustive = true
 reportCallInDefaultInitializer = true
 
-[dependency-groups]
-dev = [
-    "pytest>=7.0.0",
-    "ruff>=0.12.11",
-    "pytest-cov>=6.2.1",
-    "pre-commit>=3.0.0",
-    "fuzzywuzzy>=0.18.0",
-    "aws-lambda-powertools>=3.19.0",
-    "python-levenshtein>=0.27.1",
-    "packaging>=21.0",
-]
+
