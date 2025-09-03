@@ -80,6 +80,8 @@ jobs:
     name: Build Package
     runs-on: ubuntu-latest
     needs: [lint, test]
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
