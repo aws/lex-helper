@@ -4,7 +4,7 @@
 
 **Bot:** Hello! Welcome to Airline-Bot. I can help you with booking flights, checking flight status, tracking baggage, and managing your reservations. How can I assist you today?
 
-**User:** I need to change my flight to a new departure date 
+**User:** I need to change my flight to a new departure date
 
 **Bot:** What is your reservation number?
 
