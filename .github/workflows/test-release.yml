@@ -40,7 +40,7 @@ jobs:
             echo "Please use PEP 440 format like: 0.1.0a1, 0.1.0b1, 0.1.0rc1, or 0.1.0.dev1"
             exit 1
           fi
-          
+
           # Update version for test release
           sed -i 's/version = "[^"]*"/version = "${{ github.event.inputs.version }}"/' pyproject.toml
           echo "✅ Updated version to ${{ github.event.inputs.version }}"
