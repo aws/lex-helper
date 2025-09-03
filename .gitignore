@@ -45,3 +45,7 @@ build/
 
 # Virtual Environment
 .venv/
+
+# Node
+examples/sample_airline_bot/node_modules
+examples/sample_airline_bot/cdk.out

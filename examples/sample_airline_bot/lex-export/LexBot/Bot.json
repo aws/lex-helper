@@ -1,0 +1,11 @@
+{
+    "dataPrivacy": {
+      "childDirected": false
+    },
+    "description": null,
+    "errorLogSettings": null,
+    "identifier": "47C8A1C439",
+    "idleSessionTTLInSeconds": 86400,
+    "name": "LexBot",
+    "version": "DRAFT"
+  }
