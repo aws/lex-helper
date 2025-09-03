@@ -1,0 +1,9 @@
+boto3>=1.26.0
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pydantic>=2.0.0
+PyYAML>=6.0
+colorama>=0.4.6
+fuzzywuzzy>=0.18.0
+loguru>=0.7.0
+aws-lambda-powertools>=3.0.0

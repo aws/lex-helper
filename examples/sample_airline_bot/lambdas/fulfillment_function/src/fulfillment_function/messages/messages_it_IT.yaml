@@ -1,0 +1,56 @@
+# Italian Messages for Airline-Bot
+# Questo file contiene tutti i messaggi per il supporto all'internazionalizzazione
+
+# Messaggi per l'Intent Cancella Volo
+cancel_flight:
+  elicit_reservation_number: "Qual è il numero della sua prenotazione?"
+  cancellation_success: "Ho cancellato la sua prenotazione {reservation_number}. Riceverà a breve un'email di conferma."
+  cancellation_error: "Mi dispiace, non riesco a trovare una prenotazione con il numero {reservation_number}. Controlli il numero e riprovi."
+  invalid_reservation_format: "Fornisca un numero di prenotazione valido. Dovrebbe essere nel formato ABC123."
+
+# Messaggi per l'Intent Prenota Volo
+book_flight:
+  authentication_required: "Prima di aiutarla con la prenotazione del volo, dovrà autenticarsi."
+  elicit_trip_type: "Si tratta di un viaggio di sola andata o andata e ritorno?"
+  elicit_origin_city: "Da quale città desidera partire?"
+  elicit_destination_city: "Verso quale città desidera viaggiare?"
+  elicit_departure_date: "In che data desidera partire?"
+  elicit_passengers: "Quanti passeggeri viaggeranno?"
+  elicit_airport_code_selection: "Ho trovato più di un aeroporto per la città di {city}. La prego di selezionarne uno tra questi :\n{options}"
+  booking_success_roundtrip: "Ho prenotato il suo viaggio andata e ritorno da {origin_city} a {destination_city}. Partenza il {departure_date} e ritorno il {return_date} per {passengers} passeggero/i. Il numero di prenotazione è {reservation_number}."
+  booking_success_oneway: "Ho prenotato il suo viaggio di sola andata da {origin_city} a {destination_city} con partenza il {departure_date} per {passengers} passeggero/i. Il numero di prenotazione è {reservation_number}."
+
+# Messaggi per l'Intent Autenticazione
+authenticate:
+  elicit_account_id: "Fornisca il suo ID account per continuare."
+  authentication_success: "Autenticazione riuscita. Ora posso aiutarla con la sua richiesta originale."
+  authentication_failed: "Autenticazione fallita. Riprovi."
+
+# Messaggi per l'Intent Aggiornamento Ritardi Volo
+flight_delay:
+  elicit_flight_number: "Qual è il numero del suo volo? Ad esempio, 'AA123' o 'DL456'."
+  elicit_departure_airport: "Qual è il suo aeroporto di partenza? Fornisca il codice aeroportuale come 'FCO', 'MXP', o 'LIN'."
+  delay_info: "Il volo {flight_number} in partenza da {departure_airport} è attualmente in ritardo di {delay_minutes} minuti. Controlli l'app della compagnia aerea o il sito web per le informazioni più aggiornate."
+
+# Messaggi per l'Intent Saluto
+greeting:
+  first_time: "Ciao! Benvenuto in Airline-Bot. Posso aiutarla con la prenotazione di voli, il controllo dello stato dei voli, il tracciamento dei bagagli e la gestione delle prenotazioni. Come posso assisterla oggi?"
+  returning: "Ciao di nuovo! Come posso aiutarla oggi?"
+
+# Messaggi Generali
+general:
+  error_generic: "Mi dispiace, ho riscontrato un errore durante l'elaborazione della sua richiesta. Riprovi."
+  goodbye: "Grazie per aver utilizzato Airline-Bot. Buona giornata!"
+  anything_else: "C'è qualcos'altro con cui posso aiutarla oggi?"
+  fallback: "Non ho capito. Potrebbe riformulare la sua richiesta?"
+
+# Messaggi per l'Intent Tracciamento Bagagli
+track_baggage:
+  elicit_reservation_number: "Qual è il numero della sua prenotazione?"
+  status_response: "Il suo bagaglio per la prenotazione {reservation_number} è attualmente {status}. Dovrebbe arrivare a destinazione a breve."
+
+# Messaggi di Validazione
+validation:
+  invalid_city: "Fornisca un nome di città valido come 'Roma' o 'Milano'."
+  invalid_date: "Fornisca una data valida nel formato GG/MM/AAAA."
+  invalid_passenger_count: "Fornisca un numero valido di passeggeri (1-9)."

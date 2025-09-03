@@ -1,0 +1,67 @@
+name: Test Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.1.0-test.1)'
+        required: true
+        type: string
+
+jobs:
+  test-release:
+    name: Manual TestPyPI Release
+    runs-on: ubuntu-latest
+    environment: test-release
+    permissions:
+      id-token: write  # Required for trusted publishing to TestPyPI
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Update version in pyproject.toml
+        run: |
+          # Update version for test release
+          sed -i 's/version = "[^"]*"/version = "${{ github.event.inputs.version }}"/' pyproject.toml
+          echo "Updated version to ${{ github.event.inputs.version }}"
+          grep 'version = ' pyproject.toml
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
+
+      - name: Test installation from TestPyPI
+        run: |
+          # Wait a bit for the package to be available
+          sleep 30
+
+          # Create a fresh virtual environment for testing
+          python -m venv test_env
+          source test_env/bin/activate
+
+          # Install from TestPyPI
+          pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ lex-helper==${{ github.event.inputs.version }}
+
+          # Basic import test
+          python -c "import lex_helper; print('✅ Import successful')"
+          python -c "from lex_helper import LexHelper, Config; print('✅ Main classes import successful')"
+
+          echo "🎉 TestPyPI release and installation test successful!"

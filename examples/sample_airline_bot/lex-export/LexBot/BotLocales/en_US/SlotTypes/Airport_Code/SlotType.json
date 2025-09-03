@@ -1,0 +1,1 @@
+{"name":"Airport_Code","identifier":"X7LABTQ4YH","description":null,"slotTypeValues":null,"parentSlotTypeSignature":"AMAZON.AlphaNumeric","valueSelectionSetting":{"resolutionStrategy":"ORIGINAL_VALUE","advancedRecognitionSetting":null,"regexFilter":{"pattern":"[A-Z]{3}"}}}
