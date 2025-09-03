@@ -96,59 +96,93 @@ The Lambda function demonstrates production-ready patterns:
 
 ## 🚀 Quick Start
 
-1. Clone the repository
-2. Set up dependencies:
-   ```bash
-   mkdir -p layers/lex_helper/python
-   # Download lex-helper from https://github.com/aws/lex-helper
-   unzip lex-helper-v*.zip -d layers/lex_helper/python
-3. Deploy:
-   ```cd cloudformation
-   ./deploy_airline_bot.sh
-
-
 ### Prerequisites
 
-- **AWS CLI** installed and configured with appropriate permissions
-- **Python 3.12+** (to match Lambda runtime)
-- **S3 bucket** for storing deployment artifacts
-- **IAM permissions** for Lambda, Lex, and CloudFormation operations
+- **uv** (Python package manager): `pip install uv`
+- **Node.js and npm**: `brew install node`
+- **TypeScript**: `npm install -g typescript`
+- **Docker Desktop**: `brew install --cask docker` (must be running)
+- **Poetry**: `pip install poetry`
+- **AWS credentials**: Valid AWS credentials via `ada credentials update --account=<account> --role=<role>`
 
-### 1. Clone and Setup
+### 1. Install Dependencies
 
 ```bash
-git clone <repository-url>
-cd Airline-Bot
+# Install required tools
+pip install uv poetry
+brew install node
+npm install -g typescript
+brew install --cask docker
 
-# Create layer directory structure
-mkdir -p layers/lex_helper/python
-
-# Download and extract lex-helper framework
-# (Download lex-helper-v*.zip from https://github.com/aws/lex-helper)
-unzip layers/lex-helper-v*.zip -d layers/lex_helper/python
+# Install CDK dependencies
+npm install
 ```
 
-### 2. Deploy to AWS
+### 2. Deploy with Local lex-helper
 
-**Option A: One-Command Deployment (Recommended)**
+**One-Command Deployment (Recommended)**
 ```bash
-cd cloudformation
-./deploy_airline_bot.sh [optional-bot-alias-name]
+./deploy-with-local-lex-helper.sh
 ```
 
-**Option B: Step-by-Step Deployment**
+This script will:
+1. Build the lex-helper library from source using `uv`
+2. Copy the wheel to the Lambda function
+3. Update Poetry dependencies
+4. Build the CDK project with TypeScript
+5. Deploy the CDK stack
+
+### 3. Verify Installation
+
 ```bash
-cd cloudformation/scripts
-
-# Package components
-./package-lex-helper-layer.sh
-./package-lambda-function.sh
-./package-lex-export.sh
-
-# Deploy
-cd ..
-./deploy_airline_bot.sh [optional-bot-alias-name]
+# Check all required tools are installed
+uv --version
+npm --version
+tsc --version
+docker --version
+poetry --version
 ```
+
+## 🔄 Build and Redeploy After Changes
+
+### For Lambda Code Changes (Python files)
+```bash
+# From the sample_airline_bot directory:
+npm run build && npx cdk deploy --require-approval never
+```
+
+### For Infrastructure Changes (CDK stack)
+```bash
+# Build TypeScript
+npm run build
+
+# Deploy with approval (for IAM/security changes)
+npx cdk deploy --require-approval never
+
+# Or deploy with manual approval
+npx cdk deploy
+```
+
+### For lex-helper Library Changes
+```bash
+# From the root lex-helper directory:
+./examples/sample_airline_bot/deploy-with-local-lex-helper.sh
+```
+
+### Quick Development Cycle
+```bash
+# 1. Make your changes to Lambda code (Python files in lambdas/fulfillment_function/src/)
+# 2. Redeploy from sample_airline_bot directory:
+npm run build && npx cdk deploy --require-approval never
+
+# For lex-helper changes, use the full deployment script from root:
+# cd ../../ && ./examples/sample_airline_bot/deploy-with-local-lex-helper.sh
+```
+
+### Important Notes
+- **Lambda code changes**: Use `npm run build && npx cdk deploy` from sample_airline_bot directory
+- **lex-helper changes**: Use the deploy script from the root lex-helper directory
+- **CDK infrastructure changes**: Always use `npm run build` first to compile TypeScript
 
 ### 3. Test Your Bot
 

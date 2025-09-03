@@ -53,7 +53,11 @@ class ReservationUtils:
         if iata_result["status"] == "multiple":
             options = "\n".join([f"- {opt}" for opt in iata_result.get("options", [])])
             message = f"I found multiple airports for {city}. Please choose one:\n{options}"
-            message = get_message("book_flight.elicit_airport_code_selection")
+            try:
+                template = get_message("book_flight.elicit_airport_code_selection")
+                message = template.format(city=city, options=options)
+            except Exception as e:
+                logger.warning("Failed to get localized message: %s", e)
 
             return dialog.elicit_slot(
                 slot_to_elicit=slot_name_code, messages=[LexPlainText(content=message)], lex_request=lex_request

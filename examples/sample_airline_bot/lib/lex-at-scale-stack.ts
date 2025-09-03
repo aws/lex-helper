@@ -212,7 +212,15 @@ function fulfillmentFunction(stack: cdk.Stack): cdk_alpha.PythonFunction {
             resources: [`arn:aws:logs:${stack.region}:${stack.account}:log-group:/aws/lambda/${fulfillmentFunctionName}`],
             effect: cdk.aws_iam.Effect.DENY
           }),
-
+          new cdk.aws_iam.PolicyStatement({
+            actions: [
+              "bedrock:InvokeModel",
+              "bedrock:Converse"
+            ],
+            resources: [
+              `arn:aws:bedrock:${stack.region}::foundation-model/*`
+            ]
+          })
         ]
       }),
     }
