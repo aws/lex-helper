@@ -2,12 +2,41 @@
 
 <p align="center">
 <a href="https://github.com/aws/lex-helper/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/aws/lex-helper/actions/workflows/ci.yml/badge.svg"></a>
+<a href="https://pypi.org/project/lex-helper/"><img alt="PyPI version" src="https://badge.fury.io/py/lex-helper.svg"></a>
+<a href="https://pypi.org/project/lex-helper/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/lex-helper.svg"></a>
+<a href="https://pepy.tech/project/lex-helper"><img alt="Downloads" src="https://pepy.tech/badge/lex-helper"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"></a>
 <a href="https://github.com/astral-sh/ruff"><img alt="Code style: ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json"></a>
-<a href="https://pypi.org/project/lex-helper/"><img alt="PyPI version" src="https://badge.fury.io/py/lex-helper.svg"></a>
+<a href="https://github.com/aws/lex-helper"><img alt="GitHub stars" src="https://img.shields.io/github/stars/aws/lex-helper.svg?style=social&label=Star"></a>
+</p>
+
+<p align="center">
+<strong>A modern, type-safe Python library for building Amazon Lex chatbots with ease</strong>
 </p>
 
 The Lex Helper library is an extensive collection of functions and classes that make it easier to work with Lex. It's designed to make building Lex fulfillment lambdas easier, more efficient, understandable, and consistent. Gone are the days of accidentally mistyping a slot name, using a dictionary within a dictionary within a dictionary, or not being able to find where the code for a specific intent is.
+
+## Table of Contents
+
+- [Why Use Lex Helper?](#why-use-lex-helper)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [1. Create Session Attributes](#1-create-session-attributes)
+  - [2. Create Main Handler](#2-create-main-handler)
+  - [3. Create Intent Handlers](#3-create-intent-handlers)
+- [Core Features](#core-features)
+  - [Dialog Utilities](#dialog-utilities)
+  - [Message Management](#message-management)
+  - [Bedrock Integration](#bedrock-integration)
+- [Bedrock Usage Examples](#bedrock-usage-examples)
+  - [Basic InvokeModel API](#basic-invokemodel-api)
+  - [Converse API with System Prompt](#converse-api-with-system-prompt)
+- [Examples](#examples)
+- [Documentation](#documentation)
+- [Development Setup](#development-setup)
+  - [Prerequisites](#prerequisites)
+  - [Quick Setup](#quick-setup)
+  - [Development Commands](#development-commands)
 
 ## Why Use Lex Helper?
 

@@ -231,7 +231,6 @@ wheels = [
 
 [[package]]
 name = "lex-helper"
-version = "0.0.9"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },
@@ -240,10 +239,14 @@ dependencies = [
     { name = "pyyaml" },
 ]
 
-[package.dev-dependencies]
+[package.optional-dependencies]
+bedrock = [
+    { name = "aws-lambda-powertools" },
+]
 dev = [
     { name = "aws-lambda-powertools" },
     { name = "fuzzywuzzy" },
+    { name = "packaging" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -253,22 +256,21 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aws-lambda-powertools", marker = "extra == 'bedrock'", specifier = ">=3.19.0" },
+    { name = "aws-lambda-powertools", marker = "extra == 'dev'", specifier = ">=3.19.0" },
     { name = "boto3", specifier = ">=1.26.0" },
     { name = "botocore", specifier = ">=1.29.0" },
+    { name = "fuzzywuzzy", marker = "extra == 'dev'", specifier = ">=0.18.0" },
+    { name = "packaging", marker = "extra == 'dev'", specifier = ">=21.0" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0.0" },
     { name = "pydantic", specifier = ">2.0.0,<3.0.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.2.1" },
+    { name = "python-levenshtein", marker = "extra == 'dev'", specifier = ">=0.27.1" },
     { name = "pyyaml", specifier = ">=6.0,<7.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12.11" },
 ]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "aws-lambda-powertools", specifier = ">=3.19.0" },
-    { name = "fuzzywuzzy", specifier = ">=0.18.0" },
-    { name = "pre-commit", specifier = ">=3.0.0" },
-    { name = "pytest", specifier = ">=7.0.0" },
-    { name = "pytest-cov", specifier = ">=6.2.1" },
-    { name = "python-levenshtein", specifier = ">=0.27.1" },
-    { name = "ruff", specifier = ">=0.12.11" },
-]
+provides-extras = ["bedrock", "dev"]
 
 [[package]]
 name = "nodeenv"

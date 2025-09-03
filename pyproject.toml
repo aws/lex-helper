@@ -1,6 +1,6 @@
 [project]
 name = "lex-helper"
-version = "0.0.9"
+dynamic = ["version"]
 description = "A helper library for building Amazon Lex chatbots"
 authors = [
     {name = "Amazon Web Services"}
@@ -68,6 +68,9 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "lex_helper/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 exclude = [
@@ -202,5 +205,3 @@ reportUnnecessaryContains = true
 reportUnnecessaryComparison = true
 reportMatchNotExhaustive = true
 reportCallInDefaultInitializer = true
-
-

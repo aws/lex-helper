@@ -99,6 +99,18 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra dev
 
+      - name: Update version for release
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          # Extract version from tag (remove 'v' prefix)
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Updating version to: $VERSION"
+
+          # Update version in __init__.py
+          sed -i "s/__version__ = \"[^\"]*\"/__version__ = \"$VERSION\"/" lex_helper/__init__.py
+          echo "✅ Updated __version__ to $VERSION"
+          grep '__version__ = ' lex_helper/__init__.py
+
       - name: Build package
         run: uv build
 

@@ -8,6 +8,8 @@ This package provides tools and utilities for creating and managing
 Amazon Lex chatbots with a focus on maintainability and ease of use.
 """
 
+__version__ = "0.0.9"
+
 import logging
 
 # Add NullHandler to prevent unwanted output when no logging is configured
@@ -52,6 +54,7 @@ from lex_helper.exceptions.handlers import handle_exceptions
 from lex_helper.formatters.buttons import Button
 
 __all__ = [
+    "__version__",
     "BedrockInvocationError",
     "Bot",
     "Button",

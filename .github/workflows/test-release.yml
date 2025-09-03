@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra dev
 
-      - name: Validate and update version in pyproject.toml
+      - name: Validate and update version
         run: |
           # Validate version format (basic PEP 440 check)
           if ! uv run python -c "from packaging.version import Version; Version('${{ github.event.inputs.version }}')"; then
@@ -41,10 +41,10 @@ jobs:
             exit 1
           fi
 
-          # Update version for test release
-          sed -i 's/version = "[^"]*"/version = "${{ github.event.inputs.version }}"/' pyproject.toml
-          echo "✅ Updated version to ${{ github.event.inputs.version }}"
-          grep 'version = ' pyproject.toml
+          # Update version in __init__.py
+          sed -i 's/__version__ = "[^"]*"/__version__ = "${{ github.event.inputs.version }}"/' lex_helper/__init__.py
+          echo "✅ Updated __version__ to ${{ github.event.inputs.version }}"
+          grep '__version__ = ' lex_helper/__init__.py
 
       - name: Build package
         run: uv build
