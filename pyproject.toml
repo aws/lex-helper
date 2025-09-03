@@ -139,4 +139,5 @@ dev = [
     "fuzzywuzzy>=0.18.0",
     "aws-lambda-powertools>=3.19.0",
     "python-levenshtein>=0.27.1",
+    "packaging>=21.0",
 ]
