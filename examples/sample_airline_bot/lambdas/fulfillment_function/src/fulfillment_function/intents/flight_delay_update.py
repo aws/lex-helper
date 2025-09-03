@@ -35,8 +35,8 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
 
     # Get current slot values
     intent = dialog.get_intent(lex_request)
-    flight_number = dialog.get_slot(intent, "FlightNumber") or ""
-    departure_airport = dialog.get_slot(intent, "DepartureAirport") or ""
+    flight_number = dialog.get_slot(slot_name="FlightNumber", intent=intent) or ""
+    departure_airport = dialog.get_slot(slot_name="DepartureAirport", intent=intent) or ""
 
     logger.debug("Current slot values: flight_number=%s, departure_airport=%s", flight_number, departure_airport)
 

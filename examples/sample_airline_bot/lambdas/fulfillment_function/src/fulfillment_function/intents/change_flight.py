@@ -30,8 +30,8 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     session_attrs = lex_request.sessionState.sessionAttributes
 
     # Get slot values
-    reservation_number = dialog.get_slot(intent, "ReservationNumber") or ""
-    new_departure_date = dialog.get_slot(intent, "NewDepartureDate") or ""
+    reservation_number = dialog.get_slot(slot_name="ReservationNumber", intent=intent) or ""
+    new_departure_date = dialog.get_slot(slot_name="NewDepartureDate", intent=intent) or ""
     logger.debug("Slot values: reservation_number=%s, new_departure_date=%s", reservation_number, new_departure_date)
 
     # Store values in session attributes
@@ -57,8 +57,27 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             slot_to_elicit="NewDepartureDate", messages=[LexPlainText(content=message)], lex_request=lex_request
         )
 
-    # Create the response message
-    message = f"I've changed your reservation {reservation_number} to depart on {new_departure_date}. You will receive a confirmation email shortly."
+    # Create the response message with proper formatting
+    # Convert date to ISO format if needed
+    formatted_date = new_departure_date
+    try:
+        from datetime import datetime
+
+        # Try to parse the date and convert to ISO format
+        if isinstance(new_departure_date, str):
+            # Handle common date formats
+            for fmt in ["%B %d, %Y", "%m/%d/%Y", "%Y-%m-%d"]:
+                try:
+                    parsed_date = datetime.strptime(new_departure_date, fmt)
+                    formatted_date = parsed_date.strftime("%Y-%m-%d")
+                    break
+                except ValueError:
+                    continue
+    except Exception:
+        # If date parsing fails, use original value
+        formatted_date = new_departure_date
+
+    message = f"I've changed your reservation {reservation_number}. to depart on {formatted_date}. You will receive a confirmation email shortly."
     logger.debug("Response message: %s", message)
 
     # Close the dialog with the correct parameter order

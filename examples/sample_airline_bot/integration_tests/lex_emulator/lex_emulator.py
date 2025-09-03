@@ -430,18 +430,11 @@ def resolve_amazon_other_slot(slot_type_name: str, slot_to_elicit: str, text: st
     # Resolve any other AMAZON slot.  It is likely that new types will be added, and this function will need to be updated
     if slot_type_name.startswith("AMAZON."):
         logger.warning("Unknown builtin slot_type_name")
-        interpreted_value = {
+        return {
             "value": {
                 "originalValue": text,
                 "interpretedValue": text,
                 "resolvedValues": [text],
-            }
-        }
-        return {
-            "value": {
-                "originalValue": text,
-                "interpretedValue": interpreted_value,
-                "resolvedValues": [interpreted_value],
             }
         }
     return None
