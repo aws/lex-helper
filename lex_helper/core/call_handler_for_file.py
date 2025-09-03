@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=SessionAttributes)
 
 
-def call_handler_for_file(intent_name: str, lex_request: LexRequest[T], package_name: str | None = None) -> LexResponse[T]:
+def call_handler_for_file[T: SessionAttributes](
+    intent_name: str, lex_request: LexRequest[T], package_name: str | None = None
+) -> LexResponse[T]:
     if package_name is None:
         package_name = "fulfillment_function"
     # Determine the file to import based on intent_name

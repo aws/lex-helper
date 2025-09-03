@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=SessionAttributes)
 
 
-def call_method_for_file(intent_name: str, lex_request: LexRequest[T], method: str):
+def call_method_for_file[T: SessionAttributes](intent_name: str, lex_request: LexRequest[T], method: str):
     # Determine the file to import based on intent_name
     if "_" in intent_name:
         file_to_import = intent_name.lower()

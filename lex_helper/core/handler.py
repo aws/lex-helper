@@ -3,7 +3,7 @@
 
 import logging
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 
 from pydantic import BaseModel
 
@@ -28,14 +28,14 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=SessionAttributes)
 
 
-class Config(BaseModel, Generic[T]):
+class Config[T: SessionAttributes](BaseModel):
     session_attributes: T
     package_name: str | None = (
         "fulfillment_function"  # This is the name of the package to import the intents from.  Should be the same as the name of the package you're running the handler from.
     )
 
 
-class LexHelper(Generic[T]):
+class LexHelper[T: SessionAttributes]:
     def __init__(self, config: Config[T]):
         self.config = config
 

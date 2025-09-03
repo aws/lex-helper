@@ -6,7 +6,6 @@ from enum import Enum
 from typing import (
     Annotated,
     Any,
-    Generic,
     Literal,
     TypeVar,
     cast,
@@ -125,9 +124,7 @@ class ProposedNextState(BaseModel):
 ActiveContexts = list[dict[str, Any]] | None
 
 
-APIFailMethod = Literal[
-    "default",
-]
+APIFailMethod = Literal["default",]
 
 
 class SessionAttributes(BaseModel):
@@ -161,7 +158,6 @@ class SessionAttributes(BaseModel):
 
     channel: str = "lex"
 
-
     def to_cmd_response(self):
         response = ""
         self_dict = self.model_dump()
@@ -174,7 +170,7 @@ class SessionAttributes(BaseModel):
 T = TypeVar("T", bound=SessionAttributes)
 
 
-class SessionState(BaseModel, Generic[T]):
+class SessionState[T: SessionAttributes](BaseModel):
     activeContexts: ActiveContexts = None
     sessionAttributes: T = cast(T, None)
     intent: Intent
@@ -193,7 +189,7 @@ class Transcription(BaseModel):
     transcriptionConfidence: float
 
 
-class LexRequest(BaseModel, Generic[T]):
+class LexRequest[T: SessionAttributes](BaseModel):
     sessionId: str = "DEFAULT_SESSION_ID"
     inputTranscript: str = "DEFAULT_INPUT_TRANSCRIPT"
     interpretations: list[Interpretation] = []
@@ -209,7 +205,7 @@ class LexRequest(BaseModel, Generic[T]):
     requestAttributes: dict[str, Any] | None = None
 
 
-class LexResponse(BaseModel, Generic[T]):
+class LexResponse[T: SessionAttributes](BaseModel):
     sessionState: SessionState[T]
     messages: LexMessages
     requestAttributes: dict[str, Any]

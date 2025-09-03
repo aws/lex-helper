@@ -20,7 +20,7 @@ from lex_helper.utils.add_to_list import add_to_list
 T = TypeVar("T", bound=SessionAttributes)
 
 
-def format_for_channel(response: LexResponse[T], channel_string: str = "lex"):
+def format_for_channel[T: SessionAttributes](response: LexResponse[T], channel_string: str = "lex"):
     content_process_map: dict[type, Callable[[Any, Channel, list[str], list[Any]], list[Any]]] = {
         PlainText: _format_plain_text,
         LexPlainText: _format_plain_text,

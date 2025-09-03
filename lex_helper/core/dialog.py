@@ -40,7 +40,7 @@ class PydanticEncoder(json.JSONEncoder):
 T = TypeVar("T", bound=SessionAttributes)
 
 
-def get_sentiment(lex_request: LexRequest[T]) -> str | None:
+def get_sentiment[T: SessionAttributes](lex_request: LexRequest[T]) -> str | None:
     """
     Extracts the sentiment from the first interpretation in a LexRequest.
 
@@ -95,7 +95,7 @@ def remove_context(context_list: ActiveContexts, context_name: str) -> ActiveCon
     return new_context
 
 
-def remove_inactive_context(lex_request: LexRequest[T]) -> ActiveContexts:
+def remove_inactive_context[T: SessionAttributes](lex_request: LexRequest[T]) -> ActiveContexts:
     """
     Removes inactive contexts from the active contexts list in a LexRequest.
 
@@ -116,7 +116,7 @@ def remove_inactive_context(lex_request: LexRequest[T]) -> ActiveContexts:
     return new_context
 
 
-def close(lex_request: LexRequest[T], messages: LexMessages) -> LexResponse[T]:
+def close[T: SessionAttributes](lex_request: LexRequest[T], messages: LexMessages) -> LexResponse[T]:
     """
     Closes the dialog with the user by setting the intent state to 'Fulfilled'.
 
@@ -148,7 +148,7 @@ def close(lex_request: LexRequest[T], messages: LexMessages) -> LexResponse[T]:
     return response
 
 
-def elicit_intent(messages: LexMessages, lex_request: LexRequest[T]) -> LexResponse[T]:
+def elicit_intent[T: SessionAttributes](messages: LexMessages, lex_request: LexRequest[T]) -> LexResponse[T]:
     """
     Elicits the user's intent by sending a message and updating session attributes.
 
@@ -182,7 +182,9 @@ def elicit_intent(messages: LexMessages, lex_request: LexRequest[T]) -> LexRespo
     )
 
 
-def elicit_slot(slot_to_elicit: LexSlot | str, messages: LexMessages, lex_request: LexRequest[T]) -> LexResponse[T]:
+def elicit_slot[T: SessionAttributes](
+    slot_to_elicit: LexSlot | str, messages: LexMessages, lex_request: LexRequest[T]
+) -> LexResponse[T]:
     """
     Elicits a specific slot from the user by sending a message and updating session attributes.
 
@@ -228,7 +230,7 @@ def elicit_slot(slot_to_elicit: LexSlot | str, messages: LexMessages, lex_reques
     return response
 
 
-def delegate(lex_request: LexRequest[T]) -> LexResponse[T]:
+def delegate[T: SessionAttributes](lex_request: LexRequest[T]) -> LexResponse[T]:
     """
     Delegates the dialog to Lex by updating the session state and returning a response.
 
@@ -281,7 +283,7 @@ def get_provided_options(messages: LexMessages) -> str:
     return json.dumps(options, cls=PydanticEncoder)
 
 
-def get_intent(lex_request: LexRequest[T]) -> Intent:
+def get_intent[T: SessionAttributes](lex_request: LexRequest[T]) -> Intent:
     """
     Retrieves the intent from a LexRequest.
 
@@ -491,7 +493,7 @@ def get_composite_slot_subslot(composite_slot: LexSlot, sub_slot: Any, intent: I
         return None
 
 
-def get_active_contexts(lex_request: LexRequest[T]) -> ActiveContexts:
+def get_active_contexts[T: SessionAttributes](lex_request: LexRequest[T]) -> ActiveContexts:
     """
     Retrieves the active contexts from a LexRequest.
 
@@ -507,7 +509,7 @@ def get_active_contexts(lex_request: LexRequest[T]) -> ActiveContexts:
         return []
 
 
-def get_invocation_label(lex_request: LexRequest[T]) -> str | None:
+def get_invocation_label[T: SessionAttributes](lex_request: LexRequest[T]) -> str | None:
     """
     Retrieves the invocation label from a LexRequest.
 
@@ -521,7 +523,7 @@ def get_invocation_label(lex_request: LexRequest[T]) -> str | None:
     return lex_request.invocationLabel
 
 
-def safe_delete_session_attribute(lex_request: LexRequest[T], attribute: str) -> LexRequest[T]:
+def safe_delete_session_attribute[T: SessionAttributes](lex_request: LexRequest[T], attribute: str) -> LexRequest[T]:
     """
     Safely deletes a session attribute from a LexRequest.
 
@@ -538,7 +540,7 @@ def safe_delete_session_attribute(lex_request: LexRequest[T], attribute: str) ->
     return lex_request
 
 
-def get_request_components(
+def get_request_components[T: SessionAttributes](
     lex_request: LexRequest[T],
 ) -> tuple[Intent, ActiveContexts, T, str | None]:
     """
@@ -558,7 +560,7 @@ def get_request_components(
     return intent, active_contexts, session_attributes, invocation_label
 
 
-def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
+def any_unknown_slot_choices[T: SessionAttributes](lex_request: LexRequest[T]) -> bool:
     """
     Checks if the user provided an invalid response to a previous slot elicitation.
 
@@ -603,7 +605,7 @@ def any_unknown_slot_choices(lex_request: LexRequest[T]) -> bool:
     return False
 
 
-def handle_any_unknown_slot_choice(lex_request: LexRequest[T]) -> LexResponse[T]:
+def handle_any_unknown_slot_choice[T: SessionAttributes](lex_request: LexRequest[T]) -> LexResponse[T]:
     """
     Automatically handles invalid slot responses by delegating back to Lex or using custom logic.
 
@@ -639,7 +641,7 @@ def handle_any_unknown_slot_choice(lex_request: LexRequest[T]) -> LexResponse[T]
     return delegate(lex_request=lex_request)
 
 
-def unknown_choice_handler(
+def unknown_choice_handler[T: SessionAttributes](
     lex_request: LexRequest[T],
     choice: str | LexSlot | None,
     handle_unknown: bool | None = True,
@@ -675,7 +677,9 @@ def unknown_choice_handler(
     return delegate(lex_request=lex_request)
 
 
-def callback_original_intent_handler(lex_request: LexRequest[T], messages: LexMessages | None = None) -> LexResponse[T]:
+def callback_original_intent_handler[T: SessionAttributes](
+    lex_request: LexRequest[T], messages: LexMessages | None = None
+) -> LexResponse[T]:
     """
 
     Handles switching the conversation flow to an initial intent.
@@ -743,7 +747,7 @@ def callback_original_intent_handler(lex_request: LexRequest[T], messages: LexMe
     return response
 
 
-def reprompt_slot(lex_request: LexRequest[T]) -> LexResponse[T]:
+def reprompt_slot[T: SessionAttributes](lex_request: LexRequest[T]) -> LexResponse[T]:
     """
     Reprompts the user for a slot value by sending a message.
 
@@ -797,7 +801,7 @@ def load_messages(messages: str) -> LexMessages:
     return res
 
 
-def parse_req_sess_attrs(lex_payload: LexRequest[T]) -> LexRequest[T]:
+def parse_req_sess_attrs[T: SessionAttributes](lex_payload: LexRequest[T]) -> LexRequest[T]:
     logger.debug("LEX-PAYLOAD: %s", lex_payload.model_dump_json(exclude_none=True))
     # parsing core_data from session-state from 2nd messages
 
@@ -827,7 +831,7 @@ def parse_req_sess_attrs(lex_payload: LexRequest[T]) -> LexRequest[T]:
     return lex_payload
 
 
-def parse_lex_request(
+def parse_lex_request[T: SessionAttributes](
     data: dict[str, Any],
     session_attributes: T,
 ) -> LexRequest[T]:
@@ -862,7 +866,7 @@ def parse_lex_request(
     return lex_request
 
 
-def transition_to_intent(
+def transition_to_intent[T: SessionAttributes](
     intent_name: str,
     lex_request: LexRequest[T],
     messages: LexMessages,
@@ -883,7 +887,7 @@ def transition_to_intent(
     return response
 
 
-def transition_to_callback(
+def transition_to_callback[T: SessionAttributes](
     intent_name: str, lex_request: LexRequest[T], messages: LexMessages, clear_slots: bool = True
 ) -> LexResponse[T]:
     if clear_slots:
@@ -898,7 +902,7 @@ def transition_to_callback(
     )
 
 
-def _clear_slots(intent_name: str, lex_request: LexRequest[T], invocation_label: str | None = None):
+def _clear_slots[T: SessionAttributes](intent_name: str, lex_request: LexRequest[T], invocation_label: str | None = None):
     lex_request.sessionState.intent.slots = {}
     lex_request.sessionState.intent.name = intent_name
 
