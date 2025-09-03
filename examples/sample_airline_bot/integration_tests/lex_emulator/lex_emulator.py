@@ -1,3 +1,5 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
 import os
 import sys
 from collections.abc import Callable
@@ -61,19 +63,6 @@ def get_session(session_id: str, text: str | None = None):
     current_session = sessions.get(session_id, None)
     intent_name = "Greeting"  # Default
 
-    if text == "leave conversation" and current_session:
-        # This transition is incorrect. Feedback requests are expected
-        # to be routed to Report_Complaint (as per Val)
-        intent_name = "Common_Exit_Feedback"
-        current_session["intent"] = {
-            "name": intent_name,
-            "slots": {},
-            "state": "InProgress",
-            "confirmationState": "None",
-        }
-
-        set_session(session_id, current_session)
-
     if current_session is None and text is not None:
         # Use this for getting FallbackIntent
         intent_name = find_intent_by_utterance(text=text)
@@ -116,10 +105,6 @@ def remove_session(session_id: str):
 
 def update_session_variable(session_id: str, session_attributes: dict[str, Any]):
     session_state = get_session(session_id)
-    # session_attributes = {}
-    # if session_state is not None:
-    #     session_attributes = session_state.get("sessionAttributes", {})
-    # session_attributes[key] = value
     session_state["sessionAttributes"] = session_attributes
     set_session(session_id=session_id, session_data=session_state)
 
@@ -219,9 +204,9 @@ def query_lex_emulator(text: str, session_id: str, req_attr: dict[str, Any] | No
 
     # Fake Context
     context: LambdaContext = LambdaContext()
-    context._function_name = "PeanutAllergy"  # type: ignore
+    context._function_name = "Placeholder"  # type: ignore
     context._memory_limit_in_mb = 128  # type: ignore
-    context._invoked_function_arn = "arn:aws:lambda:us-east-1:123456789012:function:PeanutAllergy"  # type: ignore
+    context._invoked_function_arn = "arn:aws:lambda:us-east-1:123456789012:function:Placeholder"  # type: ignore
     context._aws_request_id = "12345678-1234-1234-1234-123456789012"  # type: ignore
 
     lex_response = lambda_handler(event=lex_request.model_dump(), context=context)
@@ -407,7 +392,6 @@ def resolve_custom_slot(slot_type_name: str, slot_to_elicit: str, text: str, slo
                     }
                 }
             else:
-                # {'name': 'Agent_Type', 'slotTypeId': 'd0e5b4a1a7'}
                 regular_slot_id = sub_slot.slotTypeId
                 # For every folder in lex-export/LexBot/BotLocales/en_US/SlotTypes/, load the SlotType.json file within the subfolder.
                 folder = os.path.join(sample_airline_bot_root, "lex-export/LexBot/BotLocales/en_US/SlotTypes/")
