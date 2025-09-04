@@ -29,6 +29,15 @@
 - Persistent user data across conversation turns
 - Type-safe session attributes with Pydantic
 
+### Type Safety
+- **Auto-generated Enums**: Intent and slot enums created from bot structure
+- **Slot Enums**: Per-intent enums (e.g., `BookFlightSlot.ORIGINCITY`)
+- **Intent Enum**: All intents in `IntentName` enum
+- **IDE Support**: Full autocomplete and compile-time validation
+- **Generated Location**: `lambdas/fulfillment_function/src/fulfillment_function/classes/`
+- **Generation Method**: Created by `lexcli export` command using `regenerate_enums.py`
+- **Documentation**: See [tools/README.md](../../tools/README.md) for lexcli usage
+
 ## Permissions
 
 ### Lambda IAM Role

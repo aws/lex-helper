@@ -15,8 +15,13 @@ import boto3
 import click
 import colorlog
 import pandas as pd
-import regenerate_enums as regenerate_enums
 from botocore.config import Config
+
+# Optional import for export functionality
+try:
+    import regenerate_enums
+except ImportError:
+    regenerate_enums = None
 
 # Get the path to the current directory
 base_path = os.path.dirname(os.path.abspath(__file__))
@@ -38,7 +43,8 @@ def main():
 
 @main.command()
 @click.argument("environment_name")
-def export(environment_name: str):
+@click.option("--project-root", "-p", default="../examples/sample_airline_bot", help="Path to project root directory")
+def export(environment_name: str, project_root: str):
     """
     Export a Lex bot
     """
@@ -104,25 +110,28 @@ def export(environment_name: str):
 
     # Update Intents
     update_directories(
-        "lex-export/LexBot/BotLocales/en_US/Intents",
+        os.path.join(project_root, "lex-export/LexBot/BotLocales/en_US/Intents"),
         "temp/LexBot/BotLocales/en_US/Intents",
         "intent",
     )
 
     # Update Slots
     update_directories(
-        "lex-export/LexBot/BotLocales/en_US/SlotTypes",
+        os.path.join(project_root, "lex-export/LexBot/BotLocales/en_US/SlotTypes"),
         "temp/LexBot/BotLocales/en_US/SlotTypes",
         "slotType",
     )
 
-    # Regenerate slots enum
-    print("Regenerating slot enums...")
-    regenerate_enums.regenerate_slot_enums()
+    # Regenerate slots enum (if available)
+    if regenerate_enums:
+        print("Regenerating slot enums...")
+        regenerate_enums.regenerate_slot_enums(project_root)
 
-    # Regenerate intents enum
-    print("Regenerating intents enum...")
-    regenerate_enums.regenerate_intent_enum()
+        # Regenerate intents enum
+        print("Regenerating intents enum...")
+        regenerate_enums.regenerate_intent_enum(project_root)
+    else:
+        print("Skipping enum regeneration (regenerate_enums module not found)")
 
 
 def are_dir_trees_equal(dir1: str, dir2: str):
