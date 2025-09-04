@@ -35,6 +35,6 @@
 - CloudWatch Logs: Create/write log streams
 - Bedrock: InvokeModel and Converse operations
 
-### Lex IAM Role  
+### Lex IAM Role
 - Polly: Speech synthesis
 - CloudWatch Logs: Conversation logging
