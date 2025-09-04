@@ -58,7 +58,7 @@ from lex_helper import get_message
 def handler(lex_request):
     # Get simple message
     message = get_message("book_flight.elicit_origin_city")
-    
+
     # Get message with fallback
     try:
         message = get_message("book_flight.authentication_required")
