@@ -321,6 +321,7 @@ The current implementation uses mock data. For production deployment:
 
 - **[Deployment Guide](docs/DEPLOYMENT.md)**: Complete deployment instructions and troubleshooting
 - **[Architecture Overview](docs/ARCHITECTURE.md)**: System architecture and component details
+- **[Internationalization](docs/INTERNATIONALIZATION.md)**: Multi-language support and localization
 - **[Fulfillment Lambda README](lambdas/fulfillment_function/README.md)**: Detailed Lambda function documentation
 - **[Lex Bot Export README](lex-export/README.md)**: Amazon Lex bot configuration and structure
 
