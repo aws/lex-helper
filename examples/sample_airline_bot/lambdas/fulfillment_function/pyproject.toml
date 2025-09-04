@@ -16,7 +16,7 @@ pydantic = "^2.10.6"
 pydantic-core = "^2.28.0"
 cryptography = "^44.0.0"
 pydantic-settings = "^2.7.1"
-lex-helper = { path = "lex_helper-0.0.9-py3-none-any.whl" }
+lex-helper = { path = "lex_helper-0.0.1-py3-none-any.whl" }
 
 [build-system]
 requires = ["poetry-core"]

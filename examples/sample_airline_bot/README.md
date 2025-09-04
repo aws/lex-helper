@@ -122,7 +122,8 @@ npm install
 
 **One-Command Deployment (Recommended)**
 ```bash
-./deploy-with-local-lex-helper.sh
+# Must be run from sample_airline_bot directory
+./scripts/deploy-with-local-lex-helper.sh
 ```
 
 This script will:
@@ -166,7 +167,7 @@ npx cdk deploy
 ### For lex-helper Library Changes
 ```bash
 # From the root lex-helper directory:
-./examples/sample_airline_bot/deploy-with-local-lex-helper.sh
+./examples/sample_airline_bot/scripts/deploy-with-local-lex-helper.sh
 ```
 
 ### Quick Development Cycle
@@ -318,10 +319,10 @@ The current implementation uses mock data. For production deployment:
 
 ## 📚 Documentation
 
+- **[Deployment Guide](docs/DEPLOYMENT.md)**: Complete deployment instructions and troubleshooting
+- **[Architecture Overview](docs/ARCHITECTURE.md)**: System architecture and component details
 - **[Fulfillment Lambda README](lambdas/fulfillment_function/README.md)**: Detailed Lambda function documentation
 - **[Lex Bot Export README](lex-export/README.md)**: Amazon Lex bot configuration and structure
-- **[Deployment Guide](DEPLOYMENT_GUIDE.md)**: Comprehensive deployment instructions
-- **[Lambda Layers README](layers/README.md)**: Working with Lambda layers
 
 
 ## 🤝 Contributing
