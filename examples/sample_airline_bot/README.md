@@ -19,44 +19,53 @@ The Airline-Bot provides a natural language interface for airline customers to:
 The bot is built using:
 - **Amazon Lex V2** for natural language understanding and conversation management
 - **AWS Lambda** for fulfillment logic and business processing
+- **Amazon Bedrock** for AI-powered city-to-airport resolution
 - **lex_helper Framework** for structured intent management and reduced boilerplate
-- **CloudFormation** for infrastructure as code deployment
+- **AWS CDK** for infrastructure as code deployment
 - **Modular Design** for easy extension and maintenance
 
 ## 📁 Project Structure
 
 ```
-Airline-Bot/
-├── cloudformation/                    # Infrastructure and deployment
-│   ├── scripts/                       # Deployment automation scripts
-│   │   ├── package-lambda-function.sh
-│   │   ├── package-lex-helper-layer.sh
-│   │   └── package-lex-export.sh
-│   ├── deploy_airline_bot.sh          # Main deployment script
-│   └── airline-bot-native-template.yaml # CloudFormation template
+sample_airline_bot/
+├── bin/                               # CDK entry point
+│   └── lex-at-scale.ts               # CDK app definition
+├── lib/                               # CDK infrastructure
+│   └── lex-at-scale-stack.ts          # Main CDK stack
 ├── lambdas/                           # Lambda function code
 │   └── fulfillment_function/          # Main fulfillment Lambda
-│       ├── lambda_function.py         # Entry point and request router
-│       ├── session_attributes.py      # Custom session state management
-│       ├── intents/                   # Intent handlers
-│       │   ├── authenticate.py        # User authentication flow
-│       │   ├── book_flight.py         # Flight booking with slot elicitation
-│       │   ├── cancel_flight.py       # Flight cancellation handler
-│       │   ├── change_flight.py       # Flight modification handler
-│       │   ├── flight_delay_update.py # Flight status and delays
-│       │   ├── track_baggage.py       # Baggage tracking
-│       │   ├── greeting.py            # Welcome interactions
-│       │   ├── goodbye.py             # Farewell handling
-│       │   ├── anything_else.py       # Additional assistance
-│       │   └── fallback_intent.py     # Unrecognized input handling
-│       └── utils/                     # Utility modules
-│           └── enums.py               # Constants and enumerations
-├── layers/                            # Lambda layers for dependencies
-│   └── lex-helper-v*.zip             # lex_helper framework package
+│       ├── src/fulfillment_function/      # Source code
+│       │   ├── lambda_function.py         # Entry point and request router
+│       │   ├── session_attributes.py      # Custom session state management
+│       │   ├── intents/                   # Intent handlers
+│       │   │   ├── authenticate.py        # User authentication flow
+│       │   │   ├── book_flight.py         # Flight booking with Bedrock integration
+│       │   │   ├── cancel_flight.py       # Flight cancellation handler
+│       │   │   ├── change_flight.py       # Flight modification handler
+│       │   │   ├── flight_delay_update.py # Flight status and delays
+│       │   │   ├── track_baggage.py       # Baggage tracking
+│       │   │   ├── greeting.py            # Welcome interactions
+│       │   │   ├── goodbye.py             # Farewell handling
+│       │   │   ├── anything_else.py       # Additional assistance
+│       │   │   └── fallback_intent.py     # Unrecognized input handling
+│       │   └── utils/                     # Utility modules
+│       │       ├── enums.py               # Constants and enumerations
+│       │       └── reservation_utils.py   # Bedrock-powered airport resolution
+│       ├── messages/                      # Localized messages
+│       │   ├── messages.yaml              # Default English messages
+│       │   └── messages_es_ES.yaml        # Spanish messages
+│       └── pyproject.toml                 # Python dependencies
 ├── lex-export/                        # Lex bot configuration
 │   └── LexBot/                        # Bot definition and intents
-├── zip/                               # Generated deployment packages
-├── DEPLOYMENT_GUIDE.md                # Detailed deployment instructions
+├── integration_tests/                 # Integration test suite
+├── scripts/                           # Deployment scripts
+│   └── deploy-with-local-lex-helper.sh # Main deployment script
+├── docs/                              # Documentation
+│   ├── DEPLOYMENT.md                  # Deployment guide
+│   ├── ARCHITECTURE.md                # System architecture
+│   └── INTERNATIONALIZATION.md        # Multi-language support
+├── package.json                       # Node.js dependencies
+├── tsconfig.json                      # TypeScript configuration
 └── README.md                          # This file
 ```
 
@@ -90,9 +99,11 @@ The Lambda function demonstrates production-ready patterns:
 
 1. **Multi-Turn Conversations**: Complex booking flow with multiple slot elicitation
 2. **Intent Transitions**: Moving between intents (e.g., authentication flow)
-3. **Session Management**: Persistent user data and conversation state
-4. **Error Recovery**: Handling unknown inputs and system errors
-5. **Production Readiness**: Proper logging, error handling, and deployment automation
+3. **AI-Powered Resolution**: Bedrock integration for city-to-airport code conversion
+4. **Session Management**: Persistent user data and conversation state
+5. **Error Recovery**: Handling unknown inputs and system errors
+6. **Internationalization**: Multi-language support with YAML message files
+7. **Production Readiness**: Proper logging, error handling, and deployment automation
 
 ## 🚀 Quick Start
 
@@ -189,7 +200,7 @@ npm run build && npx cdk deploy --require-approval never
 
 ```bash
 # Test Lambda function directly
-aws lambda invoke --function-name AirlineBotFulfillment \
+aws lambda invoke --function-name fulfillment-lambda-devlexbot \
   --payload file://test-event.json output.json
 
 # Test through Lex console or CLI
@@ -206,38 +217,57 @@ aws lexv2-runtime recognize-text \
 ### Setup Development Environment
 
 ```bash
-# The lambda_function.py automatically detects local environment
-# and adds the lex_helper layer to Python path
+# Navigate to Lambda source directory
+cd lambdas/fulfillment_function/src
 
-# For testing individual components:
-cd lambdas/fulfillment_function
-python -c "from intents.book_flight import handler; print('Import successful')"
+# Test imports
+python -c "from fulfillment_function.intents.book_flight import handler; print('Import successful')"
 ```
 
 ### Development Guidelines
 
 - **Follow Established Patterns**: Use existing intent handlers as templates
+- **Bedrock Integration**: Use `invoke_bedrock_converse` for AI-powered features
+- **Message Management**: Use `get_message()` for localized responses
 - **Comprehensive Logging**: Add debug logging for troubleshooting
 - **Error Handling**: Always include try-catch blocks and user-friendly error messages
-- **Documentation**: Add docstrings and inline comments
 - **Session Management**: Store relevant data in session attributes for multi-turn conversations
 
 ### Testing Locally
 
 ```bash
 # Test individual intent handlers
-python -m intents.book_flight
+cd lambdas/fulfillment_function/src
+python -c "from fulfillment_function.intents.book_flight import handler; print('Handler loaded')"
 
 # Test session attributes
-python -c "from session_attributes import AirlineBotSessionAttributes; print(AirlineBotSessionAttributes())"
+python -c "from fulfillment_function.session_attributes import AirlineBotSessionAttributes; print(AirlineBotSessionAttributes())"
+
+# Test message management
+python -c "from lex_helper import get_message; print(get_message('book_flight.elicit_origin_city'))"
 ```
 
 ## 🔧 Configuration
 
 ### Environment Variables
-- `AWS_EXECUTION_ENV`: Automatically set by Lambda runtime (used for local vs. Lambda detection)
+- `MESSAGES_YAML_PATH`: Path to message files (`/var/task/fulfillment_function/messages`)
+- `LOG_LEVEL`: Logging level (`INFO`)
+- `AWS_EXECUTION_ENV`: Automatically set by Lambda runtime
 
 ### Required AWS Permissions
+
+**Lambda IAM Role:**
+- `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents` - CloudWatch Logs
+- `bedrock:InvokeModel`, `bedrock:Converse` - Amazon Bedrock integration
+
+**Lex IAM Role:**
+- `polly:SynthesizeSpeech` - Text-to-speech
+- `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents` - Conversation logging
+
+### Bedrock Model Access
+Ensure your AWS account has access to:
+- `anthropic.claude-3-haiku-20240307-v1:0` (used for airport resolution)
+- Other Bedrock models as needed Permissions
 ```json
 {
   "Version": "2012-10-17",
