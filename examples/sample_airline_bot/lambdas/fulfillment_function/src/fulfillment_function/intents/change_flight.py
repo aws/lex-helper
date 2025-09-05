@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
+from ..classes.slot_enums import ChangeFlightSlot
 from ..session_attributes import AirlineBotSessionAttributes
 
 
@@ -30,8 +31,8 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     session_attrs = lex_request.sessionState.sessionAttributes
 
     # Get slot values
-    reservation_number = dialog.get_slot(slot_name="ReservationNumber", intent=intent) or ""
-    new_departure_date = dialog.get_slot(slot_name="NewDepartureDate", intent=intent) or ""
+    reservation_number = dialog.get_slot(slot_name=ChangeFlightSlot.RESERVATIONNUMBER.value, intent=intent) or ""
+    new_departure_date = dialog.get_slot(slot_name=ChangeFlightSlot.NEWDEPARTUREDATE.value, intent=intent) or ""
     logger.debug("Slot values: reservation_number=%s, new_departure_date=%s", reservation_number, new_departure_date)
 
     # Store values in session attributes
@@ -47,14 +48,18 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning("Failed to get localized message: %s", e)
         logger.debug("Eliciting ReservationNumber slot: %s", message)
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=ChangeFlightSlot.RESERVATIONNUMBER.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     if not new_departure_date:
         message = "What is your new departure date?"
         logger.debug("Eliciting NewDepartureDate slot: %s", message)
         return dialog.elicit_slot(
-            slot_to_elicit="NewDepartureDate", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=ChangeFlightSlot.NEWDEPARTUREDATE.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     # Create the response message with proper formatting
