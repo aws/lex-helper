@@ -8,7 +8,7 @@ This package provides tools and utilities for creating and managing
 Amazon Lex chatbots with a focus on maintainability and ease of use.
 """
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 import logging
 
