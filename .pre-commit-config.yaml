@@ -43,3 +43,20 @@ repos:
           "pytest>=7.0.0",
           "requests>=2.32.0"
         ]
+
+  # Pytest for running tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: uv run pytest
+        language: system
+        description: Run pytest test suite
+        files: ^(tests/|lex_helper/).*\.py$
+        args: [
+          "tests/",
+          "--tb=short",
+          "-v",
+          "--durations=10"
+        ]
+        pass_filenames: false

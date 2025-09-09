@@ -109,8 +109,11 @@ class TestAutoExceptionHandling:
         assert "messages" in response
         assert response["sessionState"]["dialogAction"]["type"] == "Close"
 
-    def test_auto_exception_handling_with_invalid_event(self):
+    @patch("lex_helper.get_message")
+    def test_auto_exception_handling_with_invalid_event(self, mock_get_message):
         """Test auto exception handling with an invalid event."""
+        mock_get_message.side_effect = Exception("Message not found")
+
         config = Config(
             session_attributes=TestSessionAttributes(),
             package_name="examples.basic_handler",
@@ -185,8 +188,11 @@ class TestAutoExceptionHandling:
         with pytest.raises(Exception):  # noqa: B017
             lex_helper.handler(invalid_event, {})
 
-    def test_create_minimal_error_response_method(self):
+    @patch("lex_helper.get_message")
+    def test_create_minimal_error_response_method(self, mock_get_message):
         """Test the _create_minimal_error_response method."""
+        mock_get_message.side_effect = Exception("Message not found")
+
         config = Config(
             session_attributes=TestSessionAttributes(),
             package_name="examples.basic_handler",
