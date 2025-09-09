@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 0.0.2
+
+### Changed
+
+- **Dependency Management Migration**
+  - Migrated sample airline bot from Poetry to uv for faster dependency resolution and installation
+  - Updated `pyproject.toml` to use PEP 621 standard format instead of Poetry-specific configuration
+  - Replaced `poetry.lock` with `uv.lock` for dependency locking
+  - Updated CDK bundling configuration to automatically detect and use uv for Lambda packaging
+  - Modified deployment scripts to use `uv sync` instead of `poetry lock`
+
+### Technical Details
+
+- Changed build system from `poetry-core` to `hatchling` for better PEP 621 compatibility
+- Updated Python version constraints to be compatible with all dependencies (`>=3.12,<4.0`)
+- Configured CDK `PythonFunction` and `PythonLayerVersion` to properly detect uv configuration
+- Maintained all existing functionality while improving build performance
+
 ## [0.0.1] - 2025-01-03
 
 ### Added

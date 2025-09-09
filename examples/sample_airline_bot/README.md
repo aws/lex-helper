@@ -113,14 +113,12 @@ The Lambda function demonstrates production-ready patterns:
 - **Node.js and npm**: `brew install node`
 - **TypeScript**: `npm install -g typescript`
 - **Docker Desktop**: `brew install --cask docker` (must be running)
-- **Poetry**: `pip install poetry`
 - **AWS credentials**: Valid AWS credentials via `ada credentials update --account=<account> --role=<role>`
 
 ### 1. Install Dependencies
 
 ```bash
 # Install required tools
-pip install uv poetry
 brew install node
 npm install -g typescript
 brew install --cask docker
@@ -140,9 +138,8 @@ npm install
 This script will:
 1. Build the lex-helper library from source using `uv`
 2. Copy the wheel to the Lambda function
-3. Update Poetry dependencies
-4. Build the CDK project with TypeScript
-5. Deploy the CDK stack
+3. Build the CDK project with TypeScript
+4. Deploy the CDK stack
 
 ### 3. Verify Installation
 
@@ -152,7 +149,6 @@ uv --version
 npm --version
 tsc --version
 docker --version
-poetry --version
 ```
 
 ## 🔄 Build and Redeploy After Changes

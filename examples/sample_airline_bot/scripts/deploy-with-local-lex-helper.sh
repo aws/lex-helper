@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Deploy Airline Bot with Local lex-helper Library
-# This script builds the lex-helper library locally and deploys the CDK stack
+# This script builds the lex-helper library locally using uv and deploys the CDK stack
 
 set -e
 
@@ -12,12 +12,12 @@ uv build
 echo "📦 Copying wheel to Lambda function..."
 cp dist/lex_helper-*.whl examples/sample_airline_bot/lambdas/fulfillment_function/
 
-echo "🔄 Updating Poetry dependencies..."
+echo "🔄 Updating uv dependencies..."
 cd examples/sample_airline_bot/lambdas/fulfillment_function
 # Update pyproject.toml to use the latest wheel
 WHEEL_FILE=$(ls lex_helper-*.whl | head -1)
 sed -i.bak "s/lex-helper = { path = \"lex_helper-.*\.whl\" }/lex-helper = { path = \"$WHEEL_FILE\" }/" pyproject.toml
-poetry lock
+uv sync
 
 echo "🏗️ Building CDK project..."
 cd ../../
