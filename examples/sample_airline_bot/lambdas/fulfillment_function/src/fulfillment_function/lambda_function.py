@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-from lex_helper import Config, LexHelper, LexRequest
+from lex_helper import Config, LexHelper
 
 # Use absolute import instead of relative import for Lambda compatibility
 try:
@@ -48,11 +48,6 @@ try:
 except ImportError:
     # Fallback for Lambda environment
     from session_attributes import AirlineBotSessionAttributes
-
-try:
-    from .utils.config import initialize_message_manager
-except ImportError:
-    from utils.config import initialize_message_manager
 
 
 def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
@@ -76,53 +71,23 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     session_attributes = AirlineBotSessionAttributes()
     logger.debug("Initialized session attributes")
 
-    # Create the lex_helper configuration
-    config = Config(session_attributes=session_attributes, package_name="fulfillment_function")
+    # Create the lex_helper configuration with automatic error handling
+    config = Config(
+        session_attributes=session_attributes,
+        package_name="fulfillment_function",
+        auto_handle_exceptions=True,  # Automatically handle exceptions
+        error_message="general.error_generic",  # Custom error message key
+    )
 
     # Initialize the LexHelper with our configuration
     lex_helper = LexHelper(config=config)
     logger.debug("Initialized LexHelper")
 
-    try:
-        # Create LexRequest and initialize MessageManager
-        lex_request = LexRequest(**event)
-        logger.debug("Initialized Message Manager")
-        initialize_message_manager(lex_request)
+    # Process the Lex request through the framework (exceptions handled automatically)
+    response = lex_helper.handler(event, context)
 
-        # Store locale in session attributes
-        session_attributes.user_locale = (
-            lex_request.bot.localeId if lex_request.bot.localeId in ["en_US", "it_IT"] else "en_US"
-        )
+    # Log response in development
+    if not os.getenv("AWS_EXECUTION_ENV"):
+        logger.debug("Response: %s", json.dumps(response, default=str))
 
-        # Process the Lex request through the framework
-        logger.debug("Processing Lex request")
-        response = lex_helper.handler(event, context)
-
-        # Log response in development
-        if not os.getenv("AWS_EXECUTION_ENV"):
-            logger.debug("Response: %s", json.dumps(response, default=str))
-
-        return response
-
-    except Exception:
-        logger.exception("Error processing request")
-
-        # Try to get localized error message
-        try:
-            from lex_helper import MessageManager
-
-            msg_manager = MessageManager()
-            error_message = msg_manager.get_message("general.error_generic")
-        except Exception:
-            # Fallback to hardcoded message if MessageManager fails
-            error_message = "I'm sorry, I encountered an error while processing your request. Please try again."
-
-        # Return a user-friendly error response
-        return {
-            "sessionState": {
-                "dialogAction": {"type": "Close"},
-                "intent": {"name": "FallbackIntent", "state": "Failed"},
-                "sessionAttributes": {},
-            },
-            "messages": [{"contentType": "PlainText", "content": error_message}],
-        }
+    return response

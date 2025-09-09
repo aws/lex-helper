@@ -3,6 +3,8 @@ import * as cdk from 'aws-cdk-lib';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import { randomUUID } from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 export class LexAtScaleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -15,6 +17,74 @@ export class LexAtScaleStack extends cdk.Stack {
   }
 }
 
+/**
+ * Interface for locale configuration
+ */
+interface LocaleConfig {
+  localeId: string;
+  nluConfidenceThreshold: number;
+}
+
+/**
+ * Dynamically detect available locales based ONLY on Lex bot exports
+ * @returns Array of locale configurations
+ */
+function detectAvailableLocales(): LocaleConfig[] {
+  const locales: LocaleConfig[] = [];
+  const lexExportDir = path.join(__dirname, '../lex-export/LexBot/BotLocales');
+
+  try {
+    // Get locales from Lex bot export directories ONLY
+    if (fs.existsSync(lexExportDir)) {
+      const lexDirs = fs.readdirSync(lexExportDir, { withFileTypes: true });
+      for (const dir of lexDirs) {
+        if (dir.isDirectory() && /^[a-z]{2}_[A-Z]{2}$/.test(dir.name)) {
+          // Verify the locale directory has required files
+          const localeDir = path.join(lexExportDir, dir.name);
+          const botLocaleFile = path.join(localeDir, 'BotLocale.json');
+          if (fs.existsSync(botLocaleFile)) {
+            // Read the BotLocale.json to get the confidence threshold
+            try {
+              const botLocaleContent = fs.readFileSync(botLocaleFile, 'utf8');
+              const botLocaleData = JSON.parse(botLocaleContent);
+              locales.push({
+                localeId: dir.name,
+                nluConfidenceThreshold: botLocaleData.nluConfidenceThreshold || 0.4
+              });
+            } catch (parseError) {
+              console.warn(`Failed to parse BotLocale.json for ${dir.name}, using default confidence threshold`);
+              locales.push({
+                localeId: dir.name,
+                nluConfidenceThreshold: 0.4
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Ensure we have at least en_US as fallback
+    if (locales.length === 0) {
+      console.warn('No locales detected in Lex export, falling back to en_US');
+      locales.push({
+        localeId: 'en_US',
+        nluConfidenceThreshold: 0.4
+      });
+    }
+
+    console.log(`Detected locales from Lex export: ${locales.map(l => l.localeId).join(', ')}`);
+    return locales;
+
+  } catch (error) {
+    console.error('Error detecting locales from Lex export:', error);
+    // Fallback to en_US if detection fails
+    return [{
+      localeId: 'en_US',
+      nluConfidenceThreshold: 0.4
+    }];
+  }
+}
+
 
 /**
  * Lexbot is a function that creates the Lex bot, its associated IAM role, and the Lex bot version and alias.
@@ -23,6 +93,9 @@ export class LexAtScaleStack extends cdk.Stack {
  */
 function lexbot(stack: cdk.Stack, fulfillment: cdk_alpha.PythonFunction) {
   const logGroupName = `/aws/lex/${stack.stackName.toLowerCase()}-conversation-logs`;
+
+  // Dynamically detect available locales
+  const availableLocales = detectAvailableLocales();
 
   const lexRole = new cdk.aws_iam.Role(stack, "LexRole", {
     assumedBy: new cdk.aws_iam.ServicePrincipal("lex.amazonaws.com"),
@@ -87,12 +160,7 @@ function lexbot(stack: cdk.Stack, fulfillment: cdk_alpha.PythonFunction) {
     name: `${stack.stackName}`,
     autoBuildBotLocales: true,
     botFileS3Location: lexBotS3Location,
-    botLocales: [
-      {
-        localeId: "en_US",
-        nluConfidenceThreshold: 0.4
-      }
-    ],
+    botLocales: availableLocales,
     testBotAliasSettings: {
       conversationLogSettings: {
         textLogSettings: [
@@ -107,20 +175,18 @@ function lexbot(stack: cdk.Stack, fulfillment: cdk_alpha.PythonFunction) {
           }
         ]
       },
-      botAliasLocaleSettings: [
-        {
-          localeId: "en_US",
-          botAliasLocaleSetting: {
-            enabled: true,
-            codeHookSpecification: {
-              lambdaCodeHook: {
-                codeHookInterfaceVersion: "1.0",
-                lambdaArn: fulfillment.functionArn
-              }
+      botAliasLocaleSettings: availableLocales.map(locale => ({
+        localeId: locale.localeId,
+        botAliasLocaleSetting: {
+          enabled: true,
+          codeHookSpecification: {
+            lambdaCodeHook: {
+              codeHookInterfaceVersion: "1.0",
+              lambdaArn: fulfillment.functionArn
             }
           }
         }
-      ]
+      }))
     },
 
   })
@@ -132,14 +198,12 @@ function lexbot(stack: cdk.Stack, fulfillment: cdk_alpha.PythonFunction) {
   const lexBotVersion = new cdk.aws_lex.CfnBotVersion(stack, `LexBotVersion${randomId}`, {
     botId: lexBot.attrId,
     description: "Lex Bot Version",
-    botVersionLocaleSpecification: [
-      {
-        botVersionLocaleDetails: {
-          sourceBotVersion: "DRAFT"
-        },
-        localeId: "en_US"
-      }
-    ]
+    botVersionLocaleSpecification: availableLocales.map(locale => ({
+      botVersionLocaleDetails: {
+        sourceBotVersion: "DRAFT"
+      },
+      localeId: locale.localeId
+    }))
   });
 
   // Create Lex V2 Bot Alias
@@ -160,20 +224,18 @@ function lexbot(stack: cdk.Stack, fulfillment: cdk_alpha.PythonFunction) {
         }
       ]
     },
-    botAliasLocaleSettings: [
-      {
-        localeId: "en_US",
-        botAliasLocaleSetting: {
-          enabled: true,
-          codeHookSpecification: {
-            lambdaCodeHook: {
-              codeHookInterfaceVersion: "1.0",
-              lambdaArn: fulfillment.functionArn
-            }
+    botAliasLocaleSettings: availableLocales.map(locale => ({
+      localeId: locale.localeId,
+      botAliasLocaleSetting: {
+        enabled: true,
+        codeHookSpecification: {
+          lambdaCodeHook: {
+            codeHookInterfaceVersion: "1.0",
+            lambdaArn: fulfillment.functionArn
           }
         }
       }
-    ]
+    }))
   });
 
   new cdk.CfnOutput(stack, "LexBotId", { value: lexBot.attrId });

@@ -1,7 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 """
-Handler for the TrackBaggage intent using MessageManager.
+Handler for the TrackBaggage intent
 """
 
 import logging

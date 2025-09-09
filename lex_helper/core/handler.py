@@ -33,6 +33,9 @@ class Config[T: SessionAttributes](BaseModel):
     package_name: str | None = (
         "fulfillment_function"  # This is the name of the package to import the intents from.  Should be the same as the name of the package you're running the handler from.
     )
+    auto_initialize_messages: bool = True  # Automatically initialize MessageManager with locale from request
+    auto_handle_exceptions: bool = True  # Automatically handle exceptions and return error responses
+    error_message: str | None = None  # Custom error message or message key for exceptions
 
 
 class LexHelper[T: SessionAttributes]:
@@ -55,10 +58,35 @@ class LexHelper[T: SessionAttributes]:
         Returns:
             dict[str, Any]: A formatted response ready to be sent back to Amazon Lex.
         """
+        if self.config.auto_handle_exceptions:
+            try:
+                return self._handle_request_with_auto_exception_handling(event, context)
+            except Exception as e:
+                logger.exception("Error processing request")
+                # Create a basic LexRequest for error handling
+                try:
+                    lex_request = LexRequest(**event)
+                except Exception:
+                    # If we can't even parse the event, create a minimal error response
+                    return self._create_minimal_error_response()
+
+                # Use handle_exceptions and format the response
+                error_response = handle_exceptions(e, lex_request, error_message=self.config.error_message)
+                return format_for_channel(response=error_response, channel_string="lex")
+        else:
+            return self._handle_request_with_auto_exception_handling(event, context)
+
+    def _handle_request_with_auto_exception_handling(self, event: dict[str, Any], context: Any) -> dict[str, Any]:
+        """Handle request without automatic exception handling (original behavior)."""
         logger.debug("Handler starting")
         session_attributes: T = self.config.session_attributes
         logger.debug("SessionAttributes type: %s", type(session_attributes))
         lex_payload: LexRequest[T] = parse_lex_request(event, session_attributes)
+
+        # Auto-initialize MessageManager if enabled
+        if self.config.auto_initialize_messages:
+            self._initialize_message_manager(lex_payload)
+
         logger.debug(
             "Processing request - sessionId: %s, utterance: %s, sessionAttributes: %s",
             lex_payload.sessionId,
@@ -175,3 +203,38 @@ class LexHelper[T: SessionAttributes]:
                 intent_name=intent_name, lex_request=lex_payload, package_name=self.config.package_name
             )
         return response
+
+    def _initialize_message_manager(self, lex_payload: LexRequest[T]) -> None:
+        """Initialize MessageManager with locale from the Lex request."""
+        try:
+            from lex_helper import set_locale
+
+            locale = lex_payload.bot.localeId
+            set_locale(locale)
+            logger.debug("MessageManager initialized for locale: %s", locale)
+
+        except Exception as e:
+            logger.warning("Failed to initialize MessageManager: %s", e)
+
+    def _create_minimal_error_response(self) -> dict[str, Any]:
+        """Create a minimal error response when event parsing fails."""
+        error_message = "I'm sorry, I encountered an error while processing your request. Please try again."
+
+        # Try to get custom error message if configured
+        if self.config.error_message:
+            try:
+                from lex_helper import get_message
+
+                error_message = get_message(self.config.error_message)
+            except Exception:
+                # If message key lookup fails, use it as direct string
+                error_message = self.config.error_message
+
+        return {
+            "sessionState": {
+                "dialogAction": {"type": "Close"},
+                "intent": {"name": "FallbackIntent", "state": "Failed"},
+                "sessionAttributes": {},
+            },
+            "messages": [{"contentType": "PlainText", "content": error_message}],
+        }

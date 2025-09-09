@@ -45,26 +45,51 @@ class SessionError(LexError):
     pass
 
 
-def handle_exceptions(ex: Exception, lex_request: LexRequest[Any]) -> LexResponse[Any]:
+def handle_exceptions(ex: Exception, lex_request: LexRequest[Any], error_message: str | None = None) -> LexResponse[Any]:
     """Handle exceptions and return appropriate Lex responses.
 
     Args:
         ex: The exception to handle
         lex_request: The original Lex request
+        error_message: Error message (tries as message key first, then as direct string)
 
     Returns:
         A Lex response with an appropriate error message
-    """
-    error_message = "An error occurred. Please try again."
 
-    if isinstance(ex, IntentNotFoundError):
-        error_message = "I'm not sure how to handle that request."
-    elif isinstance(ex, ValidationError):
-        error_message = str(ex) or "Invalid input provided."
-    elif isinstance(ex, SessionError):
-        error_message = "There was an issue with your session. Please start over."
-    elif isinstance(ex, ValueError):
-        error_message = "Invalid value provided."
+    Examples:
+        # Use default exception-specific messages
+        handle_exceptions(e, request)
+
+        # Direct error message
+        handle_exceptions(e, request, error_message="Something went wrong")
+
+        # Message key (automatically detected and localized)
+        handle_exceptions(e, request, error_message="general.error_generic")
+    """
+    # Default fallback message
+    final_message = "I'm sorry, I encountered an error while processing your request. Please try again."
+
+    # Handle error message - try as message key first, then use as direct string
+    if error_message:
+        try:
+            from lex_helper import get_message
+
+            # Try to get localized message (assumes it's a message key)
+            final_message = get_message(error_message)
+        except Exception:
+            # If localization fails, use the error_message as a direct string
+            final_message = error_message
+
+    # Use exception-specific messages if no error message provided
+    else:
+        if isinstance(ex, IntentNotFoundError):
+            final_message = "I'm not sure how to handle that request."
+        elif isinstance(ex, ValidationError):
+            final_message = str(ex) or "Invalid input provided."
+        elif isinstance(ex, SessionError):
+            final_message = "There was an issue with your session. Please start over."
+        elif isinstance(ex, ValueError):
+            final_message = "Invalid value provided."
 
     # Create error response
     lex_response: LexResponse[Any] = LexResponse(
@@ -74,9 +99,9 @@ def handle_exceptions(ex: Exception, lex_request: LexRequest[Any]) -> LexRespons
             ),
             intent=lex_request.sessionState.intent,
             originatingRequestId=lex_request.sessionId,
-            sessionAttributes=lex_request.sessionState.sessionAttributes,
+            sessionAttributes=lex_request.sessionState.sessionAttributes or {},
         ),
-        messages=[LexPlainText(content=error_message, contentType="PlainText")],
+        messages=[LexPlainText(content=final_message, contentType="PlainText")],
         requestAttributes={},
     )
     return lex_response

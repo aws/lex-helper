@@ -3,11 +3,8 @@
 
 from typing import Any
 
-import pytest
-
 from examples.basic_handler.handler import lambda_handler
 from lex_helper import Config, LexHelper, SessionAttributes
-from lex_helper.exceptions.handlers import IntentNotFoundError
 
 
 class TestSessionAttributes(SessionAttributes):
@@ -86,8 +83,14 @@ def test_handler_with_unknown_intent():
     event = create_test_event(intent_name="UnknownIntent")
     context = {}
 
-    with pytest.raises(IntentNotFoundError, match="Unable to find handler for intent"):
-        lambda_handler(event, context)
+    # With auto exception handling enabled, this should return an error response instead of raising
+    response = lambda_handler(event, context)
+
+    # Should return a valid error response
+    assert isinstance(response, dict)
+    assert "sessionState" in response
+    assert "messages" in response
+    assert response["sessionState"]["dialogAction"]["type"] == "Close"
 
 
 def test_handler_with_active_contexts():
@@ -120,8 +123,14 @@ def test_handler_input_validation():
     invalid_event = {"invalid": "event"}
     context = {}
 
-    with pytest.raises(ValueError):
-        lambda_handler(invalid_event, context)
+    # With auto exception handling enabled, this should return an error response instead of raising
+    response = lambda_handler(invalid_event, context)
+
+    # Should return a valid error response
+    assert isinstance(response, dict)
+    assert "sessionState" in response
+    assert "messages" in response
+    assert response["sessionState"]["dialogAction"]["type"] == "Close"
 
 
 def test_handler_response_format():

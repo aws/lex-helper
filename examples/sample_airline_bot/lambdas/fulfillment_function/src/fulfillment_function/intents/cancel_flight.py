@@ -1,7 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 """
-Handler for the CancelFlight intent using MessageManager.
+Handler for the CancelFlight intent
 """
 
 import logging
@@ -27,10 +27,6 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
         The Lex response with localized messages
     """
     logger.debug("CancelFlight intent handler called")
-
-    # Get MessageManager singleton (initialized in lambda_function.py with user's locale)
-    # from lex_helper import MessageManager
-    # msg_manager = MessageManager.get_instance()
 
     # Extract slot values from the intent
     intent = dialog.get_intent(lex_request)

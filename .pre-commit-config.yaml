@@ -30,7 +30,7 @@ repos:
 
   # Pyright for type checking
   - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.390
+    rev: v1.1.405
     hooks:
       - id: pyright
         description: Run pyright type checker
