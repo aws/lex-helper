@@ -187,7 +187,6 @@ your_project/
 
 **Development Documentation:**
 - **[Development Guide](docs/DEVELOPMENT.md)**: Complete development workflow, testing, and contribution guidelines
-- **[Migration Guide](docs/MIGRATION_GUIDE.md)**: Complete guide for migrating from Poetry to uv and modern Python tooling
 
 ## Bedrock Usage Examples
 

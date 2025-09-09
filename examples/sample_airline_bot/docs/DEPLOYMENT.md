@@ -6,7 +6,6 @@
 - **Node.js and npm**: `brew install node`
 - **TypeScript**: `npm install -g typescript`
 - **Docker Desktop**: `brew install --cask docker` (must be running)
-- **Poetry**: `pip install poetry`
 - **AWS credentials**: `ada credentials update --account=<account> --role=<role>`
 
 ## Deployment Commands
