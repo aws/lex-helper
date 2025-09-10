@@ -3,7 +3,7 @@
 
 import logging
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from pydantic import BaseModel
 
@@ -25,6 +25,19 @@ from lex_helper.exceptions.handlers import IntentNotFoundError, handle_exception
 
 logger = logging.getLogger(__name__)
 
+# Import disambiguation components (lazy import to avoid circular dependencies)
+try:
+    from lex_helper.core.disambiguation.analyzer import DisambiguationAnalyzer
+    from lex_helper.core.disambiguation.handler import DisambiguationHandler
+    from lex_helper.core.disambiguation.types import DisambiguationConfig
+
+    disambiguation_available = True
+except ImportError:
+    disambiguation_available = False
+    DisambiguationConfig = None  # type: ignore
+    DisambiguationHandler = None  # type: ignore
+    DisambiguationAnalyzer = None  # type: ignore
+
 T = TypeVar("T", bound=SessionAttributes)
 
 
@@ -36,11 +49,25 @@ class Config[T: SessionAttributes](BaseModel):
     auto_initialize_messages: bool = True  # Automatically initialize MessageManager with locale from request
     auto_handle_exceptions: bool = True  # Automatically handle exceptions and return error responses
     error_message: str | None = None  # Custom error message or message key for exceptions
+    enable_disambiguation: bool = False  # Enable smart disambiguation for ambiguous input
+    disambiguation_config: Any | None = None  # Configuration for disambiguation behavior
 
 
 class LexHelper[T: SessionAttributes]:
     def __init__(self, config: Config[T]):
         self.config = config
+
+        # Initialize disambiguation components if enabled
+        self.disambiguation_handler = None
+        self.disambiguation_analyzer = None
+
+        if self.config.enable_disambiguation and disambiguation_available:
+            disambiguation_config = self.config.disambiguation_config or DisambiguationConfig()  # type: ignore
+            self.disambiguation_handler = DisambiguationHandler(disambiguation_config)  # type: ignore
+            self.disambiguation_analyzer = DisambiguationAnalyzer(disambiguation_config)  # type: ignore
+            logger.debug("Disambiguation components initialized")
+        elif self.config.enable_disambiguation and not disambiguation_available:
+            logger.warning("Disambiguation requested but components not available - falling back to regular behavior")
 
     def handler(self, event: dict[str, Any], context: Any) -> dict[str, Any]:
         """
@@ -117,9 +144,14 @@ class LexHelper[T: SessionAttributes]:
         logger.debug("Lex-Intent: %s", lex_intent_name)
 
         # Handlers is a list of functions that take a LexRequest and return a LexResponse
-        handlers: list[Callable[[LexRequest[T]], LexResponse[T] | None]] = [
-            self.regular_intent_handler,
-        ]
+        handlers: list[Callable[[LexRequest[T]], LexResponse[T] | None]] = []
+
+        # Add disambiguation handler first if enabled
+        if self.disambiguation_handler:
+            handlers.append(self.disambiguation_intent_handler)
+
+        # Add regular intent handler
+        handlers.append(self.regular_intent_handler)
 
         try:
             response = None
@@ -171,6 +203,33 @@ class LexHelper[T: SessionAttributes]:
         except Exception as e:
             logger.exception(e)
             raise e
+
+    def disambiguation_intent_handler(self, lex_payload: LexRequest[T]) -> LexResponse[T] | None:
+        """
+        Handle disambiguation responses and trigger disambiguation when needed.
+
+        This handler processes user responses to disambiguation questions and
+        triggers new disambiguation when confidence is low.
+        """
+        if not self.disambiguation_handler:
+            return None
+
+        # First, check if this is a response to a previous disambiguation
+        disambiguation_response = self.disambiguation_handler.process_disambiguation_response(lex_payload)
+        if disambiguation_response is not None:
+            return disambiguation_response
+
+        # If not a disambiguation response, check if we need to trigger disambiguation
+        if self.disambiguation_analyzer:
+            # Analyze the request for disambiguation
+            analysis_result = self.disambiguation_analyzer.analyze_request(cast(Any, lex_payload))
+
+            if analysis_result.should_disambiguate and analysis_result.candidates:
+                logger.info("Triggering disambiguation with %d candidates", len(analysis_result.candidates))
+                return self.disambiguation_handler.handle_disambiguation(lex_payload, analysis_result.candidates)
+
+        # No disambiguation needed, let regular handler process
+        return None
 
     def regular_intent_handler(self, lex_payload: LexRequest[T]) -> LexResponse[T] | None:
         """

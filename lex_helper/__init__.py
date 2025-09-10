@@ -21,6 +21,11 @@ from lex_helper.channels.channel_formatting import format_for_channel
 from lex_helper.channels.lex import LexChannel
 from lex_helper.channels.sms import SMSChannel
 from lex_helper.core import dialog
+from lex_helper.core.disambiguation import (
+    DisambiguationConfig,
+    DisambiguationResult,
+    IntentCandidate,
+)
 from lex_helper.core.handler import Config, LexHelper
 from lex_helper.core.invoke_bedrock import (
     BedrockInvocationError,
@@ -62,11 +67,14 @@ __all__ = [
     "Config",
     "DialogAction",
     "dialog",
+    "DisambiguationConfig",
+    "DisambiguationResult",
     "format_for_channel",
     "get_message",
     "handle_exceptions",
     "ImageResponseCard",
     "Intent",
+    "IntentCandidate",
     "Interpretation",
     "invoke_bedrock",
     "invoke_bedrock_converse",

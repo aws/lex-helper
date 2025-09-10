@@ -158,6 +158,10 @@ class SessionAttributes(BaseModel):
 
     channel: str = "lex"
 
+    # Disambiguation attributes
+    disambiguation_candidates: str | None = None  # JSON string of disambiguation candidates
+    disambiguation_active: bool = False  # Whether disambiguation is currently active
+
     def to_cmd_response(self):
         response = ""
         self_dict = self.model_dump()

@@ -1,7 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from lex_helper import Button
+from lex_helper.formatters.buttons import Button
 
 
 def format_buttons(buttons: list[Button]) -> list[Button]:
