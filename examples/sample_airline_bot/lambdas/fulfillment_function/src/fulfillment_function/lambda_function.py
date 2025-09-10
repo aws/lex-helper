@@ -4,7 +4,15 @@
 Main Lambda handler for the Airline-Bot fulfillment function.
 
 This is the entry point for the AWS Lambda function that handles Amazon Lex bot requests.
-It uses the lex_helper framework to simplify request processing and intent routing.
+It uses the lex_helper framework with Smart Disambiguation to provide intelligent handling
+of ambiguous user input, with optional Bedrock-powered contextual responses.
+
+Environment Variables:
+    ENABLE_BEDROCK_DISAMBIGUATION: Set to 'true' to enable AI-powered disambiguation
+    BEDROCK_MODEL_ID: Bedrock model ID (default: anthropic.claude-3-haiku-20240307-v1:0)
+    BEDROCK_REGION: AWS region for Bedrock (default: us-east-1)
+    BEDROCK_MAX_TOKENS: Maximum tokens for responses (default: 150)
+    BEDROCK_TEMPERATURE: Temperature for text generation (default: 0.3)
 """
 
 import json
@@ -41,7 +49,7 @@ if not logger.handlers:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 from lex_helper import Config, LexHelper
-from lex_helper.core.disambiguation.types import DisambiguationConfig
+from lex_helper.core.disambiguation.types import BedrockDisambiguationConfig, DisambiguationConfig
 
 # Use absolute import instead of relative import for Lambda compatibility
 try:
@@ -72,7 +80,27 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     session_attributes = AirlineBotSessionAttributes()
     logger.debug("Initialized session attributes")
 
-    # Configure Smart Disambiguation with message keys for localization
+    # Configure Bedrock for intelligent disambiguation (optional)
+    # Set ENABLE_BEDROCK_DISAMBIGUATION=true environment variable to enable
+    enable_bedrock = os.getenv("ENABLE_BEDROCK_DISAMBIGUATION", "false").lower() == "true"
+
+    bedrock_config = BedrockDisambiguationConfig(
+        enabled=enable_bedrock,
+        model_id=os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-haiku-20240307-v1:0"),
+        region_name=os.getenv("BEDROCK_REGION", "us-east-1"),
+        max_tokens=int(os.getenv("BEDROCK_MAX_TOKENS", "150")),
+        temperature=float(os.getenv("BEDROCK_TEMPERATURE", "0.3")),
+        system_prompt=(
+            "You are a helpful airline customer service assistant. "
+            "Create clear, friendly disambiguation messages that help travelers "
+            "choose between flight-related options. Be concise and professional. "
+            "Use airline industry terminology appropriately. "
+            "Always acknowledge what the customer said and provide clear next steps."
+        ),
+        fallback_to_static=True,  # Always fall back gracefully
+    )
+
+    # Configure Smart Disambiguation with Bedrock integration and message keys for localization
     disambiguation_config = DisambiguationConfig(
         confidence_threshold=0.4,  # Threshold for low confidence scenarios
         max_candidates=2,  # Keep it simple with 2 options
@@ -96,6 +124,8 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             "ChangeFlight_CancelFlight": "disambiguation.airline.change_or_cancel",
             "FlightDelayUpdate_TrackBaggage": "disambiguation.airline.flight_or_baggage",
         },
+        # Bedrock configuration for intelligent text generation
+        bedrock_config=bedrock_config,
     )
 
     # Create the lex_helper configuration with disambiguation enabled
@@ -110,7 +140,13 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
 
     # Initialize the LexHelper with our configuration
     lex_helper = LexHelper(config=config)
-    logger.debug("Initialized LexHelper")
+
+    if enable_bedrock:
+        logger.info("Bedrock-powered disambiguation enabled with model: %s", bedrock_config.model_id)
+    else:
+        logger.debug("Using static disambiguation messages")
+
+    logger.debug("Initialized LexHelper with Smart Disambiguation")
 
     # Process the Lex request through the framework (exceptions handled automatically)
     response = lex_helper.handler(event, context)
@@ -120,3 +156,21 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
         logger.debug("Response: %s", json.dumps(response, default=str))
 
     return response
+
+
+# Usage Examples:
+#
+# 1. Basic disambiguation (default):
+#    No environment variables needed. Uses static message templates.
+#
+# 2. Bedrock-powered disambiguation:
+#    Set environment variable: ENABLE_BEDROCK_DISAMBIGUATION=true
+#    Optionally configure: BEDROCK_MODEL_ID, BEDROCK_REGION, etc.
+#
+# 3. Custom Bedrock model:
+#    ENABLE_BEDROCK_DISAMBIGUATION=true
+#    BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
+#    BEDROCK_TEMPERATURE=0.2
+#
+# The system gracefully falls back to static messages if Bedrock fails,
+# ensuring your bot always works even if AI services are unavailable.

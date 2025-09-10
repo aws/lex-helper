@@ -361,9 +361,22 @@ config = Config(
 lex_helper = LexHelper(config=config)
 ```
 
-### Example 2: Airline Bot Setup
+### Example 2: Airline Bot Setup (Complete Implementation)
+
+The `examples/sample_airline_bot/` directory contains a complete working example with both static and Bedrock-powered disambiguation:
 
 ```python
+# Environment-based configuration for flexibility
+enable_bedrock = os.getenv("ENABLE_BEDROCK_DISAMBIGUATION", "false").lower() == "true"
+
+# Bedrock configuration (optional)
+bedrock_config = BedrockDisambiguationConfig(
+    enabled=enable_bedrock,
+    model_id="anthropic.claude-3-haiku-20240307-v1:0",
+    system_prompt="You are a helpful airline customer service assistant...",
+    fallback_to_static=True,
+)
+
 # Full airline bot configuration
 disambiguation_config = DisambiguationConfig(
     confidence_threshold=0.4,
@@ -376,7 +389,8 @@ disambiguation_config = DisambiguationConfig(
         "disambiguation.booking": "disambiguation.airline.booking_options",
         "disambiguation.status": "disambiguation.airline.status_options",
         "BookFlight_ChangeFlight": "disambiguation.airline.book_or_change"
-    }
+    },
+    bedrock_config=bedrock_config,  # AI-powered enhancement
 )
 
 config = Config(
@@ -385,6 +399,15 @@ config = Config(
     enable_disambiguation=True,
     disambiguation_config=disambiguation_config
 )
+```
+
+**Usage:**
+```bash
+# Static disambiguation
+python lambda_function.py
+
+# Bedrock-powered disambiguation
+ENABLE_BEDROCK_DISAMBIGUATION=true python lambda_function.py
 ```
 
 ### Example 3: E-commerce Bot Setup
