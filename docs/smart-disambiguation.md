@@ -141,6 +141,60 @@ config = Config(
 )
 ```
 
+### Bedrock-Powered Disambiguation
+
+For even more intelligent and contextual disambiguation, enable Amazon Bedrock integration:
+
+```python
+from lex_helper.core.disambiguation.types import (
+    BedrockDisambiguationConfig,
+    DisambiguationConfig
+)
+
+# Configure Bedrock for intelligent text generation
+bedrock_config = BedrockDisambiguationConfig(
+    enabled=True,
+    model_id="anthropic.claude-3-haiku-20240307-v1:0",
+    region_name="us-east-1",
+    max_tokens=150,
+    temperature=0.3,
+    system_prompt=(
+        "You are a helpful assistant that creates clear, concise "
+        "disambiguation messages for chatbot users. Be friendly and natural."
+    ),
+    fallback_to_static=True,  # Graceful fallback if Bedrock fails
+)
+
+# Configure disambiguation with Bedrock
+disambiguation_config = DisambiguationConfig(
+    confidence_threshold=0.5,
+    max_candidates=2,
+    bedrock_config=bedrock_config,  # Enable Bedrock integration
+)
+```
+
+**Benefits of Bedrock Integration:**
+- **Contextual messages**: Acknowledges user's specific input
+- **Natural language**: More conversational than static templates
+- **Smart button labels**: Generates intuitive action text
+- **Adaptive responses**: Tailored to your domain and use case
+
+**Example comparison:**
+
+*Static disambiguation:*
+```
+User: "I need help with my flight"
+Bot: "I can help you with several things. What would you like to do?"
+Buttons: ["Book Flight", "Change Flight", "Cancel Flight"]
+```
+
+*Bedrock-powered disambiguation:*
+```
+User: "I need help with my flight"
+Bot: "I'd be happy to help with your flight! Are you looking to make changes to an existing booking or book a new flight?"
+Buttons: ["Modify existing booking", "Book new flight"]
+```
+
 ### Configuration Parameters
 
 | Parameter | Type | Default | Description |
@@ -151,6 +205,19 @@ config = Config(
 | `min_candidates` | int | 2 | Minimum candidates needed to trigger |
 | `custom_intent_groups` | dict | {} | Related intent groupings |
 | `custom_messages` | dict | {} | Custom message key mappings |
+| `bedrock_config` | BedrockDisambiguationConfig | disabled | Bedrock integration settings |
+
+#### Bedrock Configuration Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `enabled` | bool | False | Enable Bedrock text generation |
+| `model_id` | str | claude-3-haiku | Bedrock model to use |
+| `region_name` | str | us-east-1 | AWS region for Bedrock |
+| `max_tokens` | int | 200 | Maximum tokens for responses |
+| `temperature` | float | 0.3 | Randomness (0.0-1.0, lower = more deterministic) |
+| `system_prompt` | str | default | System prompt for the model |
+| `fallback_to_static` | bool | True | Fall back to static messages if Bedrock fails |
 
 ## Message Localization
 

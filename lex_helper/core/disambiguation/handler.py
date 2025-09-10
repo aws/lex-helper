@@ -28,6 +28,7 @@ from lex_helper.core.types import (
 )
 from lex_helper.formatters.buttons import Button
 
+from .bedrock_generator import BedrockDisambiguationGenerator
 from .types import (
     DisambiguationConfig,
     IntentCandidate,
@@ -56,6 +57,17 @@ class DisambiguationHandler:
         """
         self.config = config or DisambiguationConfig()
 
+        # Initialize Bedrock generator if enabled
+        self.bedrock_generator = None
+        if self.config.bedrock_config.enabled:
+            try:
+                self.bedrock_generator = BedrockDisambiguationGenerator(self.config.bedrock_config)
+                logger.debug("Bedrock disambiguation generator initialized")
+            except Exception as e:
+                logger.warning("Failed to initialize Bedrock generator: %s", e)
+                if not self.config.bedrock_config.fallback_to_static:
+                    raise
+
     def handle_disambiguation(self, lex_request: LexRequest[T], candidates: list[IntentCandidate]) -> LexResponse[T]:
         """
         Generate disambiguation response with clarifying questions.
@@ -78,8 +90,8 @@ class DisambiguationHandler:
         # Store disambiguation state in session
         self._store_disambiguation_state(lex_request, limited_candidates)
 
-        # Create clarification messages
-        messages = self._create_clarification_messages(limited_candidates)
+        # Create clarification messages with user input context
+        messages = self._create_clarification_messages(limited_candidates, lex_request.inputTranscript)
 
         # Use elicit_intent to get user's clarification
         return elicit_intent(messages, lex_request)
@@ -128,25 +140,32 @@ class DisambiguationHandler:
         # Return None to let the regular handler process the updated request
         return None
 
-    def _create_clarification_messages(self, candidates: list[IntentCandidate]) -> LexMessages:
+    def _create_clarification_messages(
+        self, candidates: list[IntentCandidate], user_input: str | None = None
+    ) -> LexMessages:
         """
         Create user-friendly clarification messages with intent options.
 
         Args:
             candidates: List of intent candidates to present
+            user_input: Optional user input for context
 
         Returns:
             List of messages including text and buttons
         """
-        # Get the main clarification message
-        main_message = self._get_clarification_text(candidates)
+        # Get the main clarification message (potentially from Bedrock)
+        main_message = self._get_clarification_text(candidates, user_input)
+
+        # Generate button labels (potentially from Bedrock)
+        button_labels = self._get_button_labels(candidates, user_input)
 
         # Create buttons for each candidate
         buttons = []
-        for _, candidate in enumerate(candidates, 1):
+        for i, candidate in enumerate(candidates):
+            button_text = button_labels[i] if i < len(button_labels) else candidate.display_name
             button = Button(
-                text=candidate.display_name,
-                value=candidate.display_name,  # Use display name as value for natural conversation flow
+                text=button_text,
+                value=button_text,  # Use button text as value for natural conversation flow
             )
             buttons.append(button)
 
@@ -172,16 +191,25 @@ class DisambiguationHandler:
 
         return messages
 
-    def _get_clarification_text(self, candidates: list[IntentCandidate]) -> str:
+    def _get_clarification_text(self, candidates: list[IntentCandidate], user_input: str | None = None) -> str:
         """
         Get the main clarification text based on candidates.
 
         Args:
             candidates: List of intent candidates
+            user_input: Optional user input for context
 
         Returns:
             Clarification message text
         """
+        # Try Bedrock generation first if enabled
+        if self.bedrock_generator and user_input:
+            try:
+                return self.bedrock_generator.generate_clarification_message(user_input, candidates)
+            except Exception as e:
+                logger.warning("Bedrock clarification generation failed, falling back to static: %s", e)
+                # Continue to static message generation
+
         # Try to get custom message for specific scenario
         custom_message = self._get_custom_clarification_message(candidates)
         if custom_message:
@@ -250,6 +278,28 @@ class DisambiguationHandler:
 
         return None
 
+    def _get_button_labels(self, candidates: list[IntentCandidate], user_input: str | None = None) -> list[str]:
+        """
+        Get button labels for the candidates, potentially using Bedrock generation.
+
+        Args:
+            candidates: List of intent candidates
+            user_input: Optional user input for context
+
+        Returns:
+            List of button labels
+        """
+        # Try Bedrock generation first if enabled
+        if self.bedrock_generator:
+            try:
+                return self.bedrock_generator.generate_button_labels(candidates, user_input)
+            except Exception as e:
+                logger.warning("Bedrock button label generation failed, falling back to display names: %s", e)
+                # Continue to fallback
+
+        # Fallback to display names
+        return [candidate.display_name for candidate in candidates]
+
     def _store_disambiguation_state(self, lex_request: LexRequest[T], candidates: list[IntentCandidate]) -> None:
         """
         Store disambiguation state in session attributes.
@@ -260,15 +310,19 @@ class DisambiguationHandler:
         """
         session_attrs = lex_request.sessionState.sessionAttributes
 
-        # Store candidates as JSON
+        # Get button labels for storage
+        button_labels = self._get_button_labels(candidates, lex_request.inputTranscript)
+
+        # Store candidates as JSON with button labels
         candidates_data = [
             {
                 "intent_name": c.intent_name,
                 "display_name": c.display_name,
+                "button_label": button_labels[i] if i < len(button_labels) else c.display_name,
                 "confidence_score": c.confidence_score,
                 "description": c.description,
             }
-            for c in candidates
+            for i, c in enumerate(candidates)
         ]
 
         # Store disambiguation state in session attributes
@@ -316,6 +370,8 @@ class DisambiguationHandler:
                     display_name=c["display_name"],
                     confidence_score=c["confidence_score"],
                     description=c["description"],
+                    # Store button label in required_slots for now (we can extend IntentCandidate later if needed)
+                    required_slots=[c.get("button_label", c["display_name"])],
                 )
                 for c in candidates_data
             ]
@@ -346,6 +402,11 @@ class DisambiguationHandler:
             if candidate.display_name.lower() == user_input_lower:
                 return candidate.intent_name
 
+        # Try exact match with button labels (stored in required_slots[0])
+        for candidate in candidates:
+            if candidate.required_slots and candidate.required_slots[0].lower() == user_input_lower:
+                return candidate.intent_name
+
         # Try number selection (1, 2, 3, etc.)
         try:
             selection_num = int(user_input_lower)
@@ -360,9 +421,14 @@ class DisambiguationHandler:
             if 0 <= letter_index < len(candidates):
                 return candidates[letter_index].intent_name
 
-        # Try partial match with display names (do this last to avoid conflicts)
+        # Try partial match with display names
         for candidate in candidates:
             if user_input_lower in candidate.display_name.lower():
+                return candidate.intent_name
+
+        # Try partial match with button labels
+        for candidate in candidates:
+            if candidate.required_slots and user_input_lower in candidate.required_slots[0].lower():
                 return candidate.intent_name
 
         return None

@@ -22,6 +22,8 @@ from lex_helper.channels.lex import LexChannel
 from lex_helper.channels.sms import SMSChannel
 from lex_helper.core import dialog
 from lex_helper.core.disambiguation import (
+    BedrockDisambiguationConfig,
+    BedrockDisambiguationGenerator,
     DisambiguationConfig,
     DisambiguationResult,
     IntentCandidate,
@@ -60,6 +62,8 @@ from lex_helper.formatters.buttons import Button
 
 __all__ = [
     "__version__",
+    "BedrockDisambiguationConfig",
+    "BedrockDisambiguationGenerator",
     "BedrockInvocationError",
     "Bot",
     "Button",

@@ -58,6 +58,44 @@ class DisambiguationResult:
 
 
 @dataclass
+class BedrockDisambiguationConfig:
+    """
+    Configuration for Bedrock-powered disambiguation text generation.
+
+    Allows using Amazon Bedrock models to generate contextual and intelligent
+    disambiguation messages and button text based on the user's input and
+    available intent candidates.
+    """
+
+    enabled: bool = False
+    """Whether to use Bedrock for generating disambiguation text"""
+
+    model_id: str = "anthropic.claude-3-haiku-20240307-v1:0"
+    """Bedrock model ID to use for text generation"""
+
+    region_name: str = "us-east-1"
+    """AWS region for Bedrock service"""
+
+    max_tokens: int = 200
+    """Maximum tokens for generated response"""
+
+    temperature: float = 0.3
+    """Temperature for text generation (0.0-1.0, lower = more deterministic)"""
+
+    system_prompt: str = field(
+        default_factory=lambda: (
+            "You are a helpful assistant that creates clear, concise disambiguation messages "
+            "for chatbot users. When users provide ambiguous input, help them choose between "
+            "available options with friendly, natural language."
+        )
+    )
+    """System prompt for the Bedrock model"""
+
+    fallback_to_static: bool = True
+    """Whether to fall back to static messages if Bedrock fails"""
+
+
+@dataclass
 class DisambiguationConfig:
     """
     Configuration options for the disambiguation system.
@@ -89,6 +127,9 @@ class DisambiguationConfig:
 
     custom_messages: dict[str, str] = field(default_factory=lambda: {})
     """Custom clarification messages for specific disambiguation scenarios"""
+
+    bedrock_config: BedrockDisambiguationConfig = field(default_factory=BedrockDisambiguationConfig)
+    """Configuration for Bedrock-powered text generation"""
 
 
 # Type aliases for better code readability

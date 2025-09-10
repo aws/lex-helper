@@ -10,14 +10,18 @@ targeted clarifying questions to users.
 """
 
 from .analyzer import DisambiguationAnalyzer
+from .bedrock_generator import BedrockDisambiguationGenerator
 from .handler import DisambiguationHandler
 from .types import (
+    BedrockDisambiguationConfig,
     DisambiguationConfig,
     DisambiguationResult,
     IntentCandidate,
 )
 
 __all__ = [
+    "BedrockDisambiguationConfig",
+    "BedrockDisambiguationGenerator",
     "DisambiguationAnalyzer",
     "DisambiguationHandler",
     "DisambiguationConfig",
