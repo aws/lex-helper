@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://lex-helper.aws.github.io/LAMBDA_LAYER_DEPLOYMENT/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Lambda Layer Deployment Guide for Lex Helper Library - Lex-Helper Docs</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Lex-Helper Docs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Welcome to MkDocs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../BEST_PRACTICES/" class="nav-link">Lex Helper Library - Best Practices Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../DEVELOPMENT/" class="nav-link">Development Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">Lambda Layer Deployment Guide for Lex Helper Library</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../SECURITY/" class="nav-link">SECURITY</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../SUPPORT/" class="nav-link">Support</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../TESTING_GUIDE/" class="nav-link">Testing Guide for Lex Helper Library</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../smart-disambiguation/" class="nav-link">Smart Disambiguation for lex-helper</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../DEVELOPMENT/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../SECURITY/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#lambda-layer-deployment-guide-for-lex-helper-library" class="nav-link">Lambda Layer Deployment Guide for Lex Helper Library</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#overview" class="nav-link">Overview</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#prerequisites" class="nav-link">Prerequisites</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#method-1-using-pip-install-recommended" class="nav-link">Method 1: Using pip install (Recommended)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#method-2-using-poetry" class="nav-link">Method 2: Using Poetry</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#verify-layer-contents-and-size" class="nav-link">Verify Layer Contents and Size</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#package-the-layer" class="nav-link">Package the Layer</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#deploy-to-aws-lambda" class="nav-link">Deploy to AWS Lambda</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#using-the-layer-in-lambda-functions" class="nav-link">Using the Layer in Lambda Functions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#automation-with-infrastructure-as-code" class="nav-link">Automation with Infrastructure as Code</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#best-practices" class="nav-link">Best Practices</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#layer-updates" class="nav-link">Layer Updates</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="lambda-layer-deployment-guide-for-lex-helper-library">Lambda Layer Deployment Guide for Lex Helper Library</h1>
+<h2 id="overview">Overview</h2>
+<p>This guide covers creating and deploying a Lambda layer containing the lex-helper library and its dependencies. Lambda layers allow you to share code across multiple Lambda functions and reduce deployment package sizes.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>Python 3.12+ installed locally</li>
+<li>AWS CLI configured with appropriate permissions</li>
+<li>lex-helper library (see <a href="../README.md">README.md</a> for installation)</li>
+<li>Poetry installed (for Method 2): <code>pip install poetry</code></li>
+</ul>
+<h2 id="method-1-using-pip-install-recommended">Method 1: Using pip install (Recommended)</h2>
+<h3 id="step-1-create-layer-directory-structure">Step 1: Create Layer Directory Structure</h3>
+<pre><code class="language-bash">mkdir -p lex-helper-layer/python/lib/python3.12/site-packages/
+cd lex-helper-layer
+</code></pre>
+<h3 id="step-2-install-lex-helper-and-dependencies">Step 2: Install lex-helper and Dependencies</h3>
+<pre><code class="language-bash"># Install from PyPI
+pip install lex-helper -t python/lib/python3.12/site-packages/
+
+# Or install from local source
+pip install /path/to/lex-helper -t python/lib/python3.12/site-packages/
+</code></pre>
+<h3 id="step-3-clean-up-unnecessary-files">Step 3: Clean Up Unnecessary Files</h3>
+<p>Remove files that aren't needed in production to reduce layer size:</p>
+<pre><code class="language-bash"># Remove Python cache files
+find . -type d -name &quot;__pycache__&quot; -exec rm -rf {} +
+find . -type f -name &quot;*.pyc&quot; -delete
+find . -type f -name &quot;*.pyo&quot; -delete
+
+# Remove test files and directories
+find . -type d -name &quot;tests&quot; -exec rm -rf {} +
+find . -type d -name &quot;.pytest_cache&quot; -exec rm -rf {} +
+
+# Remove development files
+find . -name &quot;*.egg-info&quot; -exec rm -rf {} +
+find . -name &quot;.git*&quot; -delete
+find . -name &quot;*.md&quot; -delete
+find . -name &quot;LICENSE*&quot; -delete
+</code></pre>
+<h2 id="method-2-using-poetry">Method 2: Using Poetry</h2>
+<h3 id="step-1-create-poetry-project">Step 1: Create Poetry Project</h3>
+<pre><code class="language-bash">mkdir lex-helper-layer-poetry
+cd lex-helper-layer-poetry
+poetry init --no-interaction
+</code></pre>
+<h3 id="step-2-add-lex-helper-dependency">Step 2: Add lex-helper Dependency</h3>
+<pre><code class="language-bash"># Add lex-helper as dependency
+poetry add lex-helper
+
+# Or add from local source
+poetry add /path/to/lex-helper
+</code></pre>
+<h3 id="step-3-export-dependencies-and-install-to-layer">Step 3: Export Dependencies and Install to Layer</h3>
+<pre><code class="language-bash"># Export dependencies to requirements.txt
+poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+# Create layer directory
+mkdir -p ../lex-helper-layer/python/lib/python3.12/site-packages/
+
+# Install dependencies to layer directory
+pip install -r requirements.txt -t ../lex-helper-layer/python/lib/python3.12/site-packages/
+
+# Clean up
+cd ../lex-helper-layer
+</code></pre>
+<h3 id="alternative-using-poetrys-virtual-environment">Alternative: Using Poetry's Virtual Environment</h3>
+<pre><code class="language-bash"># Create and activate poetry environment
+poetry install
+poetry shell
+
+# Find the virtual environment path
+poetry env info --path
+
+# Copy site-packages from poetry venv to layer
+cp -r $(poetry env info --path)/lib/python3.12/site-packages/* python/lib/python3.12/site-packages/
+
+# Remove development dependencies manually
+rm -rf python/lib/python3.12/site-packages/pytest*
+rm -rf python/lib/python3.12/site-packages/ruff*
+</code></pre>
+<h3 id="step-4-clean-up-same-as-method-1-step-3">Step 4: Clean Up (same as Method 1, Step 3)</h3>
+<h2 id="verify-layer-contents-and-size">Verify Layer Contents and Size</h2>
+<h3 id="check-layer-size">Check Layer Size</h3>
+<p>Lambda layers have a 250 MB unzipped size limit:</p>
+<pre><code class="language-bash">du -sh lex-helper-layer/
+# Expected output: ~10-15MB for lex-helper with dependencies
+</code></pre>
+<h3 id="view-layer-contents">View Layer Contents</h3>
+<pre><code class="language-bash">find lex-helper-layer -type f | head -20
+</code></pre>
+<p>Expected structure:</p>
+<pre><code>lex-helper-layer/
+└── python/
+    └── lib/
+        └── python3.12/
+            └── site-packages/
+                ├── lex_helper/
+                │   ├── __init__.py
+                │   ├── core/
+                │   └── utils/
+                └── pydantic/
+</code></pre>
+<h2 id="package-the-layer">Package the Layer</h2>
+<h3 id="create-zip-archive">Create ZIP Archive</h3>
+<pre><code class="language-bash">cd lex-helper-layer
+zip -r ../lex-helper-layer.zip .
+cd ..
+</code></pre>
+<h3 id="verify-zip-contents">Verify ZIP Contents</h3>
+<pre><code class="language-bash">unzip -l lex-helper-layer.zip | head -10
+</code></pre>
+<h2 id="deploy-to-aws-lambda">Deploy to AWS Lambda</h2>
+<h3 id="using-aws-cli">Using AWS CLI</h3>
+<pre><code class="language-bash"># Create new layer version
+aws lambda publish-layer-version \
+    --layer-name lex-helper-layer \
+    --description &quot;Lex Helper Library with dependencies&quot; \
+    --zip-file fileb://lex-helper-layer.zip \
+    --compatible-runtimes python3.12 \
+    --compatible-architectures x86_64 arm64
+
+# Note the LayerVersionArn from the response
+</code></pre>
+<h3 id="using-aws-console">Using AWS Console</h3>
+<ol>
+<li>Open AWS Lambda Console</li>
+<li>Navigate to "Layers" in the left sidebar</li>
+<li>Click "Create layer"</li>
+<li>Fill in:</li>
+<li>Name: <code>lex-helper-layer</code></li>
+<li>Description: <code>Lex Helper Library with dependencies</code></li>
+<li>Upload ZIP file: <code>lex-helper-layer.zip</code></li>
+<li>Compatible runtimes: <code>Python 3.12</code></li>
+<li>Compatible architectures: <code>x86_64</code>, <code>arm64</code></li>
+<li>Click "Create"</li>
+</ol>
+<h2 id="using-the-layer-in-lambda-functions">Using the Layer in Lambda Functions</h2>
+<h3 id="add-layer-to-function-aws-cli">Add Layer to Function (AWS CLI)</h3>
+<pre><code class="language-bash">aws lambda update-function-configuration \
+    --function-name your-lex-bot-function \
+    --layers arn:aws:lambda:region:account:layer:lex-helper-layer:1
+</code></pre>
+<h3 id="add-layer-to-function-console">Add Layer to Function (Console)</h3>
+<ol>
+<li>Open your Lambda function</li>
+<li>Scroll to "Layers" section</li>
+<li>Click "Add a layer"</li>
+<li>Select "Custom layers"</li>
+<li>Choose your <code>lex-helper-layer</code></li>
+<li>Select the latest version</li>
+<li>Click "Add"</li>
+</ol>
+<h3 id="using-in-your-lambda-code">Using in Your Lambda Code</h3>
+<p>Once the layer is attached, import normally:</p>
+<pre><code class="language-python">from lex_helper import Config, LexHelper, dialog, LexPlainText
+from lex_helper.core.types import LexRequest, LexResponse
+
+def lambda_handler(event, context):
+    # Your code here
+    pass
+</code></pre>
+<h3 id="environment-variables">Environment Variables</h3>
+<p>Configure these environment variables in your Lambda function:</p>
+<pre><code class="language-bash"># Optional: Custom messages file path
+MESSAGES_YAML_PATH=/opt/lambda/config/
+
+# AWS region for Bedrock and other services
+AWS_REGION=us-east-1
+
+# Logging level
+LOG_LEVEL=INFO
+</code></pre>
+<h2 id="automation-with-infrastructure-as-code">Automation with Infrastructure as Code</h2>
+<h3 id="cloudformation-template">CloudFormation Template</h3>
+<pre><code class="language-yaml">AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  LexHelperLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: lex-helper-layer
+      Description: Lex Helper Library with dependencies
+      Content:
+        S3Bucket: your-deployment-bucket
+        S3Key: layers/lex-helper-layer.zip
+      CompatibleRuntimes:
+        - python3.12
+      CompatibleArchitectures:
+        - x86_64
+        - arm64
+
+  YourLexBotFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: your-lex-bot-function
+      Runtime: python3.12
+      Handler: handler.lambda_handler
+      Code:
+        S3Bucket: your-deployment-bucket
+        S3Key: functions/your-bot.zip
+      Layers:
+        - !Ref LexHelperLayer
+      Environment:
+        Variables:
+          MESSAGES_YAML_PATH: /opt/lambda/config/
+          AWS_REGION: us-east-1
+          LOG_LEVEL: INFO
+</code></pre>
+<h3 id="terraform-configuration">Terraform Configuration</h3>
+<pre><code class="language-hcl">resource &quot;aws_lambda_layer_version&quot; &quot;lex_helper&quot; {
+  filename         = &quot;lex-helper-layer.zip&quot;
+  layer_name       = &quot;lex-helper-layer&quot;
+  description      = &quot;Lex Helper Library with dependencies&quot;
+
+  compatible_runtimes      = [&quot;python3.12&quot;]
+  compatible_architectures = [&quot;x86_64&quot;, &quot;arm64&quot;]
+}
+
+resource &quot;aws_lambda_function&quot; &quot;lex_bot&quot; {
+  filename         = &quot;your-bot.zip&quot;
+  function_name    = &quot;your-lex-bot-function&quot;
+  role            = aws_iam_role.lambda_role.arn
+  handler         = &quot;handler.lambda_handler&quot;
+  runtime         = &quot;python3.12&quot;
+
+  layers = [aws_lambda_layer_version.lex_helper.arn]
+
+  environment {
+    variables = {
+      MESSAGES_YAML_PATH = &quot;/opt/lambda/config/&quot;
+      AWS_REGION         = &quot;us-east-1&quot;
+      LOG_LEVEL          = &quot;INFO&quot;
+    }
+  }
+}
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="layer-management">Layer Management</h3>
+<ul>
+<li><strong>Version Control</strong>: Tag layer versions for easy rollback</li>
+<li><strong>Size Optimization</strong>: Regularly clean up unused dependencies</li>
+<li><strong>Regional Deployment</strong>: Deploy layers in all regions where functions run</li>
+<li><strong>Permissions</strong>: Set appropriate layer permissions for sharing</li>
+</ul>
+<h3 id="development-workflow">Development Workflow</h3>
+<ul>
+<li><strong>Local Testing</strong>: Test with the same layer structure locally</li>
+<li><strong>CI/CD Integration</strong>: Automate layer building and deployment</li>
+<li><strong>Dependency Updates</strong>: Monitor for security updates in dependencies</li>
+</ul>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<h4 id="common-issues">Common Issues</h4>
+<p><strong>Import Errors</strong>:</p>
+<pre><code class="language-python"># Verify layer is attached and imports work
+import sys
+print(sys.path)  # Should include /opt/python/lib/python3.12/site-packages
+</code></pre>
+<p><strong>Size Limits</strong>:
+- Unzipped layer size: 250 MB maximum
+- Total function + layers: 250 MB unzipped
+- Deployment package: 50 MB zipped (direct upload)</p>
+<p><strong>Python Version Mismatch</strong>:
+- Ensure layer Python version matches Lambda runtime
+- Use correct site-packages path for Python version</p>
+<h4 id="verification-script">Verification Script</h4>
+<pre><code class="language-python"># Add to your Lambda function for debugging
+def verify_layer():
+    try:
+        import lex_helper
+        print(f&quot;lex-helper version: {lex_helper.__version__}&quot;)
+        print(f&quot;lex-helper location: {lex_helper.__file__}&quot;)
+        return True
+    except ImportError as e:
+        print(f&quot;Import error: {e}&quot;)
+        return False
+
+# Call in lambda_handler for testing
+verify_layer()
+</code></pre>
+<h2 id="layer-updates">Layer Updates</h2>
+<h3 id="updating-the-layer">Updating the Layer</h3>
+<ol>
+<li>Modify dependencies or add new packages</li>
+<li>Rebuild the layer following steps above</li>
+<li>Create new layer version</li>
+<li>Update Lambda functions to use new version</li>
+<li>Test thoroughly before removing old versions</li>
+</ol>
+<h3 id="rollback-strategy">Rollback Strategy</h3>
+<pre><code class="language-bash"># List layer versions
+aws lambda list-layer-versions --layer-name lex-helper-layer
+
+# Rollback function to previous layer version
+aws lambda update-function-configuration \
+    --function-name your-lex-bot-function \
+    --layers arn:aws:lambda:region:account:layer:lex-helper-layer:PREVIOUS_VERSION
+</code></pre>
+<p>This approach provides a clean, maintainable way to deploy and manage the lex-helper library across your Lambda functions.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

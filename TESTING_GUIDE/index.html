@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://lex-helper.aws.github.io/TESTING_GUIDE/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Testing Guide for Lex Helper Library - Lex-Helper Docs</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Lex-Helper Docs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Welcome to MkDocs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../BEST_PRACTICES/" class="nav-link">Lex Helper Library - Best Practices Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../DEVELOPMENT/" class="nav-link">Development Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../LAMBDA_LAYER_DEPLOYMENT/" class="nav-link">Lambda Layer Deployment Guide for Lex Helper Library</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../SECURITY/" class="nav-link">SECURITY</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../SUPPORT/" class="nav-link">Support</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">Testing Guide for Lex Helper Library</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../smart-disambiguation/" class="nav-link">Smart Disambiguation for lex-helper</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../SUPPORT/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../smart-disambiguation/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#testing-guide-for-lex-helper-library" class="nav-link">Testing Guide for Lex Helper Library</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#test-helper-functions" class="nav-link">Test Helper Functions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#unit-testing-slot-elicitation" class="nav-link">Unit Testing Slot Elicitation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="testing-guide-for-lex-helper-library">Testing Guide for Lex Helper Library</h1>
+<p>This guide covers comprehensive testing strategies for Lex bots built with the Lex Helper library. For basic setup and usage, see <a href="../README.md">README.md</a> and <a href="../BEST_PRACTICES/">BEST_PRACTICES.md</a>.</p>
+<h2 id="test-helper-functions">Test Helper Functions</h2>
+<pre><code class="language-python">import pytest
+from lex_helper import dialog, LexPlainText, set_locale, get_message, MessageManager
+from your_project.intents.booking_intent import handle_booking_intent
+from your_project.session_attributes import CustomSessionAttributes
+
+def create_test_request(intent_name=&quot;BookingIntent&quot;, slots=None, session_attrs=None):
+    &quot;&quot;&quot;Helper to create test requests&quot;&quot;&quot;
+    return {
+        &quot;sessionId&quot;: &quot;test-session&quot;,
+        &quot;inputTranscript&quot;: &quot;test input&quot;,
+        &quot;sessionState&quot;: {
+            &quot;sessionAttributes&quot;: session_attrs or {},
+            &quot;activeContexts&quot;: [],
+            &quot;intent&quot;: {
+                &quot;name&quot;: intent_name,
+                &quot;slots&quot;: slots or {},
+                &quot;state&quot;: &quot;InProgress&quot;,
+                &quot;confirmationState&quot;: &quot;None&quot;,
+            },
+        },
+    }
+</code></pre>
+<h2 id="unit-testing-slot-elicitation">Unit Testing Slot Elicitation</h2>
+<p>Test that your intent handlers properly elicit required slots:</p>
+<p>def test_elicit_missing_slot():
+    """Test that missing slots are properly elicited"""
+    # Create request without required slot
+    request_dict = create_test_request(slots={})
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())</p>
+<pre><code>response = handle_booking_intent(lex_request)
+
+# Verify slot elicitation
+assert response.sessionState.dialogAction.type == "ElicitSlot"
+assert response.sessionState.dialogAction.slotToElicit == "destination"
+assert len(response.messages) &gt; 0
+assert isinstance(response.messages[0], LexPlainText)
+</code></pre>
+<p>def test_slot_validation():
+    """Test slot value validation"""
+    # Create request with invalid slot value
+    slots = {"email": {"value": {"originalValue": "invalid-email"}}}
+    request_dict = create_test_request(slots=slots)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())</p>
+<pre><code>response = handle_booking_intent(lex_request)
+
+# Should re-elicit the slot
+assert response.sessionState.dialogAction.type == "ElicitSlot"
+assert response.sessionState.dialogAction.slotToElicit == "email"
+</code></pre>
+<p>def test_all_slots_filled():
+    """Test behavior when all required slots are filled"""
+    slots = {
+        "destination": {"value": {"originalValue": "Paris"}},
+        "date": {"value": {"originalValue": "2024-01-15"}},
+        "email": {"value": {"originalValue": "user@example.com"}}
+    }
+    request_dict = create_test_request(slots=slots)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())</p>
+<pre><code>response = handle_booking_intent(lex_request)
+
+# Should delegate or close
+assert response.sessionState.dialogAction.type in ["Delegate", "Close"]
+</code></pre>
+<pre><code>
+### Testing Dialog Flow Transitions
+
+Validate multi-turn conversations and intent transitions:
+
+```python
+def test_intent_transition():
+    &quot;&quot;&quot;Test transitioning between intents&quot;&quot;&quot;
+    request_dict = create_test_request()
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    # Simulate transition to authentication
+    response = dialog.transition_to_intent(
+        intent_name=&quot;authenticate&quot;,
+        lex_request=lex_request,
+        messages=[LexPlainText(content=&quot;Please authenticate&quot;)]
+    )
+
+    assert response.sessionState.intent.name == &quot;authenticate&quot;
+    assert len(response.messages) &gt; 0
+    assert response.messages[0].content == &quot;Please authenticate&quot;
+
+def test_callback_pattern():
+    &quot;&quot;&quot;Test callback pattern for returning to original intent&quot;&quot;&quot;
+    # Set up callback
+    request_dict = create_test_request()
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    lex_request.sessionState.sessionAttributes.callback_handler = &quot;BookingIntent&quot;
+    lex_request.sessionState.sessionAttributes.callback_event = json.dumps(lex_request, default=str)
+
+    # Test callback handler
+    response = dialog.callback_original_intent_handler(lex_request)
+
+    assert response is not None
+    # Verify session attributes were merged properly
+</code></pre>
+<h3 id="testing-unknown-choice-handling">Testing Unknown Choice Handling</h3>
+<p>Validate error handling for invalid user inputs:</p>
+<pre><code class="language-python">def test_unknown_slot_choice_detection():
+    &quot;&quot;&quot;Test detection of unknown slot choices&quot;&quot;&quot;
+    # Set up previous elicit slot state
+    session_attrs = {
+        &quot;previous_dialog_action_type&quot;: &quot;ElicitSlot&quot;,
+        &quot;previous_slot_to_elicit&quot;: &quot;BookingIntentSlot.DESTINATION&quot;
+    }
+    request_dict = create_test_request(
+        slots={},  # No slot filled (unknown choice)
+        session_attrs=session_attrs
+    )
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    # Should detect unknown choice
+    assert dialog.any_unknown_slot_choices(lex_request) == True
+
+def test_valid_slot_choice():
+    &quot;&quot;&quot;Test that valid choices are not flagged as unknown&quot;&quot;&quot;
+    session_attrs = {
+        &quot;previous_dialog_action_type&quot;: &quot;ElicitSlot&quot;,
+        &quot;previous_slot_to_elicit&quot;: &quot;BookingIntentSlot.DESTINATION&quot;
+    }
+    slots = {&quot;destination&quot;: {&quot;value&quot;: {&quot;originalValue&quot;: &quot;Paris&quot;}}}
+    request_dict = create_test_request(slots=slots, session_attrs=session_attrs)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    # Should not detect unknown choice
+    assert dialog.any_unknown_slot_choices(lex_request) == False
+
+def test_error_count_increment():
+    &quot;&quot;&quot;Test that error count increments on unknown choices&quot;&quot;&quot;
+    session_attrs = {
+        &quot;previous_dialog_action_type&quot;: &quot;ElicitSlot&quot;,
+        &quot;previous_slot_to_elicit&quot;: &quot;BookingIntentSlot.DESTINATION&quot;,
+        &quot;error_count&quot;: 1
+    }
+    request_dict = create_test_request(slots={}, session_attrs=session_attrs)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    dialog.any_unknown_slot_choices(lex_request)
+
+    # Error count should increment
+    assert lex_request.sessionState.sessionAttributes.error_count == 2
+</code></pre>
+<h3 id="integration-testing">Integration Testing</h3>
+<p>Test complete dialog flows end-to-end:</p>
+<pre><code class="language-python">def test_complete_booking_flow():
+    &quot;&quot;&quot;Test complete booking conversation flow&quot;&quot;&quot;
+    # Step 1: Initial request
+    request_dict = create_test_request()
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    response1 = handle_booking_intent(lex_request)
+    assert response1.sessionState.dialogAction.type == &quot;ElicitSlot&quot;
+
+    # Step 2: Provide destination
+    slots = {&quot;destination&quot;: {&quot;value&quot;: {&quot;originalValue&quot;: &quot;Paris&quot;}}}
+    request_dict = create_test_request(slots=slots)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    response2 = handle_booking_intent(lex_request)
+    # Should elicit next slot (date)
+    assert response2.sessionState.dialogAction.slotToElicit == &quot;date&quot;
+
+    # Step 3: Complete all slots
+    slots = {
+        &quot;destination&quot;: {&quot;value&quot;: {&quot;originalValue&quot;: &quot;Paris&quot;}},
+        &quot;date&quot;: {&quot;value&quot;: {&quot;originalValue&quot;: &quot;2024-01-15&quot;}},
+        &quot;email&quot;: {&quot;value&quot;: {&quot;originalValue&quot;: &quot;user@example.com&quot;}}
+    }
+    request_dict = create_test_request(slots=slots)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    response3 = handle_booking_intent(lex_request)
+    assert response3.sessionState.dialogAction.type in [&quot;Delegate&quot;, &quot;Close&quot;]
+</code></pre>
+<h3 id="testing-session-attributes">Testing Session Attributes</h3>
+<p>Validate session state management:</p>
+<pre><code class="language-python">def test_session_attribute_persistence():
+    &quot;&quot;&quot;Test that session attributes persist across turns&quot;&quot;&quot;
+    session_attrs = {&quot;user_name&quot;: &quot;John&quot;, &quot;visit_count&quot;: 1}
+    request_dict = create_test_request(session_attrs=session_attrs)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    # Modify session attributes
+    lex_request.sessionState.sessionAttributes.visit_count += 1
+
+    response = handle_booking_intent(lex_request)
+
+    # Verify attributes are maintained
+    assert response.sessionState.sessionAttributes.user_name == &quot;John&quot;
+    assert response.sessionState.sessionAttributes.visit_count == 2
+
+def test_session_attribute_merging():
+    &quot;&quot;&quot;Test session attribute merging in callback scenarios&quot;&quot;&quot;
+    # Create original request with callback data
+    original_attrs = {&quot;user_name&quot;: &quot;John&quot;, &quot;booking_id&quot;: &quot;123&quot;}
+    callback_event = json.dumps(create_test_request(session_attrs=original_attrs), default=str)
+
+    # Create current request with additional attributes
+    current_attrs = {
+        &quot;callback_event&quot;: callback_event,
+        &quot;callback_handler&quot;: &quot;BookingIntent&quot;,
+        &quot;auth_token&quot;: &quot;abc123&quot;
+    }
+    request_dict = create_test_request(session_attrs=current_attrs)
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    response = dialog.callback_original_intent_handler(lex_request)
+
+    # Both original and current attributes should be present
+    assert hasattr(response.sessionState.sessionAttributes, 'user_name')
+    assert hasattr(response.sessionState.sessionAttributes, 'auth_token')
+</code></pre>
+<h3 id="testing-message-handling">Testing Message Handling</h3>
+<p>Validate message creation and formatting:</p>
+<pre><code class="language-python">def test_message_loading():
+    &quot;&quot;&quot;Test loading messages from JSON&quot;&quot;&quot;
+    messages_json = '''[
+        {&quot;contentType&quot;: &quot;PlainText&quot;, &quot;content&quot;: &quot;Hello!&quot;},
+        {&quot;contentType&quot;: &quot;ImageResponseCard&quot;, &quot;imageResponseCard&quot;: {&quot;title&quot;: &quot;Test&quot;}}
+    ]'''
+
+    messages = dialog.load_messages(messages_json)
+
+    assert len(messages) == 2
+    assert isinstance(messages[0], LexPlainText)
+    assert messages[0].content == &quot;Hello!&quot;
+
+def test_message_prepending():
+    &quot;&quot;&quot;Test that messages are properly prepended in transitions&quot;&quot;&quot;
+    request_dict = create_test_request()
+    lex_request = dialog.parse_lex_request(request_dict, CustomSessionAttributes())
+
+    input_messages = [LexPlainText(content=&quot;Transition message&quot;)]
+
+    # Mock the handler to return a response with messages
+    def mock_handler(intent_name, lex_request):
+        return dialog.LexResponse(
+            sessionState=lex_request.sessionState,
+            messages=[LexPlainText(content=&quot;Handler message&quot;)],
+            requestAttributes={}
+        )
+
+    # Test message prepending
+    response = dialog.transition_to_intent(
+        intent_name=&quot;test_intent&quot;,
+        lex_request=lex_request,
+        messages=input_messages
+    )
+
+    # Input messages should come first
+    assert len(response.messages) &gt;= 1
+    assert response.messages[0].content == &quot;Transition message&quot;
+</code></pre>
+<h3 id="testing-message-management">Testing Message Management</h3>
+<p>Test localized messages and MessageManager functionality:</p>
+<pre><code class="language-python">def test_message_loading():
+    &quot;&quot;&quot;Test loading messages for different locales&quot;&quot;&quot;
+    # Test English messages
+    set_locale(&quot;en_US&quot;)
+    greeting = get_message(&quot;greeting&quot;)
+    assert &quot;Hello&quot; in greeting
+
+    # Test Spanish messages
+    set_locale(&quot;es_ES&quot;)
+    spanish_greeting = get_message(&quot;greeting&quot;)
+    assert &quot;Hola&quot; in spanish_greeting
+
+    # Test fallback to default
+    fallback_message = get_message(&quot;nonexistent.key&quot;, &quot;Default message&quot;)
+    assert fallback_message == &quot;Default message&quot;
+
+def test_locale_override():
+    &quot;&quot;&quot;Test locale override in get_message&quot;&quot;&quot;
+    set_locale(&quot;en_US&quot;)
+
+    # Get message in current locale
+    english_msg = get_message(&quot;greeting&quot;)
+
+    # Override locale for specific message
+    spanish_msg = get_message(&quot;greeting&quot;, locale=&quot;es_ES&quot;)
+
+    assert english_msg != spanish_msg
+    assert &quot;Hello&quot; in english_msg
+    assert &quot;Hola&quot; in spanish_msg
+
+def test_message_manager_singleton():
+    &quot;&quot;&quot;Test MessageManager singleton behavior&quot;&quot;&quot;
+    manager1 = MessageManager()
+    manager2 = MessageManager()
+
+    assert manager1 is manager2
+
+    # Test that locale changes affect all instances
+    manager1.set_locale(&quot;fr_FR&quot;)
+    french_msg = manager2.get_message(&quot;greeting&quot;)
+    assert &quot;Bonjour&quot; in french_msg or &quot;greeting&quot; in french_msg  # fallback
+
+def test_nested_message_keys():
+    &quot;&quot;&quot;Test nested message key access&quot;&quot;&quot;
+    set_locale(&quot;en_US&quot;)
+
+    # Test nested key access
+    agent_confirmation = get_message(&quot;agent.confirmation&quot;)
+    error_general = get_message(&quot;error.general&quot;)
+
+    assert agent_confirmation != &quot;Message not found: agent.confirmation&quot;
+    assert error_general != &quot;Message not found: error.general&quot;
+</code></pre>
+<h3 id="running-tests">Running Tests</h3>
+<p>Use pytest to run your tests:</p>
+<pre><code class="language-bash"># Run all tests
+pytest tests/
+
+# Run specific test file
+pytest tests/test_dialog_flows.py
+
+# Run with coverage
+pytest --cov=your_project tests/
+
+# Run tests with verbose output
+pytest -v tests/
+</code></pre>
+<h3 id="test-organization">Test Organization</h3>
+<p>Structure your tests to match your intent organization:</p>
+<pre><code>tests/
+├── __init__.py
+├── conftest.py              # Shared fixtures
+├── test_dialog_flows.py     # Dialog flow tests
+├── test_slot_validation.py  # Slot validation tests
+├── test_session_management.py # Session attribute tests
+└── intents/
+    ├── test_booking_intent.py
+    ├── test_welcome_intent.py
+    └── test_fallback_intent.py
+</code></pre>
+<h3 id="best-practices-for-testing">Best Practices for Testing</h3>
+<ol>
+<li><strong>Use fixtures</strong> for common test data and setup</li>
+<li><strong>Test edge cases</strong> like empty inputs, invalid data, and error conditions</li>
+<li><strong>Mock external dependencies</strong> to isolate your bot logic</li>
+<li><strong>Test across channels</strong> by simulating different request attributes</li>
+<li><strong>Validate error handling</strong> and fallback behaviors</li>
+<li><strong>Test session state</strong> persistence and transitions</li>
+<li><strong>Use descriptive test names</strong> that explain the scenario being tested</li>
+</ol>
+<p>This comprehensive testing approach ensures your Lex bot handles all dialog scenarios correctly and provides a reliable user experience.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

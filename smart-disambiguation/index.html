@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://lex-helper.aws.github.io/smart-disambiguation/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Smart Disambiguation for lex-helper - Lex-Helper Docs</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Lex-Helper Docs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Welcome to MkDocs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../BEST_PRACTICES/" class="nav-link">Lex Helper Library - Best Practices Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../DEVELOPMENT/" class="nav-link">Development Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../LAMBDA_LAYER_DEPLOYMENT/" class="nav-link">Lambda Layer Deployment Guide for Lex Helper Library</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../SECURITY/" class="nav-link">SECURITY</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../SUPPORT/" class="nav-link">Support</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../TESTING_GUIDE/" class="nav-link">Testing Guide for Lex Helper Library</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">Smart Disambiguation for lex-helper</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../TESTING_GUIDE/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#smart-disambiguation-for-lex-helper" class="nav-link">Smart Disambiguation for lex-helper</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#overview" class="nav-link">Overview</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#table-of-contents" class="nav-link">Table of Contents</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#how-it-works" class="nav-link">How It Works</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#when-disambiguation-triggers" class="nav-link">When Disambiguation Triggers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#configuration" class="nav-link">Configuration</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#message-localization" class="nav-link">Message Localization</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#integration" class="nav-link">Integration</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#best-practices" class="nav-link">Best Practices</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#troubleshooting" class="nav-link">Troubleshooting</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#migration-guide" class="nav-link">Migration Guide</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#api-reference" class="nav-link">API Reference</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#conclusion" class="nav-link">Conclusion</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="smart-disambiguation-for-lex-helper">Smart Disambiguation for lex-helper</h1>
+<h2 id="overview">Overview</h2>
+<p>Smart Disambiguation is an intelligent feature in lex-helper that helps resolve ambiguous user input by presenting clear options when Amazon Lex cannot confidently determine the user's intent. Instead of falling back to "I didn't understand," the system analyzes confidence scores and presents relevant choices to guide users to their desired outcome.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#how-it-works">How It Works</a></li>
+<li><a href="#when-disambiguation-triggers">When Disambiguation Triggers</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#message-localization">Message Localization</a></li>
+<li><a href="#integration">Integration</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#best-practices">Best Practices</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+<h2 id="how-it-works">How It Works</h2>
+<h3 id="the-problem">The Problem</h3>
+<p>Traditional chatbots often respond with generic fallback messages when they can't determine user intent:</p>
+<pre><code>User: &quot;I need help with my booking&quot;
+Bot: &quot;I didn't understand that. Could you please rephrase your request?&quot;
+</code></pre>
+<h3 id="the-solution">The Solution</h3>
+<p>Smart Disambiguation analyzes Lex's confidence scores and presents clear options:</p>
+<pre><code>User: &quot;I need help with my booking&quot;
+Bot: &quot;I can help you with a couple of things. Which would you like to do?&quot;
+     [Book a Flight] [Change Flight]
+</code></pre>
+<h3 id="architecture">Architecture</h3>
+<p>The disambiguation system consists of three main components:</p>
+<ol>
+<li><strong>DisambiguationAnalyzer</strong> - Analyzes confidence scores and determines when to disambiguate</li>
+<li><strong>DisambiguationHandler</strong> - Generates user-friendly clarification responses</li>
+<li><strong>Handler Pipeline Integration</strong> - Seamlessly integrates with existing lex-helper flow</li>
+</ol>
+<h2 id="when-disambiguation-triggers">When Disambiguation Triggers</h2>
+<p>Disambiguation triggers in two scenarios:</p>
+<h3 id="1-low-confidence-scenario">1. Low Confidence Scenario</h3>
+<p>When the top intent has low confidence and multiple candidates exist:</p>
+<pre><code class="language-python"># Example: All intents have low confidence
+{
+    &quot;TrackBaggage&quot;: 0.25,
+    &quot;ChangeFlight&quot;: 0.23,
+    &quot;CancelFlight&quot;: 0.19
+}
+# Result: Triggers disambiguation
+</code></pre>
+<h3 id="2-close-scores-scenario">2. Close Scores Scenario</h3>
+<p>When multiple intents have similar confidence scores:</p>
+<pre><code class="language-python"># Example: Two intents are very close
+{
+    &quot;BookFlight&quot;: 0.45,
+    &quot;ChangeFlight&quot;: 0.42,
+    &quot;CancelFlight&quot;: 0.10
+}
+# Result: Triggers disambiguation between BookFlight and ChangeFlight
+</code></pre>
+<h3 id="when-it-doesnt-trigger">When It Doesn't Trigger</h3>
+<p>When there's a clear winner:</p>
+<pre><code class="language-python"># Example: Clear winner
+{
+    &quot;TrackBaggage&quot;: 0.75,
+    &quot;ChangeFlight&quot;: 0.15,
+    &quot;Authenticate&quot;: 0.10
+}
+# Result: Proceeds directly to TrackBaggage
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<h3 id="basic-configuration">Basic Configuration</h3>
+<p>Enable disambiguation with default settings:</p>
+<pre><code class="language-python">from lex_helper import Config, LexHelper
+from lex_helper.core.disambiguation.types import DisambiguationConfig
+
+config = Config(
+    session_attributes=MySessionAttributes(),
+    enable_disambiguation=True  # Enable with defaults
+)
+
+lex_helper = LexHelper(config=config)
+</code></pre>
+<h3 id="advanced-configuration">Advanced Configuration</h3>
+<p>Customize disambiguation behavior:</p>
+<pre><code class="language-python">disambiguation_config = DisambiguationConfig(
+    # Core thresholds
+    confidence_threshold=0.4,      # Trigger when top score &lt; 0.4
+    similarity_threshold=0.15,     # Trigger when top scores within 0.15
+    max_candidates=2,              # Show max 2 options
+    min_candidates=2,              # Need at least 2 candidates
+
+    # Intent groupings for better messages
+    custom_intent_groups={
+        &quot;booking&quot;: [&quot;BookFlight&quot;, &quot;ChangeFlight&quot;, &quot;CancelFlight&quot;],
+        &quot;status&quot;: [&quot;FlightDelayUpdate&quot;, &quot;TrackBaggage&quot;],
+        &quot;account&quot;: [&quot;Authenticate&quot;]
+    },
+
+    # Custom message keys for localization
+    custom_messages={
+        # Direct intent pair mappings
+        &quot;BookFlight_ChangeFlight&quot;: &quot;disambiguation.airline.book_or_change&quot;,
+
+        # Intent group mappings
+        &quot;disambiguation.booking&quot;: &quot;disambiguation.airline.booking_options&quot;,
+
+        # General mappings
+        &quot;disambiguation.two_options&quot;: &quot;disambiguation.airline.two_options&quot;
+    }
+)
+
+config = Config(
+    session_attributes=MySessionAttributes(),
+    enable_disambiguation=True,
+    disambiguation_config=disambiguation_config
+)
+</code></pre>
+<h3 id="bedrock-powered-disambiguation">Bedrock-Powered Disambiguation</h3>
+<p>For even more intelligent and contextual disambiguation, enable Amazon Bedrock integration:</p>
+<pre><code class="language-python">from lex_helper.core.disambiguation.types import (
+    BedrockDisambiguationConfig,
+    DisambiguationConfig
+)
+
+# Configure Bedrock for intelligent text generation
+bedrock_config = BedrockDisambiguationConfig(
+    enabled=True,
+    model_id=&quot;anthropic.claude-3-haiku-20240307-v1:0&quot;,
+    region_name=&quot;us-east-1&quot;,
+    max_tokens=150,
+    temperature=0.3,
+    system_prompt=(
+        &quot;You are a helpful assistant that creates clear, concise &quot;
+        &quot;disambiguation messages for chatbot users. Be friendly and natural.&quot;
+    ),
+    fallback_to_static=True,  # Graceful fallback if Bedrock fails
+)
+
+# Configure disambiguation with Bedrock
+disambiguation_config = DisambiguationConfig(
+    confidence_threshold=0.5,
+    max_candidates=2,
+    bedrock_config=bedrock_config,  # Enable Bedrock integration
+)
+</code></pre>
+<p><strong>Benefits of Bedrock Integration:</strong>
+- <strong>Contextual messages</strong>: Acknowledges user's specific input
+- <strong>Natural language</strong>: More conversational than static templates
+- <strong>Smart button labels</strong>: Generates intuitive action text
+- <strong>Adaptive responses</strong>: Tailored to your domain and use case</p>
+<p><strong>Example comparison:</strong></p>
+<p><em>Static disambiguation:</em></p>
+<pre><code>User: &quot;I need help with my flight&quot;
+Bot: &quot;I can help you with several things. What would you like to do?&quot;
+Buttons: [&quot;Book Flight&quot;, &quot;Change Flight&quot;, &quot;Cancel Flight&quot;]
+</code></pre>
+<p><em>Bedrock-powered disambiguation:</em></p>
+<pre><code>User: &quot;I need help with my flight&quot;
+Bot: &quot;I'd be happy to help with your flight! Are you looking to make changes to an existing booking or book a new flight?&quot;
+Buttons: [&quot;Modify existing booking&quot;, &quot;Book new flight&quot;]
+</code></pre>
+<h3 id="configuration-parameters">Configuration Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>confidence_threshold</code></td>
+<td>float</td>
+<td>0.6</td>
+<td>Minimum confidence to avoid disambiguation</td>
+</tr>
+<tr>
+<td><code>similarity_threshold</code></td>
+<td>float</td>
+<td>0.15</td>
+<td>Max difference between top scores to trigger</td>
+</tr>
+<tr>
+<td><code>max_candidates</code></td>
+<td>int</td>
+<td>3</td>
+<td>Maximum options to show users</td>
+</tr>
+<tr>
+<td><code>min_candidates</code></td>
+<td>int</td>
+<td>2</td>
+<td>Minimum candidates needed to trigger</td>
+</tr>
+<tr>
+<td><code>custom_intent_groups</code></td>
+<td>dict</td>
+<td>{}</td>
+<td>Related intent groupings</td>
+</tr>
+<tr>
+<td><code>custom_messages</code></td>
+<td>dict</td>
+<td>{}</td>
+<td>Custom message key mappings</td>
+</tr>
+<tr>
+<td><code>bedrock_config</code></td>
+<td>BedrockDisambiguationConfig</td>
+<td>disabled</td>
+<td>Bedrock integration settings</td>
+</tr>
+</tbody>
+</table>
+<h4 id="bedrock-configuration-parameters">Bedrock Configuration Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Enable Bedrock text generation</td>
+</tr>
+<tr>
+<td><code>model_id</code></td>
+<td>str</td>
+<td>claude-3-haiku</td>
+<td>Bedrock model to use</td>
+</tr>
+<tr>
+<td><code>region_name</code></td>
+<td>str</td>
+<td>us-east-1</td>
+<td>AWS region for Bedrock</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>int</td>
+<td>200</td>
+<td>Maximum tokens for responses</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td>float</td>
+<td>0.3</td>
+<td>Randomness (0.0-1.0, lower = more deterministic)</td>
+</tr>
+<tr>
+<td><code>system_prompt</code></td>
+<td>str</td>
+<td>default</td>
+<td>System prompt for the model</td>
+</tr>
+<tr>
+<td><code>fallback_to_static</code></td>
+<td>bool</td>
+<td>True</td>
+<td>Fall back to static messages if Bedrock fails</td>
+</tr>
+</tbody>
+</table>
+<h2 id="message-localization">Message Localization</h2>
+<h3 id="message-key-mapping">Message Key Mapping</h3>
+<p>The system uses a hierarchical approach to find the right message:</p>
+<h4 id="1-direct-intent-pair-mapping-highest-priority">1. Direct Intent Pair Mapping (Highest Priority)</h4>
+<pre><code class="language-python"># For intents: [&quot;BookFlight&quot;, &quot;ChangeFlight&quot;]
+# Creates key: &quot;BookFlight_ChangeFlight&quot; (alphabetically sorted)
+custom_messages = {
+    &quot;BookFlight_ChangeFlight&quot;: &quot;disambiguation.airline.book_or_change&quot;
+}
+</code></pre>
+<h4 id="2-intent-group-mapping-medium-priority">2. Intent Group Mapping (Medium Priority)</h4>
+<pre><code class="language-python"># For intents in the &quot;booking&quot; group
+# Creates key: &quot;disambiguation.booking&quot;
+custom_messages = {
+    &quot;disambiguation.booking&quot;: &quot;disambiguation.airline.booking_options&quot;
+}
+</code></pre>
+<h4 id="3-default-mapping-lowest-priority">3. Default Mapping (Lowest Priority)</h4>
+<pre><code class="language-python"># Falls back to default keys
+custom_messages = {
+    &quot;disambiguation.two_options&quot;: &quot;disambiguation.airline.two_options&quot;
+}
+</code></pre>
+<h3 id="message-files">Message Files</h3>
+<p>Add disambiguation messages to your localization files:</p>
+<p><strong>messages_en_US.yaml:</strong></p>
+<pre><code class="language-yaml">disambiguation:
+  # Default messages
+  two_options: &quot;I can help you with two things. Which would you like to do?&quot;
+  multiple_options: &quot;I can help you with several things. What would you like to do?&quot;
+
+  # Custom airline messages
+  airline:
+    two_options: &quot;I can help you with a couple of things. Which would you like to do?&quot;
+    booking_options: &quot;I can help you with flight bookings. Would you like to book, change, or cancel a flight?&quot;
+    book_or_change: &quot;Would you like to book a new flight or change an existing one?&quot;
+</code></pre>
+<p><strong>messages_es_ES.yaml:</strong></p>
+<pre><code class="language-yaml">disambiguation:
+  two_options: &quot;Puedo ayudarte con dos cosas. ¿Cuál te gustaría hacer?&quot;
+  multiple_options: &quot;Puedo ayudarte con varias cosas. ¿Qué te gustaría hacer?&quot;
+
+  airline:
+    two_options: &quot;Puedo ayudarte con un par de cosas. ¿Cuál te gustaría hacer?&quot;
+    booking_options: &quot;Puedo ayudarte con reservas de vuelos. ¿Te gustaría reservar, cambiar o cancelar un vuelo?&quot;
+    book_or_change: &quot;¿Te gustaría reservar un nuevo vuelo o cambiar uno existente?&quot;
+</code></pre>
+<h2 id="integration">Integration</h2>
+<h3 id="handler-pipeline-integration">Handler Pipeline Integration</h3>
+<p>Disambiguation integrates seamlessly into the lex-helper pipeline:</p>
+<pre><code class="language-python"># When disambiguation is enabled, the handler pipeline becomes:
+handlers = [
+    disambiguation_intent_handler,  # Added automatically
+    regular_intent_handler         # Existing handler
+]
+</code></pre>
+<h3 id="processing-flow">Processing Flow</h3>
+<ol>
+<li><strong>Request Analysis</strong> - Analyzer examines Lex confidence scores</li>
+<li><strong>Disambiguation Decision</strong> - Determines if disambiguation is needed</li>
+<li><strong>Response Generation</strong> - Creates user-friendly options with buttons</li>
+<li><strong>User Selection</strong> - Processes user's choice and routes to correct intent</li>
+</ol>
+<h3 id="conversation-flow-example">Conversation Flow Example</h3>
+<pre><code>User: &quot;I need help with my booking&quot;
+
+Bot: &quot;I can help you with a couple of things. Which would you like to do?&quot;
+     [Book Flight] [Change Flight]
+
+User clicks [Change Flight]
+→ User input appears as: &quot;Change Flight&quot; (not &quot;ChangeFlight&quot;)
+
+Bot: &quot;What is your reservation number?&quot;
+</code></pre>
+<p>This natural conversation flow ensures users see human-readable text throughout their interaction.</p>
+<h3 id="response-format">Response Format</h3>
+<p>Disambiguation responses include both text and interactive buttons:</p>
+<pre><code class="language-json">{
+  &quot;messages&quot;: [
+    {
+      &quot;content&quot;: &quot;I can help you with a couple of things. Which would you like to do?&quot;,
+      &quot;contentType&quot;: &quot;PlainText&quot;
+    },
+    {
+      &quot;contentType&quot;: &quot;ImageResponseCard&quot;,
+      &quot;imageResponseCard&quot;: {
+        &quot;title&quot;: &quot;Please choose an option:&quot;,
+        &quot;subtitle&quot;: &quot;Select what you'd like to do&quot;,
+        &quot;buttons&quot;: [
+          {&quot;text&quot;: &quot;Track Baggage&quot;, &quot;value&quot;: &quot;Track Baggage&quot;},
+          {&quot;text&quot;: &quot;Change Flight&quot;, &quot;value&quot;: &quot;Change Flight&quot;}
+        ]
+      }
+    }
+  ]
+}
+</code></pre>
+<p><strong>Note</strong>: Button values use human-readable display names (e.g., "Track Baggage") rather than technical intent names (e.g., "TrackBaggage"). This ensures that when users click buttons, they see natural language as their input, creating a more conversational experience.</p>
+<pre><code>
+## Examples
+
+### Example 1: Basic Setup
+
+```python
+# Minimal setup - just enable disambiguation
+config = Config(
+    session_attributes=MySessionAttributes(),
+    enable_disambiguation=True
+)
+
+lex_helper = LexHelper(config=config)
+</code></pre>
+<h3 id="example-2-airline-bot-setup-complete-implementation">Example 2: Airline Bot Setup (Complete Implementation)</h3>
+<p>The <code>examples/sample_airline_bot/</code> directory contains a complete working example with both static and Bedrock-powered disambiguation:</p>
+<pre><code class="language-python"># Environment-based configuration for flexibility
+enable_bedrock = os.getenv(&quot;ENABLE_BEDROCK_DISAMBIGUATION&quot;, &quot;false&quot;).lower() == &quot;true&quot;
+
+# Bedrock configuration (optional)
+bedrock_config = BedrockDisambiguationConfig(
+    enabled=enable_bedrock,
+    model_id=&quot;anthropic.claude-3-haiku-20240307-v1:0&quot;,
+    system_prompt=&quot;You are a helpful airline customer service assistant...&quot;,
+    fallback_to_static=True,
+)
+
+# Full airline bot configuration
+disambiguation_config = DisambiguationConfig(
+    confidence_threshold=0.4,
+    max_candidates=2,
+    custom_intent_groups={
+        &quot;booking&quot;: [&quot;BookFlight&quot;, &quot;ChangeFlight&quot;, &quot;CancelFlight&quot;],
+        &quot;status&quot;: [&quot;FlightDelayUpdate&quot;, &quot;TrackBaggage&quot;]
+    },
+    custom_messages={
+        &quot;disambiguation.booking&quot;: &quot;disambiguation.airline.booking_options&quot;,
+        &quot;disambiguation.status&quot;: &quot;disambiguation.airline.status_options&quot;,
+        &quot;BookFlight_ChangeFlight&quot;: &quot;disambiguation.airline.book_or_change&quot;
+    },
+    bedrock_config=bedrock_config,  # AI-powered enhancement
+)
+
+config = Config(
+    session_attributes=AirlineBotSessionAttributes(),
+    package_name=&quot;fulfillment_function&quot;,
+    enable_disambiguation=True,
+    disambiguation_config=disambiguation_config
+)
+</code></pre>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-bash"># Static disambiguation
+python lambda_function.py
+
+# Bedrock-powered disambiguation
+ENABLE_BEDROCK_DISAMBIGUATION=true python lambda_function.py
+</code></pre>
+<h3 id="example-3-e-commerce-bot-setup">Example 3: E-commerce Bot Setup</h3>
+<pre><code class="language-python">disambiguation_config = DisambiguationConfig(
+    confidence_threshold=0.5,
+    custom_intent_groups={
+        &quot;shopping&quot;: [&quot;SearchProducts&quot;, &quot;AddToCart&quot;, &quot;Checkout&quot;],
+        &quot;account&quot;: [&quot;Login&quot;, &quot;Register&quot;, &quot;ViewOrders&quot;],
+        &quot;support&quot;: [&quot;ContactSupport&quot;, &quot;ReturnItem&quot;, &quot;TrackOrder&quot;]
+    },
+    custom_messages={
+        &quot;disambiguation.shopping&quot;: &quot;ecommerce.shopping_options&quot;,
+        &quot;disambiguation.account&quot;: &quot;ecommerce.account_options&quot;,
+        &quot;SearchProducts_AddToCart&quot;: &quot;ecommerce.search_or_add&quot;
+    }
+)
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-threshold-configuration">1. Threshold Configuration</h3>
+<ul>
+<li><strong>Conservative (0.6-0.8)</strong>: Only disambiguate when really unsure</li>
+<li><strong>Moderate (0.4-0.5)</strong>: Good balance for most bots</li>
+<li><strong>Aggressive (0.2-0.3)</strong>: Catch more ambiguous cases</li>
+</ul>
+<h3 id="2-intent-grouping">2. Intent Grouping</h3>
+<p>Group related intents for better user experience:</p>
+<pre><code class="language-python"># Good grouping - related functionality
+custom_intent_groups = {
+    &quot;booking&quot;: [&quot;BookFlight&quot;, &quot;ChangeFlight&quot;, &quot;CancelFlight&quot;],
+    &quot;status&quot;: [&quot;FlightStatus&quot;, &quot;BaggageStatus&quot;]
+}
+
+# Avoid - unrelated intents
+custom_intent_groups = {
+    &quot;mixed&quot;: [&quot;BookFlight&quot;, &quot;Weather&quot;, &quot;Authenticate&quot;]  # Don't do this
+}
+</code></pre>
+<h3 id="3-message-design">3. Message Design</h3>
+<ul>
+<li>Keep messages <strong>concise and clear</strong></li>
+<li>Use <strong>action-oriented language</strong></li>
+<li>Provide <strong>specific options</strong> rather than generic choices</li>
+<li>Test with <strong>real user scenarios</strong></li>
+</ul>
+<h3 id="4-localization">4. Localization</h3>
+<ul>
+<li>Always use <strong>message keys</strong> instead of hardcoded text</li>
+<li>Provide translations for <strong>all supported locales</strong></li>
+<li>Test disambiguation in <strong>each language</strong></li>
+<li>Consider <strong>cultural differences</strong> in phrasing</li>
+</ul>
+<h3 id="5-testing">5. Testing</h3>
+<p>Test disambiguation with various scenarios:</p>
+<pre><code class="language-python"># Test cases to verify
+test_cases = [
+    # Low confidence scenario
+    {&quot;TrackBaggage&quot;: 0.25, &quot;ChangeFlight&quot;: 0.23},
+
+    # Close scores scenario
+    {&quot;BookFlight&quot;: 0.45, &quot;ChangeFlight&quot;: 0.42},
+
+    # Clear winner (should not disambiguate)
+    {&quot;TrackBaggage&quot;: 0.75, &quot;ChangeFlight&quot;: 0.15},
+
+    # Single candidate (should not disambiguate)
+    {&quot;BookFlight&quot;: 0.30}
+]
+</code></pre>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<h4 id="1-disambiguation-not-triggering">1. Disambiguation Not Triggering</h4>
+<p><strong>Problem</strong>: Expected disambiguation but got fallback instead.</p>
+<p><strong>Solutions</strong>:
+- Check if <code>enable_disambiguation=True</code> in config
+- Verify confidence scores are within triggering range
+- Ensure minimum candidates requirement is met
+- Check if disambiguation components are properly imported</p>
+<h4 id="2-wrong-message-displayed">2. Wrong Message Displayed</h4>
+<p><strong>Problem</strong>: Generic message instead of custom message.</p>
+<p><strong>Solutions</strong>:
+- Verify message keys exist in localization files
+- Check custom_messages mapping is correct
+- Ensure intent names match exactly (case-sensitive)
+- Verify locale is set correctly</p>
+<h4 id="3-disambiguation-triggering-too-often">3. Disambiguation Triggering Too Often</h4>
+<p><strong>Problem</strong>: Disambiguation shows for clear intent matches.</p>
+<p><strong>Solutions</strong>:
+- Increase <code>confidence_threshold</code> (try 0.6 instead of 0.4)
+- Increase <code>similarity_threshold</code> (try 0.2 instead of 0.15)
+- Check Lex training data quality
+- Review intent utterance overlap</p>
+<h3 id="debug-information">Debug Information</h3>
+<p>Enable detailed logging to troubleshoot:</p>
+<pre><code class="language-python">disambiguation_config = DisambiguationConfig(
+    enable_logging=True,  # Enable detailed logs
+    # ... other config
+)
+</code></pre>
+<p>Check logs for:
+- Confidence scores extracted from Lex
+- Disambiguation decision reasoning
+- Message key resolution</p>
+<h3 id="performance-considerations">Performance Considerations</h3>
+<ul>
+<li>Disambiguation adds minimal latency (~10-50ms)</li>
+<li>Message localization is cached by lex-helper</li>
+<li>Button rendering is handled by Lex UI</li>
+</ul>
+<h2 id="migration-guide">Migration Guide</h2>
+<h3 id="from-regular-lex-helper">From Regular lex-helper</h3>
+<ol>
+<li><strong>Update imports</strong>:</li>
+</ol>
+<pre><code class="language-python">from lex_helper.core.disambiguation.types import DisambiguationConfig
+</code></pre>
+<ol>
+<li><strong>Add configuration</strong>:</li>
+</ol>
+<pre><code class="language-python">config = Config(
+    # ... existing config
+    enable_disambiguation=True
+)
+</code></pre>
+<ol>
+<li>
+<p><strong>Add message keys</strong> to localization files</p>
+</li>
+<li>
+<p><strong>Test thoroughly</strong> with existing intents</p>
+</li>
+</ol>
+<h3 id="backward-compatibility">Backward Compatibility</h3>
+<ul>
+<li>Disambiguation is <strong>disabled by default</strong></li>
+<li>Existing code works <strong>without changes</strong></li>
+<li>No breaking changes to existing APIs</li>
+<li>Graceful fallback if disambiguation components unavailable</li>
+</ul>
+<h2 id="api-reference">API Reference</h2>
+<h3 id="disambiguationconfig">DisambiguationConfig</h3>
+<pre><code class="language-python">@dataclass
+class DisambiguationConfig:
+    confidence_threshold: float = 0.6
+    max_candidates: int = 3
+    fallback_to_original: bool = True
+    min_candidates: int = 2
+    similarity_threshold: float = 0.15
+    enable_logging: bool = True
+    custom_intent_groups: dict[str, list[str]] = field(default_factory=dict)
+    custom_messages: dict[str, str] = field(default_factory=dict)
+</code></pre>
+<h3 id="config-integration">Config Integration</h3>
+<pre><code class="language-python">class Config:
+    # ... existing fields
+    enable_disambiguation: bool = False
+    disambiguation_config: DisambiguationConfig | None = None
+</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>Smart Disambiguation transforms ambiguous user interactions into clear, actionable choices. By leveraging Lex's confidence scores, it significantly improves user experience while maintaining the simplicity and power of lex-helper.</p>
+<p>The feature is designed to be:
+- <strong>Easy to integrate</strong> - Just set <code>enable_disambiguation=True</code>
+- <strong>Highly configurable</strong> - Customize thresholds, messages, and behavior
+- <strong>Fully localized</strong> - Support for multiple languages out of the box
+- <strong>Backward compatible</strong> - No impact on existing implementations</p>
+<p>Start with the basic configuration and gradually customize based on your bot's specific needs and user feedback.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://lex-helper.aws.github.io/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+    <url>
+         <loc>https://lex-helper.aws.github.io/BEST_PRACTICES/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+    <url>
+         <loc>https://lex-helper.aws.github.io/DEVELOPMENT/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+    <url>
+         <loc>https://lex-helper.aws.github.io/LAMBDA_LAYER_DEPLOYMENT/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+    <url>
+         <loc>https://lex-helper.aws.github.io/SECURITY/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+    <url>
+         <loc>https://lex-helper.aws.github.io/SUPPORT/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+    <url>
+         <loc>https://lex-helper.aws.github.io/TESTING_GUIDE/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+    <url>
+         <loc>https://lex-helper.aws.github.io/smart-disambiguation/</loc>
+         <lastmod>2025-09-15</lastmod>
+    </url>
+</urlset>
