@@ -74,6 +74,7 @@ path = "lex_helper/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 exclude = [
+    "mkdocs.yml",
     "tests/",
     "examples/",
     "docs/",
@@ -206,3 +207,8 @@ reportUnnecessaryContains = true
 reportUnnecessaryComparison = true
 reportMatchNotExhaustive = true
 reportCallInDefaultInitializer = true
+
+[dependency-groups]
+dev = [
+    "mkdocs-material>=9.6.20",
+]
