@@ -872,7 +872,6 @@ def transition_to_intent[T: SessionAttributes](
     if clear_slots:
         _clear_slots(intent_name=intent_name, lex_request=lex_request, invocation_label=invocation_label)
 
-
     # Call the intent handler and get its response
     response = call_handler_for_file(intent_name=intent_name, lex_request=lex_request)
 

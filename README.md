@@ -27,10 +27,15 @@ The Lex Helper library is an extensive collection of functions and classes that 
 - [Core Features](#core-features)
   - [Dialog Utilities](#dialog-utilities)
   - [Message Management](#message-management)
+  - [Smart Disambiguation](#smart-disambiguation)
   - [Bedrock Integration](#bedrock-integration)
 - [Bedrock Usage Examples](#bedrock-usage-examples)
   - [Basic InvokeModel API](#basic-invokemodel-api)
   - [Converse API with System Prompt](#converse-api-with-system-prompt)
+- [Smart Disambiguation](#smart-disambiguation-1)
+  - [Basic Setup](#basic-setup)
+  - [AI-Powered Disambiguation](#ai-powered-disambiguation)
+  - [Example Interaction](#example-interaction)
 - [Examples](#examples)
 - [Documentation](#documentation)
 - [Development Setup](#development-setup)
@@ -55,6 +60,8 @@ The Lex Helper library is an extensive collection of functions and classes that 
 - **Error Handling Made Easy**: Comprehensive exception handling and error reporting help you quickly identify and fix issues in your fulfillment logic.
 
 - **Reduced Boilerplate**: Common Lex operations like transitioning between intents, handling dialog states, and managing session attributes are simplified into clean, intuitive methods.
+
+- **Smart Disambiguation**: Automatically handle ambiguous user input with intelligent clarification prompts. Optional AI-powered responses using Amazon Bedrock create natural, contextual disambiguation messages that improve user experience.
 
 - **Developer Experience**: Get the benefits of modern Python features like type hints, making your code more maintainable and easier to understand. Full IDE support means better autocomplete and fewer runtime errors.
 
@@ -171,6 +178,13 @@ your_project/
 - Supports `messages_{localeId}.yaml` files (e.g., `messages_en_US.yaml`, `messages_es_ES.yaml`)
 - Automatic fallback to `messages.yaml` for missing locales
 
+### Smart Disambiguation
+- **Intelligent Intent Resolution**: Automatically detects ambiguous user input and presents clarifying options
+- **AI-Powered Responses**: Optional Bedrock integration for contextual, natural language disambiguation messages
+- **Configurable Thresholds**: Fine-tune when disambiguation triggers based on confidence scores and similarity
+- **Multi-Selection Support**: Users can choose via text, numbers, letters, or button clicks
+- **Graceful Fallbacks**: Seamless fallback to static messages if AI services are unavailable
+
 ### Bedrock Integration
 - **invoke_bedrock**: Direct integration with Amazon Bedrock models
 - Supports multiple model families (Claude, Titan, Jurassic, Cohere, Llama)
@@ -215,6 +229,60 @@ response = invoke_bedrock(
 )
 print(response['text'])
 ```
+
+## Smart Disambiguation
+
+Handle ambiguous user input intelligently with automatic clarification prompts:
+
+### Basic Setup
+```python
+from lex_helper import Config, LexHelper
+from lex_helper.core.disambiguation.types import DisambiguationConfig
+
+# Enable disambiguation with default settings
+config = Config(
+    session_attributes=CustomSessionAttributes(),
+    enable_disambiguation=True,
+    disambiguation_config=DisambiguationConfig(
+        confidence_threshold=0.5,  # Trigger when confidence < 50%
+        max_candidates=2,          # Show up to 2 options
+    )
+)
+```
+
+### AI-Powered Disambiguation
+```python
+from lex_helper.core.disambiguation.types import BedrockDisambiguationConfig
+
+# Enable Bedrock for intelligent, contextual responses
+bedrock_config = BedrockDisambiguationConfig(
+    enabled=True,
+    model_id="anthropic.claude-3-haiku-20240307-v1:0",
+    system_prompt="You are a helpful assistant that creates clear, "
+                 "friendly disambiguation messages for users."
+)
+
+disambiguation_config = DisambiguationConfig(
+    confidence_threshold=0.5,
+    bedrock_config=bedrock_config,  # AI-powered responses
+)
+```
+
+### Example Interaction
+```
+User: "I need help with my booking"
+
+Static Response:
+"I can help you with several things. What would you like to do?"
+Buttons: ["Book Flight", "Change Flight", "Cancel Flight"]
+
+AI-Powered Response:
+"I'd be happy to help with your booking! Are you looking to make
+changes to an existing reservation or book a new flight?"
+Buttons: ["Modify existing booking", "Book new flight"]
+```
+
+For detailed configuration options, see [Smart Disambiguation Documentation](docs/smart-disambiguation.md).
 
 ## Examples
 
