@@ -180,7 +180,7 @@ class LexHelper[T: SessionAttributes]:
             messages += response.messages
             if response.requestAttributes and "callback" in response.requestAttributes:
                 callback_name = response.requestAttributes["callback"]
-                logger.debug("CALLBACK FOUND: %s", callback_name)
+                logger.debug("Callback found: %s", callback_name)
                 response.requestAttributes.pop("callback")
                 response = call_handler_for_file(
                     intent_name=callback_name, lex_request=lex_payload, package_name=self.config.package_name

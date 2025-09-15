@@ -320,7 +320,13 @@ function fulfillmentFunction(stack: cdk.Stack): cdk_alpha.PythonFunction {
     role: fulfillmentLambdaRole,
     environment: {
       MESSAGES_YAML_PATH: "/var/task/fulfillment_function/messages",
-      LOG_LEVEL: "INFO"
+      LOG_LEVEL: "DEBUG", // Enable debug logging
+      // Bedrock Disambiguation Configuration
+      ENABLE_BEDROCK_DISAMBIGUATION: "true", // Enable AI-powered disambiguation
+      BEDROCK_MODEL_ID: "anthropic.claude-3-haiku-20240307-v1:0", // Fast, cost-effective model
+      BEDROCK_REGION: stack.region, // Use the same region as the stack
+      BEDROCK_MAX_TOKENS: "150", // Concise responses
+      BEDROCK_TEMPERATURE: "0.3", // More deterministic for consistent UX
     },
     bundling: {
       assetExcludes: ["*.pyc", "__pycache__", '.venv', 'tests']

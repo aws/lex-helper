@@ -44,9 +44,17 @@ if not os.getenv("AWS_EXECUTION_ENV"):
 # Configure logging for Lambda environment
 logger = logging.getLogger(__name__)
 
+# Configure logging level from environment variable
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+numeric_level = getattr(logging, log_level, logging.INFO)
+
 # Configure basic logging for Lambda if not already configured
 if not logger.handlers:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    logging.basicConfig(level=numeric_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+# Also set the root logger level to ensure all lex_helper logs are captured
+logging.getLogger("lex_helper").setLevel(numeric_level)
+logging.getLogger().setLevel(numeric_level)
 
 from lex_helper import Config, LexHelper
 from lex_helper.core.disambiguation.types import BedrockDisambiguationConfig, DisambiguationConfig
@@ -74,11 +82,16 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     Returns:
         Dict[str, Any]: The Lex response formatted for Amazon Lex service
     """
-    logger.debug("Initializing Airline-Bot fulfillment Lambda")
+    logger.info("🚀 Initializing Airline-Bot fulfillment Lambda")
+    logger.debug(
+        "📊 Environment variables: LOG_LEVEL=%s, ENABLE_BEDROCK_DISAMBIGUATION=%s",
+        os.getenv("LOG_LEVEL", "INFO"),
+        os.getenv("ENABLE_BEDROCK_DISAMBIGUATION", "false"),
+    )
 
     # Initialize the session attributes with default values
     session_attributes = AirlineBotSessionAttributes()
-    logger.debug("Initialized session attributes")
+    logger.debug("✅ Initialized session attributes")
 
     # Configure Bedrock for intelligent disambiguation (optional)
     # Set ENABLE_BEDROCK_DISAMBIGUATION=true environment variable to enable
@@ -142,9 +155,19 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     lex_helper = LexHelper(config=config)
 
     if enable_bedrock:
-        logger.info("Bedrock-powered disambiguation enabled with model: %s", bedrock_config.model_id)
+        logger.info("🤖 Bedrock-powered disambiguation enabled with model: %s", bedrock_config.model_id)
+        logger.info("🌍 Bedrock region: %s", bedrock_config.region_name)
+        logger.info(
+            "🎛️ Bedrock settings: max_tokens=%d, temperature=%.1f", bedrock_config.max_tokens, bedrock_config.temperature
+        )
     else:
-        logger.debug("Using static disambiguation messages")
+        logger.info("📝 Using static disambiguation messages (Bedrock disabled)")
+
+    logger.info(
+        "🎯 Disambiguation config: threshold=%.2f, max_candidates=%d",
+        disambiguation_config.confidence_threshold,
+        disambiguation_config.max_candidates,
+    )
 
     logger.debug("Initialized LexHelper with Smart Disambiguation")
 
