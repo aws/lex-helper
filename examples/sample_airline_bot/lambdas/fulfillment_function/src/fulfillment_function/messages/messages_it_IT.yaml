@@ -54,3 +54,20 @@ validation:
   invalid_city: "Fornisca un nome di città valido come 'Roma' o 'Milano'."
   invalid_date: "Fornisca una data valida nel formato GG/MM/AAAA."
   invalid_passenger_count: "Fornisca un numero valido di passeggeri (1-9)."
+
+# Messaggi di Disambiguazione Intelligente
+disambiguation:
+  # Messaggi di disambiguazione predefiniti
+  two_options: "Posso aiutarla con due cose. Quale desidera fare?"
+  multiple_options: "Posso aiutarla con diverse cose. Cosa desidera fare?"
+  fallback: "Non sono sicuro di cosa stia cercando. Potrebbe essere più specifico?"
+
+  # Messaggi di disambiguazione specifici per compagnie aeree
+  airline:
+    two_options: "Posso aiutarla con un paio di cose. Quale desidera fare?"
+    multiple_options: "Posso aiutarla con diverse cose. Cosa desidera fare?"
+    booking_options: "Posso aiutarla con le prenotazioni di voli. Desidera prenotare, modificare o cancellare un volo?"
+    status_options: "Posso aiutarla a controllare le informazioni di stato. Desidera aggiornamenti sui voli o tracciamento bagagli?"
+    book_or_change: "Desidera prenotare un nuovo volo o modificare uno esistente?"
+    change_or_cancel: "Desidera modificare il suo volo o cancellarlo?"
+    flight_or_baggage: "Desidera controllare lo stato del volo o tracciare il suo bagaglio?"

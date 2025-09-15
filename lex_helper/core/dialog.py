@@ -143,7 +143,7 @@ def close[T: SessionAttributes](lex_request: LexRequest[T], messages: LexMessage
         messages=messages,
     )
 
-    logger.debug("FF-LAMBDA :: DIALOG-CLOSE")
+    logger.debug("Dialog closed")
 
     return response
 
@@ -168,7 +168,7 @@ def elicit_intent[T: SessionAttributes](messages: LexMessages, lex_request: LexR
     session_attributes.previous_slot_to_elicit = ""
     session_attributes.options_provided = get_provided_options(messages)
 
-    logger.debug("FF-LAMBDA :: Elicit-Intent")
+    logger.debug("Elicit-Intent")
 
     return LexResponse(
         sessionState=SessionState(
@@ -240,7 +240,7 @@ def delegate[T: SessionAttributes](lex_request: LexRequest[T]) -> LexResponse[T]
     Returns:
     LexResponse: The response object to be sent back to Lex.
     """
-    logger.debug("IN DELEGATE")
+    logger.debug("Delegating")
 
     updated_active_contexts = remove_inactive_context(lex_request)
     lex_request.sessionState.intent.state = "ReadyForFulfillment"
@@ -252,8 +252,6 @@ def delegate[T: SessionAttributes](lex_request: LexRequest[T]) -> LexResponse[T]
         intent=lex_request.sessionState.intent,
         dialogAction=DialogAction(type="Delegate"),
     )
-
-    logger.debug("FF-LAMBDA :: DELEGATE")
 
     return LexResponse(sessionState=updated_session_state, requestAttributes={}, messages=[])
 
@@ -278,7 +276,7 @@ def get_provided_options(messages: LexMessages) -> str:
         if isinstance(message, LexImageResponseCard)
         for button in message.imageResponseCard.buttons
     ]
-    logger.debug("FF-LAMBDA :: OPTS-PVD :: %s", options)
+    logger.debug("Get provided options :: %s", options)
 
     return json.dumps(options, cls=PydanticEncoder)
 
@@ -443,7 +441,7 @@ def set_subslot(
 
     # Logging for debugging purposes
     logger.debug("Setting subslot %s in composite slot %s", subslot_name, composite_slot_name)
-    logger.debug("RESULTING INTENT: %s", json.dumps(intent, cls=PydanticEncoder))
+    logger.debug("Resulting intent: %s", json.dumps(intent, cls=PydanticEncoder))
 
     return intent
 
@@ -556,7 +554,6 @@ def get_request_components[T: SessionAttributes](
     active_contexts = get_active_contexts(lex_request)
     session_attributes = lex_request.sessionState.sessionAttributes
     invocation_label = get_invocation_label(lex_request)
-    logger.debug("DLG-UTL :: INV-LBL: %s", invocation_label)
     return intent, active_contexts, session_attributes, invocation_label
 
 
@@ -624,17 +621,17 @@ def handle_any_unknown_slot_choice[T: SessionAttributes](lex_request: LexRequest
     """
     intent, _, session_attributes, _ = get_request_components(lex_request)
 
-    logger.debug("FF-LAMBDA :: Handle_Any_Unknown_Choice :: %s", session_attributes)
+    logger.debug("Handle_Any_Unknown_Choice :: %s", session_attributes)
     intent = get_intent(lex_request)
     previous_slot_to_elicit = session_attributes.previous_slot_to_elicit
 
     logger.debug("Unparsed slot name: " + (previous_slot_to_elicit or ""))
     slot_name = previous_slot_to_elicit
 
-    logger.debug("IDENTIFIER FOR BAD SLOT %s", slot_name)
+    logger.debug("Identifier for bad slot: %s", slot_name)
 
     choice = get_slot(slot_name or "", intent, preference="interpretedValue")
-    logger.debug("BAD CHOICE IS %s", choice)
+    logger.debug("Bad choice is %s", choice)
     if not isinstance(choice, str):
         logger.debug("Bad slot choice")
         return unknown_choice_handler(lex_request=lex_request, choice=choice)
@@ -712,12 +709,12 @@ def callback_original_intent_handler[T: SessionAttributes](
     Returns:
         LexResponse[T]: _description_
     """
-    logger.debug("CALLING BACK ORIGINAL HANDLER")
+    logger.debug("Calling back original handler")
 
     callback_event = lex_request.sessionState.sessionAttributes.callback_event
     callback_handler = lex_request.sessionState.sessionAttributes.callback_handler or ""
     if not callback_event and not callback_handler:
-        logger.debug("NO CALLBACK EVENT OR HANDLER")
+        logger.debug("No callback event or handler")
         lex_request.sessionState.intent.name = "greeting"
         return call_handler_for_file("greeting", lex_request)
 
@@ -728,7 +725,7 @@ def callback_original_intent_handler[T: SessionAttributes](
         del lex_request.sessionState.sessionAttributes.callback_handler
         lex_payload: LexRequest[T] = LexRequest(**callback_request)
 
-        logger.debug("MERGING SESSION ATTRIBUTES")
+        logger.debug("Merging session attributes")
         merged_attrs = lex_payload.sessionState.sessionAttributes.model_dump()
         merged_attrs.update(
             {k: v for k, v in lex_request.sessionState.sessionAttributes.model_dump().items() if v is not None}
@@ -757,7 +754,7 @@ def reprompt_slot[T: SessionAttributes](lex_request: LexRequest[T]) -> LexRespon
     Returns:
     LexResponse: The response object to be sent back to Lex.
     """
-    logger.debug("FFL-DLG :: REPROMPT-SLOT :: START")
+    logger.debug("Reprompting slot")
 
     session_attributes = lex_request.sessionState.sessionAttributes
     previous_slot_to_elicit = session_attributes.previous_slot_to_elicit
@@ -765,7 +762,6 @@ def reprompt_slot[T: SessionAttributes](lex_request: LexRequest[T]) -> LexRespon
         return delegate(lex_request)
     logger.debug("Unparsed slot name: " + previous_slot_to_elicit)
     slot_name = previous_slot_to_elicit
-    logger.debug("IDENTIFIER 3 %s", slot_name)
     messages = []
     logger.debug("Reprompt-Messages :: %s", messages)
 
@@ -797,18 +793,18 @@ def load_messages(messages: str) -> LexMessages:
             case _:
                 res.append(msg)
 
-    logger.debug("PARSED-PREV-MSG :: %s", res)
+    logger.debug("Previous Message :: %s", res)
     return res
 
 
 def parse_req_sess_attrs[T: SessionAttributes](lex_payload: LexRequest[T]) -> LexRequest[T]:
-    logger.debug("LEX-PAYLOAD: %s", lex_payload.model_dump_json(exclude_none=True))
+    logger.debug("Lex-Payload: %s", lex_payload.model_dump_json(exclude_none=True))
     # parsing core_data from session-state from 2nd messages
 
     channel_string = ""
 
     if lex_payload.requestAttributes:
-        logger.debug("FFL :: CREATING NEW SESS ATTRS")
+        logger.debug("Creating new session attributes")
         if "channel" in lex_payload.requestAttributes:
             channel_string = lex_payload.requestAttributes["channel"]
             logger.info("User passed in channel: %s", channel_string)
@@ -876,7 +872,6 @@ def transition_to_intent[T: SessionAttributes](
     if clear_slots:
         _clear_slots(intent_name=intent_name, lex_request=lex_request, invocation_label=invocation_label)
 
-    # logger.debug(f"TRANSITION :: SESS-STATE : {lex_request.sessionState.sessionAttributes}")
     # Call the intent handler and get its response
     response = call_handler_for_file(intent_name=intent_name, lex_request=lex_request)
 

@@ -54,3 +54,20 @@ validation:
   invalid_city: "Please provide a valid city name like 'New York' or 'Los Angeles'."
   invalid_date: "Please provide a valid date in the format MM/DD/YYYY."
   invalid_passenger_count: "Please provide a valid number of passengers (1-9)."
+
+# Smart Disambiguation Messages
+disambiguation:
+  # Default disambiguation messages
+  two_options: "I can help you with either of these. Which would you like to do?"
+  multiple_options: "I can help you with several things. What would you like to do?"
+  fallback: "I'm not sure what you're looking for. Could you be more specific?"
+
+  # Airline-specific disambiguation messages
+  airline:
+    two_options: "I can help you with a couple of things. Which would you like to do?"
+    multiple_options: "I can help you with several things. What would you like to do?"
+    booking_options: "I can help you with flight bookings. Would you like to book, change, or cancel a flight?"
+    status_options: "I can help you check status information. Would you like flight updates or baggage tracking?"
+    book_or_change: "Would you like to book a new flight or change an existing one?"
+    change_or_cancel: "Would you like to change your flight or cancel it?"
+    flight_or_baggage: "Would you like to check flight status or track your baggage?"
