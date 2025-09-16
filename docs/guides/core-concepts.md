@@ -70,7 +70,7 @@ def handler(lex_request, session_attributes):
     # Automatically handles BookFlight intent
     pass
 
-# File: intents/cancel_booking.py  
+# File: intents/cancel_booking.py
 def handler(lex_request, session_attributes):
     # Automatically handles CancelBooking intent
     pass
@@ -157,6 +157,7 @@ def create_response(
     intent_name: str = "FallbackIntent"
 ) -> LexResponse:
     # Implementation with full type safety
+    pass  # Implementation details
 ```
 
 ## Channel Abstraction
@@ -166,7 +167,7 @@ def create_response(
 lex-helper automatically handles different communication channels:
 
 - **SMS**: Text-only with length constraints
-- **Web/Lex**: Rich formatting with buttons and cards  
+- **Web/Lex**: Rich formatting with buttons and cards
 - **Voice**: Speech-optimized responses
 
 The [`format_for_channel`](../api/channels.md#channel-formatting) function automatically adapts your responses:
@@ -208,7 +209,7 @@ def book_flight_handler(lex_request, session_attributes):
     # Handle BookFlight intent
     return response
 
-# File: intents/cancel_booking.py  
+# File: intents/cancel_booking.py
 def cancel_booking_handler(lex_request, session_attributes):
     # Handle CancelBooking intent
     return response
@@ -288,12 +289,12 @@ graph TD
     D --> E[Execute Business Logic]
     E --> F[Format Response]
     F --> G[Return to Lex]
-    
+
     D --> H[Disambiguation Check]
     H --> I[AI Analysis]
     I --> J[Present Options]
     J --> D
-    
+
     E --> K[Error Handling]
     K --> L[User-Friendly Message]
     L --> F
@@ -312,10 +313,12 @@ class LexHelper[T: SessionAttributes]:
         # Initialize disambiguation if enabled
         # Set up error handling
         # Configure message management
-    
+        pass  # Implementation details
+
     def handler(self, event: dict, context: Any) -> dict:
         # Main entry point for Lambda
         # Handles parsing, routing, and response formatting
+        pass  # Implementation details
 ```
 
 #### 2. Configuration System
@@ -360,7 +363,7 @@ response = LexResponse(messages=[...])
 
 # Automatically formatted for:
 # - SMS: Text-only with numbered options
-# - Web: Rich cards with buttons and images  
+# - Web: Rich cards with buttons and images
 # - Voice: Speech-optimized with SSML
 formatted = format_for_channel(response, channel="auto")
 ```
@@ -404,10 +407,10 @@ def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessi
     # AWS service integration
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('bookings')
-    
+
     # External API calls
     response = requests.get('https://api.flights.com/search')
-    
+
     # Error handling is automatic
     return process_results(response.json(), lex_request)
 ```
@@ -438,10 +441,10 @@ class MySessionAttributes(SessionAttributes):
     # Use specific types
     user_id: int
     preferences: dict[str, str] = {}
-    
+
     # Provide defaults for optional fields
     last_activity: str = ""
-    
+
     # Use enums for constrained values
     booking_status: BookingStatus = BookingStatus.PENDING
 ```
@@ -455,7 +458,7 @@ def book_flight_handler(lex_request, session_attributes):
     # Check prerequisites
     if not session_attributes.user_authenticated:
         return redirect_to_authentication(lex_request)
-    
+
     # Progressive slot collection
     if not session_attributes.departure_city:
         return ask_for_departure()

@@ -458,7 +458,7 @@ python -X importtime -c "import lex_helper"
 ```
 
 **Issue: Memory usage in Lambda**
-```bash
+```python
 # Monitor memory usage
 import psutil
 print(f"Memory usage: {psutil.Process().memory_info().rss / 1024 / 1024:.2f} MB")
@@ -520,21 +520,21 @@ import importlib.util
 def run_diagnostics():
     print("🔍 lex-helper Diagnostic Report")
     print("=" * 40)
-    
+
     # System information
     print(f"OS: {platform.system()} {platform.release()}")
     print(f"Python: {sys.version}")
     print(f"Python executable: {sys.executable}")
-    
+
     # Virtual environment
     venv = sys.prefix != sys.base_prefix
     print(f"Virtual environment: {'Yes' if venv else 'No'}")
     if venv:
         print(f"Virtual env path: {sys.prefix}")
-    
+
     # Package information
     try:
-        result = subprocess.run([sys.executable, "-m", "pip", "show", "lex-helper"], 
+        result = subprocess.run([sys.executable, "-m", "pip", "show", "lex-helper"],
                               capture_output=True, text=True)
         if result.returncode == 0:
             print("\n📦 lex-helper Package Info:")
@@ -543,7 +543,7 @@ def run_diagnostics():
             print("\n❌ lex-helper not installed")
     except Exception as e:
         print(f"\n❌ Error checking package: {e}")
-    
+
     # Import test
     try:
         import lex_helper
@@ -551,22 +551,22 @@ def run_diagnostics():
         print(f"Version: {getattr(lex_helper, '__version__', 'Unknown')}")
     except ImportError as e:
         print(f"\n❌ lex-helper import failed: {e}")
-    
+
     # AWS SDK test
     try:
         import boto3
         print("✅ boto3 available")
     except ImportError:
         print("❌ boto3 not available")
-    
+
     # Dependencies
     try:
-        result = subprocess.run([sys.executable, "-m", "pip", "freeze"], 
+        result = subprocess.run([sys.executable, "-m", "pip", "freeze"],
                               capture_output=True, text=True)
         if result.returncode == 0:
             print(f"\n📋 Installed packages:")
-            relevant_packages = [line for line in result.stdout.split('\n') 
-                               if any(pkg in line.lower() for pkg in 
+            relevant_packages = [line for line in result.stdout.split('\n')
+                               if any(pkg in line.lower() for pkg in
                                      ['lex-helper', 'boto3', 'pydantic', 'pyyaml'])]
             for pkg in relevant_packages:
                 if pkg.strip():

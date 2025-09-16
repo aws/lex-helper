@@ -9,7 +9,7 @@ repos:
         description: Ensure files end with a newline
       - id: check-yaml
         description: Validate YAML files
-        exclude: ^examples/sample_airline_bot/.*\.ya?ml$
+        exclude: ^(examples/sample_airline_bot/.*\.ya?ml|mkdocs\.yml)$
       - id: check-added-large-files
         description: Prevent large files from being committed
         args: ['--maxkb=1000']
@@ -60,3 +60,12 @@ repos:
           "--durations=10"
         ]
         pass_filenames: false
+
+      # Documentation Quality Assurance
+      - id: docs-quality-check
+        name: docs-quality-check
+        entry: uv run python scripts/pre-commit-docs-check.py
+        language: system
+        description: Run documentation quality checks (code examples, build test, links)
+        files: ^(docs/.*\.md$|mkdocs\.yml$)
+        pass_filenames: true

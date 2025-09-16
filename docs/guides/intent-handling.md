@@ -60,12 +60,12 @@ For intents that provide information without collecting data:
 def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessionAttributes]:
     """Provide flight information."""
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Access user context
     user_name = session_attrs.user_name or "valued customer"
-    
+
     message = f"Hello {user_name}! Here's your flight information..."
-    
+
     return dialog.close(
         messages=[LexPlainText(content=message)],
         lex_request=lex_request
@@ -87,11 +87,11 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
     """Collect booking information step by step."""
     intent = lex_request.sessionState.intent
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Check global authentication status
     if not session_attrs.user_authenticated:
         return redirect_to_authentication(lex_request)
-    
+
     # Define required information
     required_slots = [
         RequiredSlot(name="DepartureCity", prompt="Which city are you departing from?"),
@@ -99,7 +99,7 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
         RequiredSlot(name="TravelDate", prompt="When would you like to travel?"),
         RequiredSlot(name="PassengerCount", prompt="How many passengers?")
     ]
-    
+
     # Check each required slot
     for slot in required_slots:
         if not dialog.get_slot(slot.name, intent):
@@ -108,7 +108,7 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
                 messages=[LexPlainText(content=slot.prompt)],
                 lex_request=lex_request
             )
-    
+
     # All slots collected - process booking
     return process_booking(lex_request)
 
@@ -116,13 +116,13 @@ def process_booking(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexRes
     """Process the booking with all required information."""
     intent = lex_request.sessionState.intent
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Extract slot values (don't store in session attributes - use temp storage)
     departure = dialog.get_slot("DepartureCity", intent)
     arrival = dialog.get_slot("ArrivalCity", intent)
     travel_date = dialog.get_slot("TravelDate", intent)
     passenger_count = dialog.get_slot("PassengerCount", intent)
-    
+
     # Store booking data in global temp storage for other intents to access
     session_attrs.temp_data.update({
         "booking_departure": departure,
@@ -130,16 +130,16 @@ def process_booking(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexRes
         "booking_date": travel_date,
         "booking_passengers": passenger_count
     })
-    
+
     # Update global conversation context
     session_attrs.current_conversation_topic = "flight_booking"
-    
+
     # Confirm booking details
     confirmation_message = (
         f"I'll book {passenger_count} ticket(s) from {departure} to {arrival} "
         f"on {travel_date}. Is this correct?"
     )
-    
+
     return dialog.elicit_slot(
         slot_to_elicit="ConfirmBooking",
         messages=[
@@ -173,10 +173,10 @@ class BookingState(str, Enum):
 def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[ChatbotSessionAttributes]:
     """Handle booking with state machine pattern."""
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Get current state from global temp storage
     current_state = session_attrs.temp_data.get('booking_state', BookingState.COLLECTING_INFO.value)
-    
+
     # Route to appropriate handler based on state
     match current_state:
         case BookingState.COLLECTING_INFO.value:
@@ -197,12 +197,12 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
 def collect_booking_info(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[ChatbotSessionAttributes]:
     """Collect basic booking information."""
     # ... slot collection logic ...
-    
+
     # Transition to next state when complete
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.temp_data['booking_state'] = BookingState.SEARCHING_FLIGHTS.value
     session_attrs.current_conversation_topic = "flight_booking"
-    
+
     return search_and_present_flights(lex_request)
 ```
 
@@ -220,11 +220,11 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
     """Handle booking with validation."""
     intent = lex_request.sessionState.intent
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Check global authentication
     if not session_attrs.user_authenticated:
         return redirect_to_authentication(lex_request)
-    
+
     # Validate travel date
     travel_date = dialog.get_slot("TravelDate", intent)
     if travel_date:
@@ -239,7 +239,7 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
                 messages=[LexPlainText(content=validation_result.error_message)],
                 lex_request=lex_request
             )
-    
+
     # Validate passenger count
     passenger_count = dialog.get_slot("PassengerCount", intent)
     if passenger_count:
@@ -252,10 +252,10 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
                 messages=[LexPlainText(content=validation_result.error_message)],
                 lex_request=lex_request
             )
-    
+
     # Reset error count on successful validation
     session_attrs.error_count = 0
-    
+
     # Continue with normal flow
     return continue_booking_flow(lex_request)
 
@@ -269,15 +269,15 @@ def validate_travel_date(date_str: str) -> ValidationResult:
     try:
         travel_date = datetime.fromisoformat(date_str)
         now = datetime.now()
-        
+
         if travel_date < now:
             return ValidationResult(False, "Travel date cannot be in the past. When would you like to travel?")
-        
+
         if travel_date > now + timedelta(days=365):
             return ValidationResult(False, "We can only book flights up to one year in advance. Please choose a closer date.")
-        
+
         return ValidationResult(True)
-        
+
     except ValueError:
         return ValidationResult(False, "I didn't understand that date. Please provide a date like 'March 15' or '2024-03-15'.")
 
@@ -285,15 +285,15 @@ def validate_passenger_count(count_str: str) -> ValidationResult:
     """Validate passenger count is reasonable."""
     try:
         count = int(count_str)
-        
+
         if count < 1:
             return ValidationResult(False, "You need at least one passenger. How many people will be traveling?")
-        
+
         if count > 9:
             return ValidationResult(False, "For groups larger than 9, please call our group booking line. How many passengers (1-9)?")
-        
+
         return ValidationResult(True)
-        
+
     except ValueError:
         return ValidationResult(False, "Please provide a number for passenger count.")
 ```
@@ -307,12 +307,12 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
     """Handle multi-turn flight modification conversation."""
     session_attrs = lex_request.sessionState.sessionAttributes
     intent = lex_request.sessionState.intent
-    
+
     # Check if this is a continuation of a previous conversation
     modification_in_progress = session_attrs.temp_data.get('modification_in_progress', False)
     if modification_in_progress:
         return continue_modification_flow(lex_request)
-    
+
     # Start new modification flow
     booking_reference = dialog.get_slot("BookingReference", intent)
     if not booking_reference:
@@ -321,7 +321,7 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
             messages=[LexPlainText(content="What's your booking reference number?")],
             lex_request=lex_request
         )
-    
+
     # Look up booking
     booking = lookup_booking(booking_reference)
     if not booking:
@@ -330,11 +330,11 @@ def handler(lex_request: LexRequest[ChatbotSessionAttributes]) -> LexResponse[Ch
             messages=[LexPlainText(content="I couldn't find that booking. Please check your reference number.")],
             lex_request=lex_request
         )
-    
+
     # Store booking details in session
     session_attrs.current_booking = booking
     session_attrs.modification_in_progress = True
-    
+
     # Present modification options
     return present_modification_options(lex_request)
 
@@ -342,9 +342,9 @@ def continue_modification_flow(lex_request: LexRequest[BookingSessionAttributes]
     """Continue an in-progress modification."""
     session_attrs = lex_request.sessionState.sessionAttributes
     intent = lex_request.sessionState.intent
-    
+
     modification_type = dialog.get_slot("ModificationType", intent)
-    
+
     if modification_type == "change_date":
         return handle_date_change(lex_request)
     elif modification_type == "change_seat":
@@ -380,32 +380,32 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
     """Handle flight search with external API integration."""
     intent = lex_request.sessionState.intent
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Collect required information first
     departure = dialog.get_slot("DepartureCity", intent)
     arrival = dialog.get_slot("ArrivalCity", intent)
     travel_date = dialog.get_slot("TravelDate", intent)
-    
+
     if not all([departure, arrival, travel_date]):
         return collect_missing_slots(lex_request)
-    
+
     # Search for flights
     try:
         # Note: In Lambda, you'd use synchronous requests or boto3
         flights = search_flights(departure, arrival, travel_date)
-        
+
         if not flights:
             return dialog.close(
                 messages=[LexPlainText(content=f"Sorry, no flights found from {departure} to {arrival} on {travel_date}.")],
                 lex_request=lex_request
             )
-        
+
         # Store results in session
         session_attrs.available_flights = flights[:5]  # Limit to top 5
-        
+
         # Present options to user
         return present_flight_options(lex_request, flights[:3])
-        
+
     except Exception as e:
         logger.exception("Flight search failed")
         return dialog.close(
@@ -416,13 +416,13 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
 def search_flights(departure: str, arrival: str, date: str) -> list[dict]:
     """Synchronous flight search (for Lambda environment)."""
     import requests
-    
+
     response = requests.get(
         "https://api.flights.com/search",
         params={"from": departure, "to": arrival, "date": date},
         timeout=10
     )
-    
+
     if response.status_code == 200:
         return response.json().get("flights", [])
     return []
@@ -443,20 +443,20 @@ def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessi
         messages=[LexPlainText(content="Thank you! Your booking is confirmed.")],
         lex_request=lex_request
     )
-    
+
     # Ask for a specific slot
     return dialog.elicit_slot(
         slot_to_elicit="DepartureCity",
         messages=[LexPlainText(content="Which city are you departing from?")],
         lex_request=lex_request
     )
-    
+
     # Ask for any intent (open-ended)
     return dialog.elicit_intent(
         messages=[LexPlainText(content="How else can I help you today?")],
         lex_request=lex_request
     )
-    
+
     # Let Lex handle the next step
     return dialog.delegate(lex_request)
 ```
@@ -470,7 +470,7 @@ def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessi
     # Check for invalid responses to previous prompts
     if dialog.any_unknown_slot_choices(lex_request):
         return dialog.handle_any_unknown_slot_choice(lex_request)
-    
+
     # Continue with normal intent logic
     return process_intent(lex_request)
 ```
@@ -483,20 +483,20 @@ Transition between intents for complex workflows:
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     """Handle booking that requires authentication."""
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Check if user is authenticated
     if not session_attrs.user_authenticated:
         # Save current context for later
         session_attrs.callback_handler = "BookFlight"
         session_attrs.callback_event = lex_request.model_dump_json()
-        
+
         # Transition to authentication
         return transition_to_intent(
             intent_name="Authenticate",
             lex_request=lex_request,
             messages=[LexPlainText(content="I need to verify your identity first.")]
         )
-    
+
     # User is authenticated, continue with booking
     return continue_booking_flow(lex_request)
 
@@ -508,10 +508,10 @@ def transition_to_intent(
     """Transition to a different intent."""
     # Update intent name
     lex_request.sessionState.intent.name = intent_name
-    
+
     # Clear slots for new intent
     lex_request.sessionState.intent.slots = {}
-    
+
     return dialog.elicit_intent(messages=messages, lex_request=lex_request)
 ```
 
@@ -526,7 +526,7 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
     """Handle booking with error recovery."""
     try:
         return process_booking_request(lex_request)
-        
+
     except ValidationError as e:
         # Handle validation errors with specific guidance
         return dialog.elicit_slot(
@@ -534,12 +534,12 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
             messages=[LexPlainText(content=f"Please provide a valid {e.field_name}: {e.message}")],
             lex_request=lex_request
         )
-        
+
     except ExternalServiceError as e:
         # Handle external service failures
         session_attrs = lex_request.sessionState.sessionAttributes
         session_attrs.error_count += 1
-        
+
         if session_attrs.error_count < 3:
             return dialog.elicit_intent(
                 messages=[LexPlainText(content="I'm having trouble with that request. Let me try a different approach. What would you like to do?")],
@@ -550,11 +550,11 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
                 messages=[LexPlainText(content="I'm experiencing technical difficulties. Please try again later or contact support.")],
                 lex_request=lex_request
             )
-            
+
     except Exception as e:
         # Log unexpected errors
         logger.exception("Unexpected error in booking handler")
-        
+
         return dialog.close(
             messages=[LexPlainText(content="I apologize, but something went wrong. Please try again.")],
             lex_request=lex_request
@@ -584,10 +584,10 @@ def test_book_flight_collects_departure_city():
             sessionAttributes=session_attrs
         )
     )
-    
+
     # Act
     response = handler(lex_request)
-    
+
     # Assert
     assert response.sessionState.dialogAction.type == "ElicitSlot"
     assert response.sessionState.dialogAction.slotToElicit == "DepartureCity"
@@ -611,12 +611,12 @@ def test_book_flight_processes_complete_request():
             sessionAttributes=session_attrs
         )
     )
-    
+
     # Act
     with patch('my_chatbot.intents.book_flight.search_flights') as mock_search:
         mock_search.return_value = [{"flight": "UA123", "price": 299}]
         response = handler(lex_request)
-    
+
     # Assert
     assert response.sessionState.dialogAction.type == "ElicitSlot"
     assert "confirm" in response.messages[0].content.lower()
@@ -632,15 +632,15 @@ def test_book_flight_integration():
     # Load real Lex payload from file
     with open('tests/fixtures/book_flight_payload.json') as f:
         lex_payload = json.load(f)
-    
+
     # Parse into LexRequest
     session_attrs = BookingSessionAttributes()
     lex_request = LexRequest(**lex_payload)
     lex_request.sessionState.sessionAttributes = session_attrs
-    
+
     # Test handler
     response = handler(lex_request)
-    
+
     # Validate response structure
     assert isinstance(response, LexResponse)
     assert response.sessionState
@@ -682,7 +682,7 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
     # Validate critical inputs first
     if not validate_user_input(lex_request):
         return handle_invalid_input(lex_request)
-    
+
     # Continue with business logic
     return process_valid_request(lex_request)
 ```
@@ -692,11 +692,11 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
 ```python
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Track conversation state
     session_attrs.current_step = "collecting_preferences"
     session_attrs.attempts += 1
-    
+
     # Store context for later use
     session_attrs.search_results = flight_results
 ```

@@ -1,0 +1,72 @@
+# Custom dictionary for lex-helper documentation
+# Add technical terms, proper nouns, and domain-specific words here
+# One word per line, case-insensitive
+
+# Project-specific terms
+lex-helper
+lexhelper
+chatbots
+fulfillment
+disambiguation
+bedrock
+
+# AWS-specific terms
+cloudformation
+cloudwatch
+dynamodb
+botocore
+
+# Python ecosystem
+pydantic
+mkdocs
+mkdocstrings
+pytest
+asyncio
+
+# Documentation terms
+changelog
+readme
+api
+sdk
+cli
+
+# Technical abbreviations
+nlp
+nlu
+asr
+tts
+llm
+llms
+ai
+ml
+ui
+ux
+ci
+cd
+json
+yaml
+yml
+http
+https
+url
+urls
+uri
+uris
+uuid
+uuids
+oauth
+jwt
+ssl
+tls
+cdn
+
+# File extensions
+py
+pyc
+pyo
+md
+rst
+toml
+ini
+cfg
+conf

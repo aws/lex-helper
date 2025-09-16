@@ -72,38 +72,38 @@ from lex_helper import SessionAttributes
 class TravelBotSessionAttributes(SessionAttributes):
     """
     Session attributes for the Travel Assistant Bot.
-    
+
     These attributes persist across conversation turns and help
     maintain context about the user's travel preferences and booking state.
     """
-    
+
     # User preferences
     preferred_destination: str = Field(
-        default="", 
+        default="",
         description="User's preferred travel destination"
     )
     travel_dates: str = Field(
-        default="", 
+        default="",
         description="Preferred travel dates"
     )
     budget_range: str = Field(
-        default="", 
+        default="",
         description="User's budget range for travel"
     )
-    
+
     # Conversation state
     greeting_count: int = Field(
-        default=0, 
+        default=0,
         description="Number of times user has been greeted"
     )
     booking_step: str = Field(
-        default="", 
+        default="",
         description="Current step in the booking process"
     )
-    
+
     # Error handling
     consecutive_errors: int = Field(
-        default=0, 
+        default=0,
         description="Count of consecutive errors for recovery"
     )
 ```
@@ -124,19 +124,19 @@ from ..session_attributes import TravelBotSessionAttributes
 def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[TravelBotSessionAttributes]:
     """
     Handle greeting intents with personalized responses.
-    
+
     This handler demonstrates:
     - Accessing session attributes
     - Modifying session state
     - Returning different responses based on context
     """
-    
+
     # Access session attributes
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Increment greeting count
     session_attrs.greeting_count += 1
-    
+
     # Personalize response based on greeting count
     if session_attrs.greeting_count == 1:
         message = "Hello! Welcome to Travel Assistant. I can help you plan your next adventure. What would you like to do today?"
@@ -144,7 +144,7 @@ def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[
         message = f"Hello again! This is visit #{session_attrs.greeting_count}. How can I assist with your travel plans?"
     else:
         message = "You're becoming a regular! How can I help you with your travel needs today?"
-    
+
     return dialog.close(
         messages=[LexPlainText(content=message)],
         lex_request=lex_request,
@@ -164,12 +164,12 @@ def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[
     """
     Provide help information about bot capabilities.
     """
-    
+
     help_message = """
 I'm your Travel Assistant! Here's what I can help you with:
 
 🌍 **Travel Planning**: Get destination recommendations
-✈️ **Flight Booking**: Help you find and book flights  
+✈️ **Flight Booking**: Help you find and book flights
 🏨 **Hotel Booking**: Find accommodations for your trip
 💰 **Budget Planning**: Get cost estimates for your travel
 
@@ -180,7 +180,7 @@ Just tell me what you'd like to do, like:
 
 What would you like to start with?
     """.strip()
-    
+
     return dialog.close(
         messages=[LexPlainText(content=help_message)],
         lex_request=lex_request,
@@ -212,57 +212,57 @@ def get_slot_value(slot_name: str, intent: Intent) -> Optional[str]:
 def validate_destination(destination: str) -> tuple[bool, str]:
     """
     Validate destination input.
-    
+
     Returns:
         tuple: (is_valid, message)
     """
     if not destination:
         return False, "Please tell me where you'd like to travel."
-    
+
     # Simple validation - in real implementation, you might check against a database
     invalid_destinations = ["nowhere", "hell", "prison"]
     if destination.lower() in invalid_destinations:
         return False, f"I can't help you travel to {destination}. Please choose a real destination!"
-    
+
     return True, ""
 
 
 def validate_travel_dates(dates: str) -> tuple[bool, str]:
     """
     Validate travel dates input.
-    
+
     Returns:
         tuple: (is_valid, message)
     """
     if not dates:
         return False, "When would you like to travel? Please provide your preferred dates."
-    
+
     # Basic validation - in production, you'd parse and validate actual dates
     if len(dates) < 3:
         return False, "Please provide more specific travel dates, like 'next month' or 'December 15th'."
-    
+
     return True, ""
 
 
 def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[TravelBotSessionAttributes]:
     """
     Handle travel planning with progressive slot collection and validation.
-    
+
     This demonstrates:
     - Slot elicitation patterns
     - Input validation
     - Session attribute updates
     - Multi-turn conversation flow
     """
-    
+
     intent = lex_request.sessionState.intent
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Get slot values
     destination = get_slot_value("Destination", intent)
     travel_dates = get_slot_value("TravelDates", intent)
     budget = get_slot_value("Budget", intent)
-    
+
     # Step 1: Collect destination
     if not destination:
         return dialog.elicit_slot(
@@ -270,7 +270,7 @@ def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[
             messages=[LexPlainText(content="Where would you like to travel? I can help you plan a trip anywhere in the world!")],
             lex_request=lex_request,
         )
-    
+
     # Validate destination
     is_valid, error_message = validate_destination(destination)
     if not is_valid:
@@ -279,7 +279,7 @@ def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[
             messages=[LexPlainText(content=error_message)],
             lex_request=lex_request,
         )
-    
+
     # Step 2: Collect travel dates
     if not travel_dates:
         session_attrs.preferred_destination = destination
@@ -288,7 +288,7 @@ def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[
             messages=[LexPlainText(content=f"Great choice! {destination} is wonderful. When are you planning to travel?")],
             lex_request=lex_request,
         )
-    
+
     # Validate travel dates
     is_valid, error_message = validate_travel_dates(travel_dates)
     if not is_valid:
@@ -297,7 +297,7 @@ def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[
             messages=[LexPlainText(content=error_message)],
             lex_request=lex_request,
         )
-    
+
     # Step 3: Collect budget (optional)
     if not budget:
         session_attrs.travel_dates = travel_dates
@@ -306,16 +306,16 @@ def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[
             messages=[LexPlainText(content="What's your budget range for this trip? (e.g., '$1000-2000' or 'budget-friendly')")],
             lex_request=lex_request,
         )
-    
+
     # All information collected - provide travel plan
     session_attrs.budget_range = budget
     session_attrs.booking_step = "planning_complete"
-    
+
     travel_plan = f"""
 Perfect! Here's your travel plan summary:
 
 🌍 **Destination**: {destination}
-📅 **Travel Dates**: {travel_dates}  
+📅 **Travel Dates**: {travel_dates}
 💰 **Budget**: {budget}
 
 Based on your preferences, here are my recommendations:
@@ -326,7 +326,7 @@ Based on your preferences, here are my recommendations:
 
 Would you like me to help you with the next step, like finding flights or hotels?
     """.strip()
-    
+
     return dialog.close(
         messages=[LexPlainText(content=travel_plan)],
         lex_request=lex_request,
@@ -347,25 +347,25 @@ from ..session_attributes import TravelBotSessionAttributes
 
 
 def handle_error_with_recovery(
-    lex_request: LexRequest[TravelBotSessionAttributes], 
+    lex_request: LexRequest[TravelBotSessionAttributes],
     error_message: str,
     max_errors: int = 3
 ) -> LexResponse[TravelBotSessionAttributes]:
     """
     Handle errors with progressive recovery strategies.
-    
+
     Args:
         lex_request: The current Lex request
         error_message: The error message to display
         max_errors: Maximum consecutive errors before escalation
-    
+
     Returns:
         LexResponse with appropriate recovery action
     """
-    
+
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.consecutive_errors += 1
-    
+
     if session_attrs.consecutive_errors >= max_errors:
         # Escalate to human or reset conversation
         escalation_message = """
@@ -377,15 +377,15 @@ I'm having trouble understanding. Let me transfer you to a human agent, or you c
 
 How would you like to proceed?
         """.strip()
-        
+
         # Reset error count after escalation
         session_attrs.consecutive_errors = 0
-        
+
         return dialog.close(
             messages=[LexPlainText(content=escalation_message)],
             lex_request=lex_request,
         )
-    
+
     # Progressive error messages
     if session_attrs.consecutive_errors == 1:
         recovery_message = f"{error_message} Could you please try rephrasing that?"
@@ -393,7 +393,7 @@ How would you like to proceed?
         recovery_message = f"{error_message} Let me try to help differently. What specifically would you like to do?"
     else:
         recovery_message = f"{error_message} I'm still having trouble. Type 'help' to see what I can assist with."
-    
+
     return dialog.close(
         messages=[LexPlainText(content=recovery_message)],
         lex_request=lex_request,
@@ -418,22 +418,22 @@ from ..utils.error_handling import handle_error_with_recovery
 def handler(lex_request: LexRequest[TravelBotSessionAttributes]) -> LexResponse[TravelBotSessionAttributes]:
     """
     Handle unrecognized user input with helpful recovery.
-    
+
     This demonstrates:
     - Graceful error handling
     - Progressive error recovery
     - User guidance and assistance
     """
-    
+
     error_message = """
 I didn't quite understand that. I'm a travel assistant and I can help you with:
 
 • Planning trips and getting destination advice
-• Finding flights and travel information  
+• Finding flights and travel information
 • Hotel recommendations
 • Budget planning for your travels
     """.strip()
-    
+
     return handle_error_with_recovery(
         lex_request=lex_request,
         error_message=error_message,
@@ -454,14 +454,14 @@ from src.travel_bot.session_attributes import TravelBotSessionAttributes
 def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """
     Main Lambda handler for the Travel Assistant Bot.
-    
+
     This demonstrates:
     - Proper lex-helper configuration
     - Custom session attributes
     - Automatic exception handling
     - Package-based intent routing
     """
-    
+
     # Configure lex-helper with our custom session attributes
     config = Config(
         session_attributes=TravelBotSessionAttributes(),
@@ -469,7 +469,7 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
         auto_handle_exceptions=True,    # Automatically handle exceptions
         error_message="I encountered an error. Please try again or type 'help' for assistance."
     )
-    
+
     # Initialize and run the handler
     lex_helper = LexHelper(config=config)
     return lex_helper.handler(event, context)
@@ -493,49 +493,49 @@ from ..session_attributes import TravelBotSessionAttributes
 
 def create_mock_request(greeting_count: int = 0) -> LexRequest[TravelBotSessionAttributes]:
     """Helper to create mock Lex requests for testing."""
-    
+
     session_attrs = TravelBotSessionAttributes(greeting_count=greeting_count)
-    
+
     mock_request = Mock(spec=LexRequest)
     mock_request.sessionState = Mock(spec=SessionState)
     mock_request.sessionState.sessionAttributes = session_attrs
     mock_request.sessionState.intent = Mock(spec=Intent)
-    
+
     return mock_request
 
 
 def test_first_greeting():
     """Test first-time greeting response."""
-    
+
     request = create_mock_request(greeting_count=0)
     response = handler(request)
-    
+
     # Check that greeting count was incremented
     assert request.sessionState.sessionAttributes.greeting_count == 1
-    
+
     # Check response contains welcome message
     assert "Welcome to Travel Assistant" in response.messages[0].content
 
 
 def test_repeat_greeting():
     """Test repeat greeting response."""
-    
+
     request = create_mock_request(greeting_count=2)
     response = handler(request)
-    
+
     # Check that greeting count was incremented
     assert request.sessionState.sessionAttributes.greeting_count == 3
-    
+
     # Check response acknowledges repeat visit
     assert "visit #3" in response.messages[0].content
 
 
 def test_frequent_visitor():
     """Test frequent visitor greeting."""
-    
+
     request = create_mock_request(greeting_count=5)
     response = handler(request)
-    
+
     # Check response for frequent visitors
     assert "becoming a regular" in response.messages[0].content
 ```
@@ -583,19 +583,19 @@ def create_lex_event(intent_name: str, slots: dict = None, session_attrs: dict =
 
 def test_greeting_flow(lex_helper):
     """Test complete greeting conversation flow."""
-    
+
     # Create greeting event
     event = create_lex_event("greeting")
     context = Mock()
-    
+
     # Process the event
     response = lex_helper.handler(event, context)
-    
+
     # Verify response structure
     assert "sessionState" in response
     assert "messages" in response
     assert len(response["messages"]) > 0
-    
+
     # Verify session attributes were updated
     session_attrs = response["sessionState"]["sessionAttributes"]
     assert session_attrs["greeting_count"] == "1"
@@ -603,41 +603,41 @@ def test_greeting_flow(lex_helper):
 
 def test_travel_planning_flow(lex_helper):
     """Test travel planning conversation flow."""
-    
+
     # Start travel planning
     event = create_lex_event("plan_travel")
     context = Mock()
-    
+
     response = lex_helper.handler(event, context)
-    
+
     # Should ask for destination
-    assert any("where would you like to travel" in msg["content"].lower() 
+    assert any("where would you like to travel" in msg["content"].lower()
               for msg in response["messages"])
-    
+
     # Provide destination
     event = create_lex_event(
-        "plan_travel", 
+        "plan_travel",
         slots={"Destination": {"value": "Paris"}}
     )
-    
+
     response = lex_helper.handler(event, context)
-    
+
     # Should ask for travel dates
-    assert any("when are you planning" in msg["content"].lower() 
+    assert any("when are you planning" in msg["content"].lower()
               for msg in response["messages"])
 
 
 def test_error_handling(lex_helper):
     """Test error handling and recovery."""
-    
+
     # Trigger fallback intent
     event = create_lex_event("FallbackIntent")
     context = Mock()
-    
+
     response = lex_helper.handler(event, context)
-    
+
     # Should provide helpful error message
-    assert any("didn't quite understand" in msg["content"].lower() 
+    assert any("didn't quite understand" in msg["content"].lower()
               for msg in response["messages"])
 ```
 
@@ -685,40 +685,40 @@ from lex_helper.channels import format_for_channel
 
 
 def create_channel_aware_response(
-    content: str, 
+    content: str,
     lex_request: LexRequest,
     use_markdown: bool = True
 ) -> List[LexPlainText]:
     """
     Create responses optimized for different channels.
-    
+
     Args:
         content: The message content
         lex_request: Current Lex request for channel detection
         use_markdown: Whether to use markdown formatting
-    
+
     Returns:
         List of formatted messages
     """
-    
+
     # Format content for the specific channel
     formatted_content = format_for_channel(
         content=content,
         lex_request=lex_request,
         use_markdown=use_markdown
     )
-    
+
     return [LexPlainText(content=formatted_content)]
 
 
 def create_travel_summary_response(
     destination: str,
-    dates: str, 
+    dates: str,
     budget: str,
     lex_request: LexRequest
 ) -> List[LexPlainText]:
     """Create a formatted travel summary response."""
-    
+
     # Rich formatting for web/app channels
     rich_content = f"""
 **🌍 Your Travel Plan**
@@ -729,12 +729,12 @@ def create_travel_summary_response(
 
 **Next Steps:**
 • ✈️ Find flights
-• 🏨 Book accommodation  
+• 🏨 Book accommodation
 • 🎯 Plan activities
 
 Would you like help with any of these?
     """.strip()
-    
+
     # Simple formatting for SMS
     simple_content = f"""
 Your Travel Plan:
@@ -744,11 +744,11 @@ Budget: {budget}
 
 Next: flights, hotels, or activities?
     """.strip()
-    
+
     # Choose format based on channel
     channel = getattr(lex_request, 'channel', 'web')
     content = simple_content if channel == 'sms' else rich_content
-    
+
     return create_channel_aware_response(content, lex_request)
 ```
 
@@ -766,23 +766,23 @@ from pathlib import Path
 
 def create_deployment_package():
     """Create a deployment package for AWS Lambda."""
-    
+
     # Create deployment zip
     with zipfile.ZipFile('travel-bot-deployment.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-        
+
         # Add main handler
         zipf.write('lambda_function.py')
-        
+
         # Add source code
         for root, dirs, files in os.walk('src'):
             for file in files:
                 if file.endswith('.py'):
                     file_path = os.path.join(root, file)
                     zipf.write(file_path)
-        
+
         # Add requirements (you'd typically use a layer for this)
         # zipf.write('requirements.txt')
-    
+
     print("✅ Deployment package created: travel-bot-deployment.zip")
     print("📦 Package size:", os.path.getsize('travel-bot-deployment.zip'), "bytes")
 
@@ -802,7 +802,7 @@ from lambda_function import lambda_handler
 
 def test_greeting():
     """Test greeting intent locally."""
-    
+
     event = {
         "sessionState": {
             "intent": {
@@ -818,7 +818,7 @@ def test_greeting():
             "version": "1.0"
         }
     }
-    
+
     response = lambda_handler(event, None)
     print("🤖 Bot Response:")
     print(json.dumps(response, indent=2))
@@ -827,7 +827,7 @@ def test_greeting():
 
 def test_travel_planning():
     """Test travel planning intent locally."""
-    
+
     event = {
         "sessionState": {
             "intent": {
@@ -843,7 +843,7 @@ def test_travel_planning():
             "version": "1.0"
         }
     }
-    
+
     response = lambda_handler(event, None)
     print("🤖 Bot Response:")
     print(json.dumps(response, indent=2))
@@ -852,17 +852,17 @@ def test_travel_planning():
 
 if __name__ == "__main__":
     print("🧪 Testing Travel Assistant Bot locally...\n")
-    
+
     print("=" * 50)
     print("TEST 1: Greeting Intent")
     print("=" * 50)
     test_greeting()
-    
+
     print("\n" + "=" * 50)
     print("TEST 2: Travel Planning Intent")
     print("=" * 50)
     test_travel_planning()
-    
+
     print("\n✅ Local testing complete!")
 ```
 

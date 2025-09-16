@@ -49,7 +49,7 @@ Define session attributes as Pydantic models with full IDE support. Catch errors
 </div>
 
 <div class="feature-card" markdown>
-### :material-folder-outline: Organized Intent Management  
+### :material-folder-outline: Organized Intent Management
 Each intent lives in its own file with automatic discovery. Scale your bot without losing track of your code.
 
 ![Intent Organization](intent-handling.png)
@@ -157,7 +157,7 @@ Dive deep into the complete API documentation with examples.
 
 **Core Features**
 - Type-safe session attributes with Pydantic
-- Automatic intent handler discovery and routing  
+- Automatic intent handler discovery and routing
 - Comprehensive dialog state management
 - Multi-channel response formatting
 - Built-in error handling and logging

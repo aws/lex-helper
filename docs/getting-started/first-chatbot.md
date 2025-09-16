@@ -94,7 +94,7 @@ from lex_helper import SessionAttributes
 
 class UserPreferences(SessionAttributes):
     """User preferences sub-model."""
-    
+
     preferred_name: str = Field(default="", description="User's preferred name")
     timezone: str = Field(default="UTC", description="User's timezone")
     notification_enabled: bool = Field(default=True, description="Whether notifications are enabled")
@@ -102,87 +102,87 @@ class UserPreferences(SessionAttributes):
 class PersonalAssistantSessionAttributes(SessionAttributes):
     """
     Comprehensive session attributes for a personal assistant bot.
-    
+
     This demonstrates advanced session management patterns including:
     - Nested models for organization
     - Different data types (strings, integers, booleans, lists, dates)
     - Default values and validation
     - Clear documentation
     """
-    
+
     model_config = ConfigDict(extra="allow")
-    
+
     # User Information
     user_preferences: UserPreferences = Field(
         default_factory=UserPreferences,
         description="User's personal preferences"
     )
-    
+
     # Conversation State
     current_flow: str = Field(
         default="",
         description="Current conversation flow (e.g., 'weather_inquiry', 'reminder_setup')"
     )
-    
+
     last_intent: str = Field(
         default="",
         description="The last successfully handled intent"
     )
-    
+
     conversation_count: int = Field(
         default=0,
         description="Number of interactions in this session"
     )
-    
+
     # Context and Memory
     mentioned_topics: List[str] = Field(
         default_factory=list,
         description="Topics mentioned in this conversation"
     )
-    
+
     pending_reminders: List[str] = Field(
         default_factory=list,
         description="Reminders waiting to be set"
     )
-    
+
     # Error Handling
     consecutive_errors: int = Field(
         default=0,
         description="Number of consecutive errors for fallback logic"
     )
-    
+
     last_error_intent: str = Field(
         default="",
         description="Intent that last caused an error"
     )
-    
+
     # Timestamps
     session_start_time: Optional[str] = Field(
         default=None,
         description="When this session started (ISO format)"
     )
-    
+
     last_activity_time: Optional[str] = Field(
         default=None,
         description="Last activity timestamp (ISO format)"
     )
-    
+
     def update_activity(self) -> None:
         """Update the last activity timestamp."""
         self.last_activity_time = datetime.utcnow().isoformat()
         if not self.session_start_time:
             self.session_start_time = self.last_activity_time
-    
+
     def add_topic(self, topic: str) -> None:
         """Add a topic to the mentioned topics list."""
         if topic and topic not in self.mentioned_topics:
             self.mentioned_topics.append(topic)
-    
+
     def reset_error_count(self) -> None:
         """Reset the consecutive error count."""
         self.consecutive_errors = 0
         self.last_error_intent = ""
-    
+
     def increment_error_count(self, intent_name: str) -> None:
         """Increment the error count for an intent."""
         self.consecutive_errors += 1
@@ -202,7 +202,7 @@ import re
 def extract_name_from_input(user_input: str) -> Optional[str]:
     """
     Extract a name from user input using common patterns.
-    
+
     Examples:
     - "My name is John" -> "John"
     - "I'm Sarah" -> "Sarah"
@@ -214,20 +214,20 @@ def extract_name_from_input(user_input: str) -> Optional[str]:
         r"call me (\w+)",
         r"i am (\w+)",
     ]
-    
+
     user_input_lower = user_input.lower()
-    
+
     for pattern in patterns:
         match = re.search(pattern, user_input_lower)
         if match:
             return match.group(1).title()
-    
+
     return None
 
 def format_time_greeting() -> str:
     """Return a time-appropriate greeting."""
     hour = datetime.now().hour
-    
+
     if 5 <= hour < 12:
         return "Good morning"
     elif 12 <= hour < 17:
@@ -245,7 +245,7 @@ def is_business_hours() -> bool:
 def format_list_response(items: list, conjunction: str = "and") -> str:
     """
     Format a list into a natural language string.
-    
+
     Examples:
     - ["apple"] -> "apple"
     - ["apple", "banana"] -> "apple and banana"
@@ -276,29 +276,29 @@ from utils.helpers import format_time_greeting, extract_name_from_input
 def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexResponse[PersonalAssistantSessionAttributes]:
     """
     Handle welcome/greeting intents.
-    
+
     This intent demonstrates:
     - Session state initialization
     - Personalized responses based on session history
     - Context-aware greetings
     """
-    
+
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.update_activity()
     session_attrs.conversation_count += 1
     session_attrs.current_flow = "greeting"
     session_attrs.last_intent = "WelcomeIntent"
     session_attrs.add_topic("greeting")
-    
+
     # Try to extract name from user input
     user_input = lex_request.inputTranscript or ""
     extracted_name = extract_name_from_input(user_input)
     if extracted_name and not session_attrs.user_preferences.preferred_name:
         session_attrs.user_preferences.preferred_name = extracted_name
-    
+
     # Create personalized greeting
     time_greeting = format_time_greeting()
-    
+
     if session_attrs.user_preferences.preferred_name:
         if session_attrs.conversation_count == 1:
             message = f"{time_greeting}, {session_attrs.user_preferences.preferred_name}! Welcome back to your personal assistant."
@@ -306,11 +306,11 @@ def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexR
             message = f"Hello again, {session_attrs.user_preferences.preferred_name}!"
     else:
         message = f"{time_greeting}! I'm your personal assistant. What's your name?"
-    
+
     # Add helpful context
     if session_attrs.conversation_count == 1:
         message += " I can help you with weather, reminders, and general questions. What would you like to do?"
-    
+
     return dialog.close(
         messages=[LexPlainText(content=message)],
         lex_request=lex_request,
@@ -328,22 +328,22 @@ from session_attributes import PersonalAssistantSessionAttributes
 def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexResponse[PersonalAssistantSessionAttributes]:
     """
     Handle weather inquiry intents.
-    
+
     This intent demonstrates:
     - Slot validation and elicitation
     - Multi-turn conversations
     - Error handling for missing information
     """
-    
+
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.update_activity()
     session_attrs.current_flow = "weather_inquiry"
     session_attrs.last_intent = "WeatherIntent"
     session_attrs.add_topic("weather")
-    
+
     # Get the city slot
     city_slot = dialog.get_slot("City", lex_request.sessionState.intent)
-    
+
     if not city_slot or not city_slot.value:
         # Elicit the city if not provided
         return dialog.elicit_slot(
@@ -351,17 +351,17 @@ def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexR
             messages=[LexPlainText(content="Which city would you like to know the weather for?")],
             lex_request=lex_request
         )
-    
+
     city = city_slot.value.interpretedValue
-    
+
     # In a real implementation, you would call a weather API here
     # For this tutorial, we'll simulate a response
     weather_response = f"The weather in {city} is currently sunny with a temperature of 72°F. Perfect day to go outside!"
-    
+
     # Add personalized touch
     if session_attrs.user_preferences.preferred_name:
         weather_response = f"Here you go, {session_attrs.user_preferences.preferred_name}! " + weather_response
-    
+
     return dialog.close(
         messages=[LexPlainText(content=weather_response)],
         lex_request=lex_request,
@@ -379,23 +379,23 @@ from session_attributes import PersonalAssistantSessionAttributes
 def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexResponse[PersonalAssistantSessionAttributes]:
     """
     Handle reminder creation intents.
-    
+
     This intent demonstrates:
     - Complex slot management
     - Session state persistence
     - Multi-step workflows
     """
-    
+
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.update_activity()
     session_attrs.current_flow = "reminder_setup"
     session_attrs.last_intent = "ReminderIntent"
     session_attrs.add_topic("reminders")
-    
+
     # Get required slots
     reminder_text_slot = dialog.get_slot("ReminderText", lex_request.sessionState.intent)
     reminder_time_slot = dialog.get_slot("ReminderTime", lex_request.sessionState.intent)
-    
+
     # Elicit reminder text if missing
     if not reminder_text_slot or not reminder_text_slot.value:
         return dialog.elicit_slot(
@@ -403,7 +403,7 @@ def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexR
             messages=[LexPlainText(content="What would you like me to remind you about?")],
             lex_request=lex_request
         )
-    
+
     # Elicit reminder time if missing
     if not reminder_time_slot or not reminder_time_slot.value:
         return dialog.elicit_slot(
@@ -411,20 +411,20 @@ def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexR
             messages=[LexPlainText(content="When would you like to be reminded?")],
             lex_request=lex_request
         )
-    
+
     reminder_text = reminder_text_slot.value.interpretedValue
     reminder_time = reminder_time_slot.value.interpretedValue
-    
+
     # Store the reminder (in a real app, you'd save to a database)
     reminder = f"{reminder_text} at {reminder_time}"
     session_attrs.pending_reminders.append(reminder)
-    
+
     # Create confirmation message
     message = f"Perfect! I've set a reminder for '{reminder_text}' at {reminder_time}."
-    
+
     if session_attrs.user_preferences.preferred_name:
         message += f" I'll make sure to remind you, {session_attrs.user_preferences.preferred_name}!"
-    
+
     return dialog.close(
         messages=[LexPlainText(content=message)],
         lex_request=lex_request,
@@ -443,19 +443,19 @@ from utils.helpers import format_list_response
 def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexResponse[PersonalAssistantSessionAttributes]:
     """
     Handle help requests.
-    
+
     This intent demonstrates:
     - Context-aware help based on conversation history
     - Dynamic response generation
     - User guidance and onboarding
     """
-    
+
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.update_activity()
     session_attrs.current_flow = "help"
     session_attrs.last_intent = "HelpIntent"
     session_attrs.add_topic("help")
-    
+
     # Base capabilities
     capabilities = [
         "check the weather for any city",
@@ -463,25 +463,25 @@ def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexR
         "have conversations and answer questions",
         "remember your preferences"
     ]
-    
+
     # Create personalized help message
     if session_attrs.user_preferences.preferred_name:
         greeting = f"Hi {session_attrs.user_preferences.preferred_name}! "
     else:
         greeting = "Hi there! "
-    
+
     message = greeting + f"I can help you {format_list_response(capabilities)}."
-    
+
     # Add context-specific help
     if session_attrs.mentioned_topics:
         message += f"\n\nWe've talked about {format_list_response(session_attrs.mentioned_topics)} so far."
-    
+
     if session_attrs.pending_reminders:
         reminder_count = len(session_attrs.pending_reminders)
         message += f"\n\nYou have {reminder_count} pending reminder{'s' if reminder_count != 1 else ''}."
-    
+
     message += "\n\nWhat would you like to do?"
-    
+
     return dialog.close(
         messages=[LexPlainText(content=message)],
         lex_request=lex_request,
@@ -499,39 +499,39 @@ from session_attributes import PersonalAssistantSessionAttributes
 def handler(lex_request: LexRequest[PersonalAssistantSessionAttributes]) -> LexResponse[PersonalAssistantSessionAttributes]:
     """
     Handle fallback when no intent matches or errors occur.
-    
+
     This intent demonstrates:
     - Error tracking and recovery
     - Escalating help based on error frequency
     - Graceful degradation of user experience
     """
-    
+
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.update_activity()
     session_attrs.increment_error_count("FallbackIntent")
     session_attrs.current_flow = "fallback"
     session_attrs.last_intent = "FallbackIntent"
-    
+
     # Escalate help based on consecutive errors
     if session_attrs.consecutive_errors == 1:
         message = "I'm not sure I understood that. Could you try rephrasing your request?"
-        
+
     elif session_attrs.consecutive_errors == 2:
         message = "I'm still having trouble understanding. I can help with weather, reminders, or general questions. What would you like to do?"
-        
+
     elif session_attrs.consecutive_errors >= 3:
         message = "I apologize for the confusion. Let me help you get back on track. Here's what I can do:\n\n"
         message += "• Say 'weather in [city]' to get weather information\n"
         message += "• Say 'remind me to [task] at [time]' to set reminders\n"
         message += "• Say 'help' for more options\n\n"
         message += "What would you like to try?"
-        
+
         # Reset error count after providing comprehensive help
         session_attrs.reset_error_count()
-    
+
     else:
         message = "I didn't catch that. Could you please try again?"
-    
+
     return dialog.close(
         messages=[LexPlainText(content=message)],
         lex_request=lex_request,
@@ -557,39 +557,39 @@ logger = logging.getLogger(__name__)
 def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """
     Enhanced Lambda handler with comprehensive error handling and logging.
-    
+
     This handler demonstrates:
     - Proper logging for debugging and monitoring
     - Error handling and recovery
     - Configuration management
     - Performance considerations
     """
-    
+
     try:
         # Log the incoming request (be careful with sensitive data in production)
         logger.info(f"Processing request for intent: {event.get('sessionState', {}).get('intent', {}).get('name', 'Unknown')}")
-        
+
         # Configure lex-helper
         config = Config(
             session_attributes=PersonalAssistantSessionAttributes(),
             package_name="intents"
         )
-        
+
         # Initialize lex-helper
         lex_helper = LexHelper(config=config)
-        
+
         # Process the request
         response = lex_helper.handler(event, context)
-        
+
         # Log successful processing
         logger.info("Request processed successfully")
-        
+
         return response
-        
+
     except Exception as e:
         # Log the error
         logger.error(f"Error processing request: {str(e)}", exc_info=True)
-        
+
         # Return a graceful error response
         return {
             "sessionState": {
@@ -628,7 +628,7 @@ from intents.help_intent import handler as help_handler
 
 class TestWelcomeIntent:
     """Test the welcome intent handler."""
-    
+
     def test_first_time_user(self):
         """Test welcome for a new user."""
         # Create mock request
@@ -636,37 +636,37 @@ class TestWelcomeIntent:
         lex_request = Mock(spec=LexRequest)
         lex_request.sessionState.sessionAttributes = session_attrs
         lex_request.inputTranscript = "Hello"
-        
+
         # Call handler
         response = welcome_handler(lex_request)
-        
+
         # Verify response
         assert response.sessionState.dialogAction.type == "Close"
         assert "Good" in response.messages[0].content  # Should include time-based greeting
         assert session_attrs.conversation_count == 1
         assert session_attrs.last_intent == "WelcomeIntent"
-    
+
     def test_returning_user_with_name(self):
         """Test welcome for a returning user with a known name."""
         # Create mock request with existing session
         session_attrs = PersonalAssistantSessionAttributes()
         session_attrs.user_preferences.preferred_name = "Alice"
         session_attrs.conversation_count = 0  # Will be incremented to 1
-        
+
         lex_request = Mock(spec=LexRequest)
         lex_request.sessionState.sessionAttributes = session_attrs
         lex_request.inputTranscript = "Hi there"
-        
+
         # Call handler
         response = welcome_handler(lex_request)
-        
+
         # Verify personalized response
         assert "Alice" in response.messages[0].content
         assert session_attrs.conversation_count == 1
 
 class TestWeatherIntent:
     """Test the weather intent handler."""
-    
+
     def test_weather_with_city(self):
         """Test weather request with city provided."""
         # Create mock request with city slot
@@ -674,29 +674,29 @@ class TestWeatherIntent:
         lex_request = Mock(spec=LexRequest)
         lex_request.sessionState.sessionAttributes = session_attrs
         lex_request.sessionState.intent = Mock()
-        
+
         # Mock the city slot
         city_slot = Mock()
         city_slot.value.interpretedValue = "Seattle"
-        
+
         # Mock dialog.get_slot to return our city
         import intents.weather_intent
         original_get_slot = intents.weather_intent.dialog.get_slot
         intents.weather_intent.dialog.get_slot = Mock(return_value=city_slot)
-        
+
         try:
             # Call handler
             response = weather_handler(lex_request)
-            
+
             # Verify response
             assert response.sessionState.dialogAction.type == "Close"
             assert "Seattle" in response.messages[0].content
             assert session_attrs.current_flow == "weather_inquiry"
-            
+
         finally:
             # Restore original function
             intents.weather_intent.dialog.get_slot = original_get_slot
-    
+
     def test_weather_without_city(self):
         """Test weather request without city - should elicit slot."""
         # Create mock request without city slot
@@ -704,27 +704,27 @@ class TestWeatherIntent:
         lex_request = Mock(spec=LexRequest)
         lex_request.sessionState.sessionAttributes = session_attrs
         lex_request.sessionState.intent = Mock()
-        
+
         # Mock dialog.get_slot to return None (no city provided)
         import intents.weather_intent
         original_get_slot = intents.weather_intent.dialog.get_slot
         intents.weather_intent.dialog.get_slot = Mock(return_value=None)
-        
+
         try:
             # Call handler
             response = weather_handler(lex_request)
-            
+
             # Verify it elicits the city slot
             assert response.sessionState.dialogAction.type == "ElicitSlot"
             assert response.sessionState.dialogAction.slotToElicit == "City"
-            
+
         finally:
             # Restore original function
             intents.weather_intent.dialog.get_slot = original_get_slot
 
 class TestHelpIntent:
     """Test the help intent handler."""
-    
+
     def test_help_with_conversation_history(self):
         """Test help with existing conversation context."""
         # Create session with history
@@ -732,14 +732,14 @@ class TestHelpIntent:
         session_attrs.user_preferences.preferred_name = "Bob"
         session_attrs.mentioned_topics = ["weather", "reminders"]
         session_attrs.pending_reminders = ["Buy groceries at 5 PM"]
-        
+
         lex_request = Mock(spec=LexRequest)
         lex_request.sessionState.sessionAttributes = session_attrs
         lex_request.inputTranscript = "help"
-        
+
         # Call handler
         response = help_handler(lex_request)
-        
+
         # Verify contextual help
         assert "Bob" in response.messages[0].content
         assert "weather" in response.messages[0].content
@@ -786,19 +786,19 @@ def create_test_event(intent_name: str, input_text: str, slots: dict = None) -> 
 def test_conversation_flow():
     """Test a complete conversation flow."""
     print("🤖 Testing Personal Assistant Bot\n")
-    
+
     # Test 1: Welcome
     print("Test 1: Welcome Intent")
     event = create_test_event("WelcomeIntent", "Hello")
     response = lambda_handler(event, None)
     print(f"Bot: {response['messages'][0]['content']}\n")
-    
+
     # Test 2: Weather (without city)
     print("Test 2: Weather Intent (no city)")
     event = create_test_event("WeatherIntent", "What's the weather?")
     response = lambda_handler(event, None)
     print(f"Bot: {response['messages'][0]['content']}\n")
-    
+
     # Test 3: Weather (with city)
     print("Test 3: Weather Intent (with city)")
     event = create_test_event("WeatherIntent", "Weather in New York", {
@@ -810,13 +810,13 @@ def test_conversation_flow():
     })
     response = lambda_handler(event, None)
     print(f"Bot: {response['messages'][0]['content']}\n")
-    
+
     # Test 4: Help
     print("Test 4: Help Intent")
     event = create_test_event("HelpIntent", "help")
     response = lambda_handler(event, None)
     print(f"Bot: {response['messages'][0]['content']}\n")
-    
+
     # Test 5: Fallback
     print("Test 5: Fallback Intent")
     event = create_test_event("FallbackIntent", "asdfghjkl")
@@ -860,6 +860,7 @@ session_attrs.increment_error_count("FallbackIntent")
 # Provide increasingly helpful responses
 if session_attrs.consecutive_errors >= 3:
     # Provide comprehensive help and reset counter
+    pass  # Implementation details
 ```
 
 ### 4. **Type Safety Benefits**
@@ -870,7 +871,7 @@ user_name: str = session_attrs.user_preferences.preferred_name
 count: int = session_attrs.conversation_count
 
 # IDE autocomplete and error detection
-session_attrs.user_preferences.  # <- IDE shows available fields
+# session_attrs.user_preferences.  # <- IDE shows available fields
 ```
 
 ## Production Considerations

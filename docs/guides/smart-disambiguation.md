@@ -127,7 +127,7 @@ Amazon Bedrock integration transforms static disambiguation into intelligent, co
 ### Benefits of Bedrock Integration
 
 - **Contextual messages**: Acknowledges user's specific input
-- **Natural language**: More conversational than static templates  
+- **Natural language**: More conversational than static templates
 - **Smart button labels**: Generates intuitive action text
 - **Adaptive responses**: Tailored to your domain and use case
 
@@ -481,13 +481,13 @@ Test disambiguation with various scenarios:
 test_cases = [
     # Low confidence scenario
     {"TrackBaggage": 0.25, "ChangeFlight": 0.23},
-    
-    # Close scores scenario  
+
+    # Close scores scenario
     {"BookFlight": 0.45, "ChangeFlight": 0.42},
-    
+
     # Clear winner (should not disambiguate)
     {"TrackBaggage": 0.75, "ChangeFlight": 0.15},
-    
+
     # Single candidate (should not disambiguate)
     {"BookFlight": 0.30}
 ]
@@ -688,22 +688,22 @@ disambiguation_config = DisambiguationConfig(
     confidence_threshold=0.4,
     max_candidates=2,
     similarity_threshold=0.15,
-    
+
     # Group related intents for better messaging
     custom_intent_groups={
         "booking": ["BookFlight", "ChangeFlight", "CancelFlight"],
         "status": ["FlightDelayUpdate", "TrackBaggage"],
         "account": ["Authenticate", "CreateAccount"]
     },
-    
+
     # Custom message mappings for airline domain
     custom_messages={
         "disambiguation.booking": "disambiguation.airline.booking_options",
-        "disambiguation.status": "disambiguation.airline.status_options", 
+        "disambiguation.status": "disambiguation.airline.status_options",
         "BookFlight_ChangeFlight": "disambiguation.airline.book_or_change",
         "disambiguation.two_options": "disambiguation.airline.two_options"
     },
-    
+
     bedrock_config=bedrock_config,
     enable_logging=True
 )
@@ -730,7 +730,7 @@ def lambda_handler(event, context):
 # Run with static disambiguation
 python lambda_function.py
 
-# Run with Bedrock-powered disambiguation  
+# Run with Bedrock-powered disambiguation
 ENABLE_BEDROCK_DISAMBIGUATION=true python lambda_function.py
 ```
 

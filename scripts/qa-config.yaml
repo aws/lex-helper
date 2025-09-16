@@ -1,0 +1,84 @@
+# Quality Assurance Configuration
+# This file defines patterns and rules for what to ignore in QA checks
+
+# Link checking configuration
+links:
+  # External file references that are expected to be missing in documentation
+  safe_external_patterns:
+    - "../README.md"
+    - "README.md"
+    - "CONTRIBUTING.md"
+    - "CHANGELOG.md"
+    - "LICENSE"
+    - "LICENSE.md"
+    - ".env"
+    - "requirements.txt"
+    - "package.json"
+    - "pyproject.toml"
+    - "Makefile"
+    - ".gitignore"
+
+  # Files where broken links are expected (like 404 pages)
+  ignore_broken_links_in:
+    - "404.html"
+    - "error.html"
+
+# Accessibility checking configuration
+accessibility:
+  # Theme-related URL patterns for icon links without text
+  theme_icon_patterns:
+    - "https://github.com/"
+    - "https://pypi.org/"
+    - "https://aws.amazon.com/"
+    - "https://twitter.com/"
+    - "https://linkedin.com/"
+
+  # CSS classes that indicate theme-generated content
+  theme_classes:
+    - "md-header"
+    - "md-footer"
+    - "md-tabs"
+    - "md-nav"
+    - "md-social"
+    - "md-search"
+
+  # Auto-generated content that should have relaxed accessibility rules
+  generated_content_classes:
+    - "doc"
+    - "mkdocstrings"
+    - "autodoc"
+    - "api-doc"
+
+# Code validation configuration
+code:
+  # Import patterns that are acceptable to be missing (documentation examples)
+  acceptable_missing_imports:
+    - "session_attributes"
+    - "pytest"
+    - "your_project.*"
+    - "my_chatbot.*"
+    - "intents.*"
+    - "utils.*"
+    - "src.*"
+    - "handler"
+    - "psutil"  # Optional dependency for examples
+
+# Spelling configuration
+spelling:
+  # Additional technical terms (beyond the main dictionary)
+  additional_terms:
+    - "mkdocs"
+    - "mkdocstrings"
+    - "lexhelper"
+    - "chatbots"
+    - "fulfillment"
+    - "disambiguation"
+    - "bedrock"
+
+  # File patterns to skip spell checking
+  skip_patterns:
+    - "*.json"
+    - "*.yaml"
+    - "*.yml"
+    - "CHANGELOG.md"
+    - "LICENSE*"

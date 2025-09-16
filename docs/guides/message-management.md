@@ -42,7 +42,7 @@ farewell: "Thank you for using our service!"
 booking:
   confirmation: "Your booking has been confirmed!"
   cancellation: "Your booking has been cancelled."
-  
+
 error:
   general: "I'm sorry, something went wrong."
   validation: "Please provide valid information."
@@ -56,7 +56,7 @@ farewell: "¡Gracias por usar nuestro servicio!"
 booking:
   confirmation: "¡Tu reserva ha sido confirmada!"
   cancellation: "Tu reserva ha sido cancelada."
-  
+
 error:
   general: "Lo siento, algo salió mal."
   validation: "Por favor, proporciona información válida."
@@ -73,7 +73,7 @@ def lambda_handler(event, context):
     # Extract locale from Lex event
     locale = event.get("bot", {}).get("localeId", "en_US")
     set_locale(locale)
-    
+
     # All subsequent message calls use this locale
     welcome_msg = get_message("greeting")
     return process_intent(event, welcome_msg)
@@ -130,13 +130,13 @@ welcome = get_templated_message("welcome.user", name="John", points=150)
 user:
   welcome: "Welcome, {name}!"
   goodbye: "Goodbye, {name}!"
-  
+
 # Booking flow
 booking:
   start: "Let's start your booking process."
   flight_selection: "Please select your preferred flight:"
   confirmation: "Booking confirmed! Reference: {reference}"
-  
+
 # Error handling
 error:
   booking:
@@ -154,7 +154,7 @@ error:
 user:
   welcome: "いらっしゃいませ、{name}様！"
   goodbye: "ありがとうございました、{name}様！"
-  
+
 booking:
   start: "予約手続きを開始いたします。"
   flight_selection: "ご希望のフライトをお選びください："
@@ -171,17 +171,17 @@ from lex_helper import LexHelper, get_message
 class BookingIntent:
     def __init__(self, lex_helper: LexHelper):
         self.lex_helper = lex_helper
-    
+
     def handle_booking_start(self):
         message = get_message("booking.start")
         return self.lex_helper.elicit_slot(
             slot_to_elicit="departure_city",
             message=message
         )
-    
+
     def handle_booking_confirmation(self, reference: str):
         message = get_templated_message(
-            "booking.confirmation", 
+            "booking.confirmation",
             reference=reference
         )
         return self.lex_helper.close(message)
@@ -198,19 +198,19 @@ class MySessionAttributes(SessionAttributes):
 
 def handle_personalized_greeting(lex_helper):
     session = lex_helper.session_attributes
-    
+
     # Set locale from user preference
     set_locale(session.preferred_language)
-    
+
     # Get personalized message
     if session.user_name:
         message = get_templated_message(
-            "user.welcome", 
+            "user.welcome",
             name=session.user_name
         )
     else:
         message = get_message("user.welcome.anonymous")
-    
+
     return lex_helper.close(message)
 ```
 
@@ -265,7 +265,7 @@ user:
   greeting:
     first_time: "Welcome to our service!"
     returning: "Welcome back!"
-  
+
 booking:
   flight:
     search_prompt: "Where would you like to go?"
@@ -286,7 +286,7 @@ error:
     email: "Please provide a valid email address (e.g., user@example.com)"
     phone: "Please provide a valid phone number (e.g., +1-555-123-4567)"
     date: "Please provide a date in MM/DD/YYYY format"
-  
+
   booking:
     no_availability: "No flights available. Try different dates or destinations."
     payment_declined: "Payment was declined. Please check your card details or try a different payment method."
@@ -323,27 +323,27 @@ class TestMessageManager:
         # Reset MessageManager state
         MessageManager._messages = {}
         MessageManager._current_locale = "en_US"
-    
+
     def test_basic_message_retrieval(self):
         set_locale("en_US")
         message = get_message("greeting", "Default greeting")
         assert message is not None
-    
+
     def test_locale_switching(self):
         # Test English
         set_locale("en_US")
         en_message = get_message("greeting")
-        
+
         # Test Spanish
         set_locale("es_ES")
         es_message = get_message("greeting")
-        
+
         assert en_message != es_message
-    
+
     def test_nested_keys(self):
         message = get_message("booking.confirmation")
         assert "booking" not in message  # Should be the actual message, not the key
-    
+
     def test_fallback_behavior(self):
         # Test with non-existent key
         message = get_message("nonexistent.key", "Fallback message")
@@ -357,27 +357,27 @@ def test_message_integration_with_lex():
     """Test MessageManager integration with LexHelper."""
     from lex_helper import LexHelper, Config
     from lex_helper.core.session_attributes import SessionAttributes
-    
+
     # Mock Lex event with locale
     event = {
         "bot": {"localeId": "es_ES"},
         "sessionState": {"sessionAttributes": {}}
     }
-    
+
     config = Config(
         session_attributes=SessionAttributes(),
         package_name="test.intents"
     )
-    
+
     lex_helper = LexHelper(config=config)
-    
+
     # Set locale from event
     locale = event["bot"]["localeId"]
     set_locale(locale)
-    
+
     # Get localized message
     message = get_message("greeting")
-    
+
     # Verify Spanish message is returned
     assert "Hola" in message or "¡" in message
 ```
@@ -435,12 +435,12 @@ def debug_message_loading():
     # Check all loaded messages
     all_messages = MessageManager.get_all_messages()
     print(f"Loaded locales: {list(all_messages.keys())}")
-    
+
     for locale, messages in all_messages.items():
         print(f"\n{locale} messages:")
         for key, value in messages.items():
             print(f"  {key}: {value}")
-    
+
     # Test specific key
     test_key = "booking.confirmation"
     message = get_message(test_key, "KEY_NOT_FOUND")
@@ -469,17 +469,17 @@ MessageManager.reload_messages()
 
 For Lambda functions, consider message file size:
 
-```python
+```yaml
 # Good: Organized, reasonable size
-messages.yaml (5KB)
-messages_es_ES.yaml (5KB)
+# messages.yaml (5KB)
+# messages_es_ES.yaml (5KB)
 
 # Consider splitting large files:
-messages/
-├── common.yaml          # Shared messages
-├── booking.yaml         # Booking-specific
-├── support.yaml         # Support messages
-└── errors.yaml          # Error messages
+# messages/
+#   common.yaml          # Shared messages
+#   booking.yaml         # Booking-specific
+#   support.yaml         # Support messages
+#   errors.yaml          # Error messages
 ```
 
 ## Migration from Hardcoded Messages

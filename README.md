@@ -111,8 +111,12 @@ uv run ruff format .         # Format code
 # Type checking
 pyright
 
-# Run all quality checks
+# Run all quality checks (includes documentation QA)
 uv run pre-commit run --all-files
+
+# Documentation quality assurance
+make docs-qa                 # Comprehensive documentation checks
+make docs-serve             # Local documentation server
 ```
 
 For detailed migration information from older tooling, see the [Migration Guide](docs/MIGRATION_GUIDE.md).

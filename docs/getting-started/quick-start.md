@@ -30,19 +30,19 @@ from lex_helper import SessionAttributes
 
 class MySessionAttributes(SessionAttributes):
     """Custom session attributes for our greeting bot."""
-    
+
     model_config = ConfigDict(extra="allow")
-    
+
     user_name: str = Field(
-        default="", 
+        default="",
         description="The user's name"
     )
     greeting_count: int = Field(
-        default=0, 
+        default=0,
         description="Number of times user has been greeted"
     )
     last_intent: str = Field(
-        default="", 
+        default="",
         description="The last intent that was triggered"
     )
 ```
@@ -70,22 +70,22 @@ from session_attributes import MySessionAttributes
 def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """
     Main Lambda handler for the greeting bot.
-    
+
     This function:
     1. Configures lex-helper with custom session attributes
     2. Sets the package name for intent discovery
     3. Delegates request handling to the appropriate intent
     """
-    
+
     # Configure lex-helper
     config = Config(
         session_attributes=MySessionAttributes(),
         package_name="intents"  # Where to find intent handlers
     )
-    
+
     # Initialize lex-helper
     lex_helper = LexHelper(config=config)
-    
+
     # Handle the request - lex-helper will automatically
     # route to the correct intent handler
     return lex_helper.handler(event, context)
@@ -115,26 +115,26 @@ from session_attributes import MySessionAttributes
 def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessionAttributes]:
     """
     Handle greeting intents like "Hello", "Hi", "Good morning".
-    
+
     This handler:
     1. Increments the greeting counter
     2. Personalizes the response if we know the user's name
     3. Returns a friendly greeting
     """
-    
+
     # Access session attributes with full type safety
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Increment greeting count
     session_attrs.greeting_count += 1
     session_attrs.last_intent = "GreetingIntent"
-    
+
     # Create personalized response
     if session_attrs.user_name:
         message = f"Hello again, {session_attrs.user_name}! This is greeting #{session_attrs.greeting_count}."
     else:
         message = f"Hello! Nice to meet you. This is greeting #{session_attrs.greeting_count}. What's your name?"
-    
+
     # Return response using dialog utilities
     return dialog.close(
         messages=[LexPlainText(content=message)],
@@ -145,7 +145,7 @@ def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessi
 
 !!! info "API Reference"
     - [`LexRequest`](../api/core.md#type-definitions) - Typed request object
-    - [`LexResponse`](../api/core.md#type-definitions) - Typed response object  
+    - [`LexResponse`](../api/core.md#type-definitions) - Typed response object
     - [`LexPlainText`](../api/core.md#type-definitions) - Plain text message type
     - [`dialog.close`](../api/core.md#lex_helper.core.dialog.close) - Close dialog with fulfillment
 
@@ -159,16 +159,16 @@ from session_attributes import MySessionAttributes
 def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessionAttributes]:
     """
     Handle intents that capture the user's name.
-    
+
     This handler:
     1. Extracts the name from the 'Name' slot
     2. Stores it in session attributes
     3. Provides a personalized response
     """
-    
+
     # Get the name from the slot
     name_slot = dialog.get_slot("Name", lex_request.sessionState.intent)
-    
+
     if not name_slot or not name_slot.value:
         # If no name provided, ask for it
         return dialog.elicit_slot(
@@ -176,15 +176,15 @@ def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessi
             messages=[LexPlainText(content="I'd love to know your name! What should I call you?")],
             lex_request=lex_request
         )
-    
+
     # Store the name in session attributes
     session_attrs = lex_request.sessionState.sessionAttributes
     session_attrs.user_name = name_slot.value.interpretedValue
     session_attrs.last_intent = "CaptureNameIntent"
-    
+
     # Respond with personalized greeting
     message = f"Nice to meet you, {session_attrs.user_name}! I'll remember your name for our conversation."
-    
+
     return dialog.close(
         messages=[LexPlainText(content=message)],
         lex_request=lex_request,

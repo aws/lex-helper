@@ -7,7 +7,7 @@ Welcome to the comprehensive API reference for lex-helper. This documentation is
 The lex-helper library is organized into several key modules, each serving a specific purpose in building Amazon Lex chatbots:
 
 - **[Core](core.md)** - Main handler classes, dialog utilities, and core functionality
-- **[Channels](channels.md)** - Channel-specific formatting for SMS, web, and voice interfaces  
+- **[Channels](channels.md)** - Channel-specific formatting for SMS, web, and voice interfaces
 - **[Formatters](formatters.md)** - Message formatting utilities and text processing helpers
 - **[Exceptions](exceptions.md)** - Custom exceptions and error handling utilities
 

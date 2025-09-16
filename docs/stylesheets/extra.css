@@ -455,28 +455,28 @@
     text-align: center;
     padding: 0.75rem;
   }
-  
+
   .hero-content h2 {
     font-size: 1rem;
   }
-  
+
   .hero-buttons {
     justify-content: center;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .quick-start-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .md-typeset {
     font-size: 0.75rem;
   }
@@ -691,12 +691,12 @@ body {
     max-width: none !important;
     margin: 0 !important;
   }
-  
+
   .md-content {
     margin-left: 12rem !important;
     margin-right: 10rem !important;
   }
-  
+
   .md-content__inner {
     padding: 0.75rem 1rem !important;
   }
@@ -707,7 +707,7 @@ body {
     margin-left: 12rem !important;
     margin-right: 0 !important;
   }
-  
+
   .md-content__inner {
     padding: 0.75rem 1rem !important;
   }
@@ -782,7 +782,7 @@ body {
   font-weight: 600;
   color: var(--md-code-fg-color);
 }
-/* 
+/*
 AGGRESSIVE PADDING REMOVAL - Override all content padding */
 .md-content__inner {
   padding-left: 0.5rem !important;
@@ -814,7 +814,7 @@ AGGRESSIVE PADDING REMOVAL - Override all content padding */
     margin-left: 12rem !important;
     margin-right: 10rem !important;
   }
-  
+
   .md-content__inner {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
@@ -826,7 +826,7 @@ AGGRESSIVE PADDING REMOVAL - Override all content padding */
     margin-left: 12rem !important;
     margin-right: 0 !important;
   }
-  
+
   .md-content__inner {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
@@ -838,7 +838,7 @@ AGGRESSIVE PADDING REMOVAL - Override all content padding */
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  
+
   .md-content__inner {
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;

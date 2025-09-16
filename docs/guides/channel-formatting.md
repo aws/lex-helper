@@ -40,7 +40,7 @@ def handle_booking_confirmation(lex_helper):
             ]
         )
     )
-    
+
     # This SAME code produces:
     # - Rich card with image and buttons on Lex web interface
     # - Text-only format on SMS: "Booking Confirmed! | Flight AA123 - NYC to LAX | Options: View Details, Modify, Cancel"
@@ -143,7 +143,7 @@ def handle_flight_status(lex_helper):
 def handle_flight_status(lex_helper):
     # DON'T DO THIS - violates the design principle
     channel = detect_channel_somehow(lex_helper.event)
-    
+
     if channel == "sms":
         return lex_helper.close(f"Flight {flight_number}: {status}")
     else:
@@ -197,7 +197,7 @@ Test your handlers without worrying about channels - the framework handles forma
 def test_booking_confirmation():
     # Test business logic, not channel formatting
     response = handle_booking_confirmation(mock_lex_helper)
-    
+
     # Verify the response structure
     assert isinstance(response.messages[0], LexImageResponseCard)
     assert "Booking Confirmed" in response.messages[0].imageResponseCard.title
@@ -213,10 +213,10 @@ from lex_helper.channels.channel_formatting import format_for_channel
 def test_sms_formatting():
     # Create a standard response
     response = create_test_response_with_image_card()
-    
+
     # Test SMS formatting
     sms_formatted = format_for_channel(response, "sms")
-    
+
     # Verify SMS-specific formatting
     assert isinstance(sms_formatted["messages"][0], dict)
     assert "Options:" in sms_formatted["messages"][0]["content"]
@@ -225,7 +225,7 @@ def test_lex_formatting():
     # Test Lex formatting preserves rich content
     response = create_test_response_with_image_card()
     lex_formatted = format_for_channel(response, "lex")
-    
+
     assert "imageResponseCard" in lex_formatted["messages"][0]
 ```
 
@@ -270,7 +270,7 @@ from lex_helper.core.types import LexBaseResponse, LexMessages, LexPlainText
 
 class SlackChannel(Channel):
     """Custom channel for Slack integration."""
-    
+
     def format_message(self, message: LexMessages) -> LexBaseResponse:
         if isinstance(message, LexPlainText):
             # Add Slack-specific formatting (e.g., markdown conversion)
@@ -279,10 +279,10 @@ class SlackChannel(Channel):
             content = content.replace("**", "*")
             return LexPlainText(content=content)
         return message
-    
+
     def format_messages(self, messages: list[LexMessages]) -> list[LexBaseResponse]:
         return [self.format_message(msg) for msg in messages]
-    
+
     def format_image_card(self, card: LexImageResponseCard) -> LexBaseResponse:
         # Convert to Slack block format
         slack_blocks = {
@@ -421,7 +421,7 @@ Always ensure your core message works on SMS, then enhance for richer channels:
 def handle_accessible_response(lex_helper):
     # Core message that works everywhere
     base_message = "Flight AA123 departs 3:30 PM Gate B12"
-    
+
     # Enhanced for rich channels
     card = LexImageResponseCard(
         imageResponseCard=ImageResponseCard(
@@ -434,7 +434,7 @@ def handle_accessible_response(lex_helper):
             ]
         )
     )
-    
+
     return lex_helper.close(card)
 ```
 
@@ -483,9 +483,9 @@ def test_sms_formatting():
     response = LexResponse(
         messages=[LexPlainText(content="Visit example.com/help")]
     )
-    
+
     formatted = format_for_channel(response, "sms")
-    
+
     # Verify SMS-specific formatting
     assert "https://example.com/help" in formatted["messages"][0]["content"]
 
@@ -493,9 +493,9 @@ def test_lex_formatting():
     response = LexResponse(
         messages=[LexImageResponseCard(...)]
     )
-    
+
     formatted = format_for_channel(response, "lex")
-    
+
     # Verify rich formatting is preserved
     assert "imageResponseCard" in formatted["messages"][0]
 ```
@@ -540,7 +540,7 @@ def debug_channel_formatting(lex_helper):
     # Log the detected channel
     channel = lex_helper.event.get("inputMode", "text")
     lex_helper.logger.info(f"Detected channel: {channel}")
-    
+
     # Test formatting for specific channel
     test_response = format_for_channel(response, channel)
     lex_helper.logger.info(f"Formatted response: {test_response}")
@@ -556,7 +556,7 @@ from lex_helper.core.types import LexBaseResponse, LexMessages, LexPlainText
 
 class SlackChannel(Channel):
     """Custom channel for Slack integration."""
-    
+
     def format_message(self, message: LexMessages) -> LexBaseResponse:
         if isinstance(message, LexPlainText):
             # Add Slack-specific formatting
@@ -566,7 +566,7 @@ class SlackChannel(Channel):
                 content = content.replace("**", "*")  # Bold formatting
             return LexPlainText(content=content)
         return message
-    
+
     def format_messages(self, messages: list[LexMessages]) -> list[LexBaseResponse]:
         return [self.format_message(msg) for msg in messages]
 ```

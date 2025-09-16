@@ -18,7 +18,7 @@ graph TD
     H --> I[Response Formatting]
     I --> J[Channel Formatting]
     J --> K[Lambda Response]
-    
+
     F --> L[Exception Handler]
     L --> I
 ```
@@ -72,8 +72,8 @@ The handler resolution system dynamically loads intent handlers based on naming 
 #### File-Based Handler Discovery
 ```python
 def call_handler_for_file(
-    intent_name: str, 
-    lex_request: LexRequest[T], 
+    intent_name: str,
+    lex_request: LexRequest[T],
     package_name: str | None
 ) -> LexResponse[T]:
     """Dynamically import and call handler for intent."""
@@ -199,7 +199,7 @@ class LexHelper[T: SessionAttributes]:
     def __init__(self, config: Config[T]):
         self.config = config
         self._initialize_components()
-    
+
     def handler(self, event: dict[str, Any], context: Any) -> dict[str, Any]:
         """Main entry point for Lambda requests."""
         return self._process_request(event, context)
@@ -264,8 +264,8 @@ class BedrockInvocationError(LexHelperException):
 #### Error Handler Chain
 ```python
 def handle_exceptions(
-    exception: Exception, 
-    lex_request: LexRequest[T], 
+    exception: Exception,
+    lex_request: LexRequest[T],
     error_message: str | None = None
 ) -> LexResponse[T]:
     """Convert exceptions to user-friendly responses."""

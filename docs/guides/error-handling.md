@@ -99,7 +99,7 @@ When enabled, lex-helper automatically:
 def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessionAttributes]:
     # This will be automatically caught if it fails
     result = external_api_call()
-    
+
     # If an exception occurs, user sees the configured error_message
     # instead of a technical stack trace
     return process_result(result)
@@ -135,15 +135,15 @@ from lex_helper.exceptions import handle_exceptions
 def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessionAttributes]:
     try:
         return process_booking_request(lex_request)
-        
+
     except FlightNotFoundError as e:
         # Handle specific error with custom message
         return handle_exceptions(
-            e, 
-            lex_request, 
+            e,
+            lex_request,
             error_message="I couldn't find flights for those dates. Let's try different dates."
         )
-        
+
     except PaymentError as e:
         # Handle payment errors differently
         return handle_exceptions(
@@ -151,7 +151,7 @@ def handler(lex_request: LexRequest[MySessionAttributes]) -> LexResponse[MySessi
             lex_request,
             error_message="There was an issue processing your payment. Please check your payment method."
         )
-        
+
     except Exception as e:
         # Catch-all for unexpected errors
         return handle_exceptions(e, lex_request)
@@ -184,25 +184,25 @@ from typing import Optional
 
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Track retry attempts
     retry_count = getattr(session_attrs, 'api_retry_count', 0)
-    
+
     try:
         result = call_external_api()
-        
+
         # Reset retry count on success
         session_attrs.api_retry_count = 0
         return process_successful_result(result, lex_request)
-        
+
     except ExternalServiceError as e:
         if retry_count < 3:
             # Increment retry count and try again
             session_attrs.api_retry_count = retry_count + 1
-            
+
             # Exponential backoff
             time.sleep(2 ** retry_count)
-            
+
             return dialog.elicit_intent(
                 messages=[LexPlainText(content="Let me try that again...")],
                 lex_request=lex_request
@@ -226,7 +226,7 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
     try:
         # Try primary booking flow
         return book_flight_online(lex_request)
-        
+
     except ExternalServiceError:
         # Fall back to offline booking
         return offer_offline_booking(lex_request)
@@ -234,14 +234,14 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
 def offer_offline_booking(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     """Offer alternative when online booking fails."""
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Store user's request for later processing
     session_attrs.offline_booking_request = {
         "departure": session_attrs.departure_city,
         "arrival": session_attrs.arrival_city,
         "date": session_attrs.travel_date
     }
-    
+
     return dialog.close(
         messages=[
             LexPlainText(
@@ -260,15 +260,15 @@ Maintain conversation context even when errors occur:
 ```python
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     try:
         return process_payment(lex_request)
-        
+
     except PaymentError as e:
         # Preserve booking details even when payment fails
         session_attrs.payment_failed = True
         session_attrs.payment_error_reason = str(e)
-        
+
         # Offer alternative payment methods
         return dialog.elicit_slot(
             slot_to_elicit="PaymentMethod",
@@ -301,10 +301,10 @@ def validate_email(email: str) -> tuple[bool, str]:
     """Validate email format."""
     if not email:
         return False, "Please provide an email address."
-    
+
     if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
         return False, "Please provide a valid email address like user@example.com."
-    
+
     return True, ""
 
 def validate_travel_date(date_str: str) -> tuple[bool, str]:
@@ -312,21 +312,21 @@ def validate_travel_date(date_str: str) -> tuple[bool, str]:
     try:
         travel_date = datetime.fromisoformat(date_str)
         now = datetime.now()
-        
+
         if travel_date < now:
             return False, "Travel date cannot be in the past. When would you like to travel?"
-        
+
         if travel_date > now + timedelta(days=365):
             return False, "We can only book flights up to one year in advance."
-        
+
         return True, ""
-        
+
     except ValueError:
         return False, "I didn't understand that date. Please use a format like 'March 15' or '2024-03-15'."
 
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     intent = lex_request.sessionState.intent
-    
+
     # Validate email if provided
     email = dialog.get_slot("Email", intent)
     if email:
@@ -339,7 +339,7 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
                 messages=[LexPlainText(content=error_message)],
                 lex_request=lex_request
             )
-    
+
     # Continue with valid input
     return process_booking(lex_request)
 ```
@@ -354,20 +354,20 @@ from pydantic import ValidationError
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     try:
         session_attrs = lex_request.sessionState.sessionAttributes
-        
+
         # This might trigger Pydantic validation
         session_attrs.passenger_count = int(user_input)
         session_attrs.email = user_email
-        
+
         return continue_booking_flow(lex_request)
-        
+
     except ValidationError as e:
         # Convert Pydantic errors to user-friendly messages
         error_messages = []
         for error in e.errors():
             field = error['loc'][0] if error['loc'] else 'input'
             message = error['msg']
-            
+
             # Customize messages for better UX
             if 'email' in field.lower():
                 error_messages.append("Please provide a valid email address.")
@@ -375,7 +375,7 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
                 error_messages.append("Passenger count must be between 1 and 9.")
             else:
                 error_messages.append(f"{field}: {message}")
-        
+
         return dialog.elicit_intent(
             messages=[LexPlainText(content=f"Please correct: {', '.join(error_messages)}")],
             lex_request=lex_request
@@ -404,7 +404,7 @@ logger = logging.getLogger(__name__)
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     session_id = lex_request.sessionId
     intent_name = lex_request.sessionState.intent.name
-    
+
     try:
         logger.info(
             "Processing intent",
@@ -414,9 +414,9 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
                 "user_input": lex_request.inputTranscript
             }
         )
-        
+
         result = process_booking_request(lex_request)
-        
+
         logger.info(
             "Intent processed successfully",
             extra={
@@ -425,9 +425,9 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
                 "response_type": result.sessionState.dialogAction.type
             }
         )
-        
+
         return result
-        
+
     except Exception as e:
         logger.error(
             "Intent processing failed",
@@ -440,7 +440,7 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
             },
             exc_info=True
         )
-        
+
         return handle_exceptions(e, lex_request)
 ```
 
@@ -478,18 +478,18 @@ def log_error_metric(error_type: str, intent_name: str):
 
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     intent_name = lex_request.sessionState.intent.name
-    
+
     try:
         return process_booking_request(lex_request)
-        
+
     except ValidationError as e:
         log_error_metric("ValidationError", intent_name)
         return handle_exceptions(e, lex_request)
-        
+
     except ExternalServiceError as e:
         log_error_metric("ExternalServiceError", intent_name)
         return handle_exceptions(e, lex_request)
-        
+
     except Exception as e:
         log_error_metric("UnexpectedError", intent_name)
         return handle_exceptions(e, lex_request)
@@ -510,10 +510,10 @@ def test_handler_validates_email():
     """Test that handler validates email input."""
     # Arrange
     lex_request = create_test_request(slots={"Email": {"value": {"interpretedValue": "invalid-email"}}})
-    
+
     # Act
     response = handler(lex_request)
-    
+
     # Assert
     assert response.sessionState.dialogAction.type == "ElicitSlot"
     assert response.sessionState.dialogAction.slotToElicit == "Email"
@@ -523,14 +523,14 @@ def test_handler_retries_on_service_error():
     """Test that handler retries on external service errors."""
     # Arrange
     lex_request = create_test_request()
-    
+
     with patch('my_chatbot.intents.book_flight.call_external_api') as mock_api:
         # First call fails, second succeeds
         mock_api.side_effect = [ExternalServiceError("API", "Timeout"), {"success": True}]
-        
+
         # Act
         response = handler(lex_request)
-        
+
         # Assert
         assert mock_api.call_count == 2
         assert response.sessionState.dialogAction.type == "Close"
@@ -540,13 +540,13 @@ def test_handler_handles_max_retries():
     # Arrange
     lex_request = create_test_request()
     lex_request.sessionState.sessionAttributes.api_retry_count = 3
-    
+
     with patch('my_chatbot.intents.book_flight.call_external_api') as mock_api:
         mock_api.side_effect = ExternalServiceError("API", "Persistent failure")
-        
+
         # Act
         response = handler(lex_request)
-        
+
         # Assert
         assert "try again later" in response.messages[0].content.lower()
         assert response.sessionState.sessionAttributes.api_retry_count == 0
@@ -562,11 +562,11 @@ def test_error_handling_integration():
     # Create realistic error scenario
     with patch('requests.get') as mock_get:
         mock_get.side_effect = requests.exceptions.Timeout()
-        
+
         # Process request
         event = load_test_event('book_flight_complete.json')
         response = lambda_handler(event, {})
-        
+
         # Verify graceful error handling
         assert response['sessionState']['dialogAction']['type'] == 'Close'
         assert 'try again' in response['messages'][0]['content']
@@ -594,7 +594,7 @@ Don't lose user progress when errors occur:
 ```python
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     try:
         return complete_booking(lex_request)
     except PaymentError:
@@ -647,7 +647,7 @@ def test_all_error_paths():
         (ExternalServiceError("API", "Timeout"), "try again"),
         (PaymentError("Card declined"), "payment method")
     ]
-    
+
     for error, expected_message in test_cases:
         with patch('handler.process_request', side_effect=error):
             response = handler(create_test_request())
@@ -676,14 +676,14 @@ class CircuitBreaker:
         self.failure_count = 0
         self.last_failure_time = None
         self.state = CircuitState.CLOSED
-    
+
     def call(self, func, *args, **kwargs):
         if self.state == CircuitState.OPEN:
             if self._should_attempt_reset():
                 self.state = CircuitState.HALF_OPEN
             else:
                 raise ExternalServiceError("Circuit breaker", "Service unavailable")
-        
+
         try:
             result = func(*args, **kwargs)
             self._on_success()
@@ -691,21 +691,21 @@ class CircuitBreaker:
         except Exception as e:
             self._on_failure()
             raise e
-    
+
     def _should_attempt_reset(self) -> bool:
         return (
             self.last_failure_time and
             datetime.now() - self.last_failure_time > timedelta(seconds=self.timeout)
         )
-    
+
     def _on_success(self):
         self.failure_count = 0
         self.state = CircuitState.CLOSED
-    
+
     def _on_failure(self):
         self.failure_count += 1
         self.last_failure_time = datetime.now()
-        
+
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitState.OPEN
 
@@ -716,7 +716,7 @@ def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[Bo
     try:
         flights = flight_api_circuit.call(search_flights, departure, arrival, date)
         return present_flight_options(flights, lex_request)
-        
+
     except ExternalServiceError:
         return offer_callback_booking(lex_request)
 ```
@@ -728,38 +728,38 @@ Implement sophisticated error recovery:
 ```python
 def handler(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     session_attrs = lex_request.sessionState.sessionAttributes
-    
+
     # Check if we're in error recovery mode
     if session_attrs.error_recovery_active:
         return handle_error_recovery(lex_request)
-    
+
     try:
         return normal_booking_flow(lex_request)
-        
+
     except Exception as e:
         # Enter error recovery mode
         session_attrs.error_recovery_active = True
         session_attrs.original_error = str(e)
         session_attrs.recovery_options = determine_recovery_options(e)
-        
+
         return present_recovery_options(lex_request)
 
 def handle_error_recovery(lex_request: LexRequest[BookingSessionAttributes]) -> LexResponse[BookingSessionAttributes]:
     """Handle user's choice of recovery option."""
     session_attrs = lex_request.sessionState.sessionAttributes
     intent = lex_request.sessionState.intent
-    
+
     recovery_choice = dialog.get_slot("RecoveryChoice", intent)
-    
+
     if recovery_choice == "retry":
         # Clear error state and retry
         session_attrs.error_recovery_active = False
         return normal_booking_flow(lex_request)
-        
+
     elif recovery_choice == "alternative":
         # Offer alternative booking method
         return offer_phone_booking(lex_request)
-        
+
     elif recovery_choice == "later":
         # Save progress and exit gracefully
         return save_progress_and_exit(lex_request)
