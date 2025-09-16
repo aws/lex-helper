@@ -345,7 +345,6 @@ Disambiguation responses include both text and interactive buttons:
 ```
 
 **Note**: Button values use human-readable display names (e.g., "Track Baggage") rather than technical intent names (e.g., "TrackBaggage"). This ensures that when users click buttons, they see natural language as their input, creating a more conversational experience.
-```
 
 ## Examples
 

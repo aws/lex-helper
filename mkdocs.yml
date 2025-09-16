@@ -1,2 +1,197 @@
-site_name: Lex-Helper Docs
-site_url: https://lex-helper.aws.github.io
+site_name: Lex-Helper Developer Guide
+site_url: https://aws.github.io/lex-helper
+repo_url: https://github.com/aws/lex-helper
+repo_name: aws/Lex-Helper
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: blue grey
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: blue grey
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.path
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - toc.follow
+    - toc.integrate
+  icon:
+    repo: fontawesome/brands/github
+  logo: https://docs.aws.amazon.com/assets/r/images/aws_logo_light.svg
+  favicon: https://docs.aws.amazon.com/assets/r/images/aws_logo_light.svg
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_source: true
+            show_root_heading: true
+            show_root_toc_entry: false
+            show_signature_annotations: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            separate_signature: true
+            unwrap_annotated: true
+            filters: ["!^_"]
+            members_order: source
+            group_by_category: true
+            show_category_heading: true
+            show_if_no_docstring: false
+            inherited_members: true
+            show_inheritance_diagram: false
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: aws
+      repo: lex-helper
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/mkdocs.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/aws/lex-helper
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/lex-helper/
+    - icon: fontawesome/brands/aws
+      link: https://aws.amazon.com/lex/
+  version:
+    provider: mike
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+    - Your First Chatbot: getting-started/first-chatbot.md
+  - Guides:
+    - Core Concepts: guides/core-concepts.md
+    - Session Attributes: guides/session-attributes.md
+    - Intent Handling: guides/intent-handling.md
+    - Smart Disambiguation: guides/smart-disambiguation.md
+    - Bedrock Integration: guides/bedrock-integration.md
+    - Channel Formatting: guides/channel-formatting.md
+    - Message Management: guides/message-management.md
+    - Error Handling: guides/error-handling.md
+  - Tutorials:
+    - Basic Chatbot: tutorials/basic-chatbot.md
+    - Airline Bot Walkthrough: tutorials/airline-bot.md
+    - Multi-language Support: tutorials/multi-language.md
+    - Production Deployment: tutorials/production-deployment.md
+  - API Reference:
+    - Overview: api/index.md
+    - Core: api/core.md
+    - Channels: api/channels.md
+    - Formatters: api/formatters.md
+    - Exceptions: api/exceptions.md
+  - Examples:
+    - Overview: examples/index.md
+    - Basic Patterns: examples/basic-patterns.md
+    - Advanced Patterns: examples/advanced-patterns.md
+    - AWS Integrations: examples/integration-examples.md
+  - Advanced:
+    - Architecture: advanced/architecture.md
+    - Performance: advanced/performance.md
+    - Testing: advanced/testing.md
+    - Extending: advanced/extending.md
+    - Troubleshooting: advanced/troubleshooting.md
+  - Migration:
+    - From Raw Lex: migration/from-raw-lex.md
+    - Version Upgrades: migration/version-upgrades.md
+    - Breaking Changes: migration/breaking-changes.md
+  - Community:
+    - Contributing: community/contributing.md
+    - Support: community/support.md
+    - Changelog: community/changelog.md
+  - Legacy:
+    - Smart Disambiguation (Old): smart-disambiguation.md
+    - Development:
+      - Best Practices: BEST_PRACTICES.md
+      - Development Guide: DEVELOPMENT.md
+      - Testing Guide: TESTING_GUIDE.md
+      - Lambda Layer Deployment: LAMBDA_LAYER_DEPLOYMENT.md
+    - Support:
+      - Support: SUPPORT.md
+      - Security: SECURITY.md

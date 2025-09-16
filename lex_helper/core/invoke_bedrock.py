@@ -167,7 +167,11 @@ def invoke_bedrock_simple_converse(
         prompt: Single user prompt
         model_id: Bedrock model identifier
         system_prompt: System prompt for conversation
-        (other args same as invoke_bedrock_converse)
+        max_tokens: Maximum tokens to generate
+        temperature: Sampling temperature
+        top_p: Top-p sampling parameter
+        region_name: AWS region name
+        **kwargs: Additional arguments passed to invoke_bedrock_converse
 
     Returns:
         Dict with text, usage, raw_response

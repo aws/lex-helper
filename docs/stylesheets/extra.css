@@ -1,0 +1,920 @@
+/* AWS-style documentation theme for Lex-Helper */
+
+/* AWS Color Variables */
+:root {
+  --aws-orange: #FF9900;
+  --aws-orange-dark: #E88B00;
+  --aws-orange-light: #FFB84D;
+  --aws-blue: #232F3E;
+  --aws-blue-light: #37475A;
+  --aws-gray: #F2F3F3;
+  --aws-gray-dark: #EAEDED;
+  --aws-text: #16191F;
+  --aws-text-light: #5A6C7D;
+}
+
+/* Override Material Design colors with AWS colors */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: var(--aws-blue);
+  --md-primary-fg-color--light: var(--aws-blue-light);
+  --md-primary-fg-color--dark: var(--aws-blue);
+  --md-accent-fg-color: var(--aws-orange);
+  --md-typeset-a-color: var(--aws-orange);
+}
+
+/* AWS-style header - clean and minimal with subtle branding */
+.md-header {
+  background: white;
+  color: var(--aws-blue);
+  border-bottom: 1px solid var(--aws-gray-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: 3rem;
+}
+
+.md-header__title {
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--aws-blue);
+}
+
+.md-header__button {
+  color: var(--aws-blue);
+}
+
+.md-header__source {
+  width: auto;
+}
+
+/* AWS-style search */
+.md-search__form {
+  background: var(--aws-gray);
+  border-radius: 4px;
+}
+
+.md-search__input {
+  background: transparent;
+  color: var(--aws-text);
+}
+
+.md-search__input::placeholder {
+  color: var(--aws-text-light);
+}
+
+/* AWS-style navigation - polished with better states */
+.md-nav--primary .md-nav__title {
+  background: var(--aws-gray);
+  color: var(--aws-blue);
+  font-weight: 500;
+  font-size: 0.8rem !important;
+  padding: 0.5rem 0.75rem !important;
+  border-bottom: 1px solid var(--aws-gray-dark);
+}
+
+.md-nav--primary .md-nav__item--active > .md-nav__link {
+  color: var(--aws-orange);
+  font-weight: 500;
+  background: rgba(255, 153, 0, 0.1);
+  border-right: 3px solid var(--aws-orange);
+}
+
+.md-nav--primary .md-nav__link {
+  font-size: 0.8rem !important;
+  padding: 0.4rem 0.75rem !important;
+  transition: all 0.2s ease;
+  border-radius: 0 4px 4px 0;
+  margin-right: 0.25rem;
+}
+
+.md-nav__link:hover {
+  color: var(--aws-orange);
+  background: rgba(255, 153, 0, 0.05);
+}
+
+/* Breadcrumb styling */
+.md-path {
+  color: var(--aws-text-light);
+  font-size: 0.8rem;
+}
+
+.md-path__item {
+  color: var(--aws-text-light);
+}
+
+.md-path__item:hover {
+  color: var(--aws-orange);
+}
+
+/* Compact navigation sections */
+.md-nav__item--nested > .md-nav__link {
+  font-weight: 500;
+}
+
+.md-nav__item--section > .md-nav__link {
+  font-size: 0.8rem !important;
+  font-weight: 500;
+}
+
+/* AWS-style buttons - ultra-compact */
+.md-button {
+  background: var(--aws-orange);
+  border-color: var(--aws-orange);
+  color: white;
+  font-weight: 400;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  border: 1px solid var(--aws-orange);
+  min-height: auto;
+}
+
+.md-button:hover {
+  background: var(--aws-orange-dark);
+  border-color: var(--aws-orange-dark);
+  box-shadow: 0 1px 3px rgba(255, 153, 0, 0.2);
+}
+
+.md-button:focus {
+  outline: 1px solid var(--aws-orange-light);
+  outline-offset: 1px;
+}
+
+.md-button--primary {
+  background: var(--aws-orange);
+  border-color: var(--aws-orange);
+}
+
+/* Secondary button style */
+.md-button:not(.md-button--primary) {
+  background: transparent;
+  color: var(--aws-orange);
+  border: 1px solid var(--aws-orange);
+}
+
+.md-button:not(.md-button--primary):hover {
+  background: var(--aws-orange);
+  color: white;
+}
+
+/* AWS-style typography - ultra-compact like real AWS docs */
+.md-typeset {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.md-typeset h1 {
+  color: var(--aws-blue);
+  font-weight: 600;
+  font-size: 1.25rem;
+  border-bottom: 1px solid var(--aws-gray-dark);
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+}
+
+.md-typeset h2 {
+  color: var(--aws-blue);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.md-typeset h3 {
+  color: var(--aws-blue-light);
+  font-weight: 500;
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.md-typeset h4 {
+  color: var(--aws-blue-light);
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.md-typeset p {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--aws-text);
+  margin-bottom: 0.75rem;
+}
+
+.md-typeset ul,
+.md-typeset ol {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.md-typeset li {
+  margin-bottom: 0.25rem;
+}
+
+/* Remove default margins from main heading */
+.md-content h1:first-child {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* AWS-style Homepage Hero Section - ultra-compact */
+.hero-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin: 0 0 1rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+  border-radius: 4px;
+  border: 1px solid var(--aws-gray-dark);
+}
+
+.hero-content h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  color: var(--aws-blue);
+}
+
+.hero-content p {
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+  color: var(--aws-text-light);
+  line-height: 1.4;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.hero-code {
+  background: white;
+  border-radius: 4px;
+  padding: 0.75rem;
+  border: 1px solid var(--aws-gray-dark);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: 0.75rem;
+}
+
+/* AWS-style Features Grid - ultra-compact */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.feature-card {
+  background: white;
+  border: 1px solid var(--aws-gray-dark);
+  border-radius: 4px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border-color: var(--aws-orange-light);
+}
+
+.feature-card h3 {
+  color: var(--aws-blue);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.feature-card p {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--aws-text);
+  margin-bottom: 0.5rem;
+}
+
+.feature-card h3 .md-icon {
+  color: var(--aws-orange);
+}
+
+.feature-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border: 1px solid var(--aws-gray-dark);
+}
+
+/* AWS-style Social Proof Section */
+.social-proof {
+  background: white;
+  border: 1px solid var(--aws-gray-dark);
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 3rem 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.stat-item {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--aws-blue);
+  padding: 1rem;
+  background: var(--aws-gray);
+  border-radius: 4px;
+}
+
+.badges {
+  margin-top: 2rem;
+}
+
+.badges img {
+  margin: 0 0.25rem;
+}
+
+/* AWS-style Quick Start Grid */
+.quick-start-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 3rem 0;
+}
+
+.path-card {
+  background: white;
+  border: 1px solid var(--aws-gray-dark);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.path-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-color: var(--aws-orange);
+}
+
+.path-card h3 {
+  color: var(--aws-blue);
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.path-card h3 .md-icon {
+  color: var(--aws-orange);
+}
+
+.path-card a {
+  color: var(--aws-orange);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.path-card a:hover {
+  text-decoration: underline;
+  color: var(--aws-orange-dark);
+}
+
+/* AWS-style Included Features Section */
+.included-features {
+  background: white;
+  border: 1px solid var(--aws-gray-dark);
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 3rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.included-features h4 {
+  color: var(--aws-blue);
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.included-features ul {
+  margin-bottom: 2rem;
+}
+
+.included-features li {
+  color: var(--aws-text);
+  line-height: 1.6;
+}
+
+/* AWS-style Get Started Footer */
+.get-started-footer {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--aws-orange) 0%, var(--aws-orange-dark) 100%);
+  border-radius: 8px;
+  margin: 3rem 0;
+  color: white;
+}
+
+.get-started-footer a {
+  color: white !important;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent !important;
+}
+
+.get-started-footer a:hover {
+  text-decoration: underline;
+  border-bottom-color: white !important;
+}
+
+/* Mobile Responsiveness - ultra-compact */
+@media screen and (max-width: 768px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    text-align: center;
+    padding: 0.75rem;
+  }
+  
+  .hero-content h2 {
+    font-size: 1rem;
+  }
+  
+  .hero-buttons {
+    justify-content: center;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .quick-start-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .md-typeset {
+    font-size: 0.75rem;
+  }
+}
+
+/* AWS-style code blocks - ultra-compact */
+.highlight pre {
+  border-radius: 3px;
+  border: 1px solid var(--aws-gray-dark);
+  background: #F8F9FA;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.md-typeset .codehilite {
+  border-radius: 3px;
+  border: 1px solid var(--aws-gray-dark);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin: 0.5rem 0;
+}
+
+/* AWS-style code inline */
+.md-typeset code {
+  background: var(--aws-gray);
+  color: var(--aws-blue);
+  border-radius: 2px;
+  padding: 0.1em 0.3em;
+  font-size: 0.7em;
+  border: 1px solid var(--aws-gray-dark);
+}
+
+/* Code copy button styling */
+.md-clipboard {
+  color: var(--aws-text-light);
+  background: white;
+  border: 1px solid var(--aws-gray-dark);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.md-clipboard:hover {
+  color: var(--aws-orange);
+  background: var(--aws-gray);
+  border-color: var(--aws-orange);
+}
+
+/* Better spacing for API documentation */
+.doc-contents {
+  margin-bottom: 2rem;
+}
+
+/* AWS-style admonitions */
+.admonition {
+  margin: 1.5625em 0;
+  border-radius: 8px;
+  border-left: 4px solid var(--aws-orange);
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admonition-title {
+  background: var(--aws-gray);
+  color: var(--aws-blue);
+  font-weight: 600;
+}
+
+/* AWS-style table styling */
+.md-typeset table:not([class]) {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--aws-gray-dark);
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.md-typeset table th {
+  background: var(--aws-gray);
+  color: var(--aws-blue);
+  font-weight: 600;
+}
+
+.md-typeset table td {
+  border-bottom: 1px solid var(--aws-gray-dark);
+}
+
+/* AWS-style sidebar navigation - ultra-compact */
+.md-nav__title {
+  font-weight: 400;
+  font-size: 0.7rem !important;
+  padding: 0.25rem 0.5rem !important;
+}
+
+.md-nav__item {
+  font-size: 0.7rem;
+}
+
+.md-nav__link {
+  font-size: 0.7rem !important;
+  padding: 0.2rem 0.5rem !important;
+  line-height: 1.3;
+}
+
+.md-nav--secondary .md-nav__link {
+  font-size: 0.65rem !important;
+  padding: 0.15rem 0.5rem !important;
+}
+
+/* Make navigation sections more compact */
+.md-nav__list {
+  padding: 0;
+}
+
+.md-nav__item {
+  margin: 0;
+}
+
+/* Aggressive padding reduction for AWS-style compact layout */
+.md-container {
+  max-width: none !important;
+}
+
+.md-main {
+  flex-grow: 1;
+}
+
+.md-main__inner {
+  margin-top: 0 !important;
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+.md-content {
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+.md-content__inner {
+  margin: 0 !important;
+  padding: 0.75rem 1rem !important;
+  max-width: none !important;
+}
+
+.md-sidebar {
+  width: 12rem !important;
+}
+
+.md-sidebar--primary {
+  left: 0;
+}
+
+.md-sidebar--secondary {
+  right: 0;
+  width: 10rem !important;
+}
+
+/* Remove default Material Design constraints */
+.md-grid {
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+/* AWS-style page background */
+body {
+  background: #FAFBFC;
+}
+
+.md-main {
+  background: white;
+  border-left: 1px solid var(--aws-gray-dark);
+  border-right: 1px solid var(--aws-gray-dark);
+}
+
+/* AWS-style footer */
+.md-footer {
+  background: var(--aws-blue);
+  color: white;
+}
+
+.md-footer__title {
+  background: var(--aws-blue);
+  color: white;
+}
+
+.md-footer__direction {
+  color: var(--aws-gray);
+}
+
+/* Subtle scroll indicators */
+.md-sidebar__scrollwrap::-webkit-scrollbar {
+  width: 4px;
+}
+
+.md-sidebar__scrollwrap::-webkit-scrollbar-thumb {
+  background: var(--aws-gray-dark);
+  border-radius: 2px;
+}
+
+.md-sidebar__scrollwrap::-webkit-scrollbar-thumb:hover {
+  background: var(--aws-orange);
+}
+
+/* Improve search results */
+.md-search-result__teaser {
+  color: var(--md-default-fg-color--light);
+}
+
+/* Full-width layout with minimal margins */
+@media screen and (min-width: 76.25em) {
+  .md-main__inner {
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  
+  .md-content {
+    margin-left: 12rem !important;
+    margin-right: 10rem !important;
+  }
+  
+  .md-content__inner {
+    padding: 0.75rem 1rem !important;
+  }
+}
+
+@media screen and (min-width: 60em) and (max-width: 76.1875em) {
+  .md-content {
+    margin-left: 12rem !important;
+    margin-right: 0 !important;
+  }
+  
+  .md-content__inner {
+    padding: 0.75rem 1rem !important;
+  }
+}
+
+@media screen and (max-width: 59.9375em) {
+  .md-content__inner {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Enhanced transitions and micro-interactions */
+* {
+  scroll-behavior: smooth;
+}
+
+.md-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus improvements for accessibility */
+.md-nav__link:focus,
+.md-typeset a:focus {
+  outline: 2px solid var(--aws-orange);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Improved link styling */
+.md-typeset a {
+  color: var(--aws-orange);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.md-typeset a:hover {
+  border-bottom-color: var(--aws-orange);
+}
+
+/* Improve mobile navigation */
+@media screen and (max-width: 76.1875em) {
+  .md-nav--primary .md-nav__title {
+    background-color: var(--md-primary-fg-color);
+  }
+}
+
+/* Custom styling for API documentation sections */
+.doc-heading {
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Improve parameter lists in API docs */
+.doc-contents .field-list {
+  margin: 1rem 0;
+}
+
+.doc-contents .field-list .field-name {
+  font-weight: 600;
+  color: var(--md-code-fg-color);
+}
+/* 
+AGGRESSIVE PADDING REMOVAL - Override all content padding */
+.md-content__inner {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.md-content {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 12rem !important;
+  margin-right: 10rem !important;
+}
+
+.md-main__inner {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.md-container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Responsive padding fixes */
+@media screen and (min-width: 76.25em) {
+  .md-content {
+    margin-left: 12rem !important;
+    margin-right: 10rem !important;
+  }
+  
+  .md-content__inner {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+@media screen and (min-width: 60em) and (max-width: 76.1875em) {
+  .md-content {
+    margin-left: 12rem !important;
+    margin-right: 0 !important;
+  }
+  
+  .md-content__inner {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+@media screen and (max-width: 59.9375em) {
+  .md-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  .md-content__inner {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+}/* AWS
+ Logo styling */
+.md-header__button.md-logo {
+  padding: 0.2rem;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.5rem;
+  width: auto;
+  filter: none;
+}
+
+/* Ensure logo displays properly in both light and dark modes */
+[data-md-color-scheme="default"] .md-header__button.md-logo img,
+[data-md-color-scheme="default"] .md-header__button.md-logo svg {
+  filter: brightness(0) saturate(100%) invert(15%) sepia(15%) saturate(1158%) hue-rotate(177deg) brightness(96%) contrast(89%);
+}
+
+[data-md-color-scheme="slate"] .md-header__button.md-logo img,
+[data-md-color-scheme="slate"] .md-header__button.md-logo svg {
+  filter: none;
+}/* Fix AWS
+ Logo - Remove all filters to preserve original colors */
+.md-logo img,
+.md-logo svg,
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  filter: none !important;
+  height: 1.5rem;
+  width: auto;
+}
+
+/* Override Material Design theme filters */
+[data-md-color-scheme="default"] .md-logo img,
+[data-md-color-scheme="default"] .md-logo svg,
+[data-md-color-scheme="slate"] .md-logo img,
+[data-md-color-scheme="slate"] .md-logo svg {
+  filter: none !important;
+}/* Fix he
+ader vertical alignment */
+.md-header__inner {
+  display: flex;
+  align-items: center;
+  height: 3rem;
+}
+
+.md-header__button.md-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem;
+  margin-right: 0.5rem;
+}
+
+.md-header__title {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  line-height: 1;
+  margin: 0;
+}
+
+.md-header__ellipsis {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Ensure all header buttons are vertically centered */
+.md-header__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

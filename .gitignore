@@ -1,3 +1,9 @@
+# Kiro
+.kiro/
+
+# Mkdocs
+site/
+
 # Python
 __pycache__/
 *.pyc
