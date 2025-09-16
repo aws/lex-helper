@@ -1,6 +1,6 @@
 # Support
 
-For support information, please see the [Support section in our README](README.md#support).
+For support information, please see the [Support section](community/support.md).
 ## Getting Help
 
 ### For Issues
@@ -10,4 +10,4 @@ For support information, please see the [Support section in our README](README.m
 
 ### For Development Questions
 - Review the [Contributing Guide](CONTRIBUTING.md)
-- Check the development setup instructions in the [README](README.md#development)
+- Check the development setup instructions in the [Contributing Guide](community/contributing.md)

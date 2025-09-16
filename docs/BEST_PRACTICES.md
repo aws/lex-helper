@@ -1,6 +1,6 @@
 # Lex Helper Library - Best Practices Guide
 
-This guide covers detailed usage patterns and best practices for the Lex Helper library. For basic installation and setup, see [README.md](../README.md).
+This guide covers detailed usage patterns and best practices for the Lex Helper library. For basic installation and setup, see [Installation Guide](getting-started/installation.md).
 
 ## Environment Variables
 

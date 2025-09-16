@@ -8,7 +8,7 @@ This guide covers creating and deploying a Lambda layer containing the lex-helpe
 
 - Python 3.12+ installed locally
 - AWS CLI configured with appropriate permissions
-- lex-helper library (see [README.md](../README.md) for installation)
+- lex-helper library (see [Installation Guide](getting-started/installation.md) for installation)
 - Poetry installed (for Method 2): `pip install poetry`
 
 ## Method 1: Using pip install (Recommended)

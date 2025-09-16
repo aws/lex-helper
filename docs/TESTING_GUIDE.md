@@ -1,6 +1,6 @@
 # Testing Guide for Lex Helper Library
 
-This guide covers comprehensive testing strategies for Lex bots built with the Lex Helper library. For basic setup and usage, see [README.md](../README.md) and [BEST_PRACTICES.md](BEST_PRACTICES.md).
+This guide covers comprehensive testing strategies for Lex bots built with the Lex Helper library. For basic setup and usage, see [Installation Guide](getting-started/installation.md) and [Best Practices](BEST_PRACTICES.md).
 
 ## Test Helper Functions
 
