@@ -492,7 +492,7 @@ python -c "from lex_helper import LexRequest, LexResponse; print('✅ Type hints
 
 If you encounter issues not covered here:
 
-1. **Check the [FAQ](../community/support.md#frequently-asked-questions)**
+1. **Check the [troubleshooting guide](../advanced/troubleshooting.md)**
 2. **Search [existing issues](https://github.com/aws/lex-helper/issues)**
 3. **Create a new issue** with:
    - Operating system and version

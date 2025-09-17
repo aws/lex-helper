@@ -962,7 +962,7 @@ dialog.elicit_slot(
 ### Getting Help
 
 - **[Advanced Troubleshooting](../advanced/troubleshooting.md)** - Detailed debugging guide
-- **[Community Support](../community/support.md)** - Get help from other developers
+- **[Troubleshooting Guide](../advanced/troubleshooting.md)** - Get help with common issues
 - **[GitHub Issues](https://github.com/aws/lex-helper/issues)** - Report bugs or request features
 
 ---

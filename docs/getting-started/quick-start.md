@@ -322,7 +322,7 @@ session_attrs = MySessionAttributes(user_name="John")  # ❌ Wrong
 ### Getting Help
 
 - **[Troubleshooting Guide](../advanced/troubleshooting.md)** - Common issues and solutions
-- **[Community Support](../community/support.md)** - Get help from the community
+- **[Troubleshooting Guide](../advanced/troubleshooting.md)** - Get help with common issues
 - **[GitHub Issues](https://github.com/aws/lex-helper/issues)** - Report bugs or request features
 
 ---

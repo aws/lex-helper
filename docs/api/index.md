@@ -70,7 +70,7 @@ Then return here for detailed API information as you build more complex chatbots
 
 ## API Stability
 
-All public APIs documented here follow semantic versioning. Breaking changes are clearly documented in the [changelog](../community/changelog.md) and [migration guides](../migration/version-upgrades.md).
+All public APIs documented here follow semantic versioning. Breaking changes are clearly documented in the [migration guides](../migration/version-upgrades.md).
 
 ---
 

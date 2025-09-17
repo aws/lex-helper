@@ -1,6 +1,6 @@
 # Support
 
-For support information, please see the [Support section](community/support.md).
+For support information, please see the resources below.
 ## Getting Help
 
 ### For Issues
@@ -10,4 +10,4 @@ For support information, please see the [Support section](community/support.md).
 
 ### For Development Questions
 - Review the [Contributing Guide](CONTRIBUTING.md)
-- Check the development setup instructions in the [Contributing Guide](community/contributing.md)
+- Check the development setup instructions in the [Contributing Guide](CONTRIBUTING.md)

@@ -7,20 +7,9 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   palette:
-    # Palette toggle for light mode
-    - scheme: default
-      primary: blue grey
-      accent: orange
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    # Palette toggle for dark mode
-    - scheme: slate
-      primary: blue grey
-      accent: orange
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+    scheme: default
+    primary: blue grey
+    accent: orange
   features:
     - navigation.tabs
     - navigation.sections
@@ -181,17 +170,3 @@ nav:
     - From Raw Lex: migration/from-raw-lex.md
     - Version Upgrades: migration/version-upgrades.md
     - Breaking Changes: migration/breaking-changes.md
-  - Community:
-    - Contributing: community/contributing.md
-    - Support: community/support.md
-    - Changelog: community/changelog.md
-  - Legacy:
-    - Smart Disambiguation (Old): smart-disambiguation.md
-    - Development:
-      - Best Practices: BEST_PRACTICES.md
-      - Development Guide: DEVELOPMENT.md
-      - Testing Guide: TESTING_GUIDE.md
-      - Lambda Layer Deployment: LAMBDA_LAYER_DEPLOYMENT.md
-    - Support:
-      - Support: SUPPORT.md
-      - Security: SECURITY.md

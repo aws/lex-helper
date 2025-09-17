@@ -183,5 +183,5 @@ Dive deep into the complete API documentation with examples.
 <div class="get-started-footer" markdown>
 Ready to build better chatbots? **[Get started in 5 minutes →](getting-started/quick-start.md)**
 
-Questions? Check our **[FAQ](community/support.md)** or **[join the discussion](https://github.com/aws/lex-helper/discussions)**
+Questions? **[Report issues](https://github.com/aws/lex-helper/issues)** or check our **[troubleshooting guide](advanced/troubleshooting.md)**
 </div>

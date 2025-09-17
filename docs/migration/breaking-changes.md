@@ -48,4 +48,4 @@ Getting help with migration challenges.
 
 ---
 
-*This page is part of the comprehensive lex-helper documentation. [Community →](../community/contributing.md)*
+*This page is part of the comprehensive lex-helper documentation. [Contributing →](../CONTRIBUTING.md)*

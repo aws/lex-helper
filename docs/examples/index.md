@@ -38,7 +38,7 @@ AI-powered chatbot with smart disambiguation.
 
 ## Contributing Examples
 
-Have a great example to share? See our [contribution guidelines](../community/contributing.md).
+Have a great example to share? See our [contribution guidelines](../CONTRIBUTING.md).
 
 ---
 
