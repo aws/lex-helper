@@ -20,12 +20,15 @@ def main():
     # Check if dependencies are installed
     try:
         import mkdocs  # noqa
-        import mkdocs_material  # noqa
+        import material  # noqa - mkdocs-material installs as 'material'
         import mkdocstrings  # noqa
     except ImportError as e:
         print(f"Missing dependency: {e}")
         print("Please install documentation dependencies:")
         print("  uv sync --group docs")
+        print("Or run: make docs-install")
+        print("\nIf you continue to have issues, try:")
+        print("  uv sync --all-groups")
         sys.exit(1)
 
     # Run MkDocs serve with development options

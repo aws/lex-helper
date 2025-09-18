@@ -70,11 +70,13 @@
   border-bottom: 1px solid var(--aws-gray-dark);
 }
 
-.md-nav--primary .md-nav__item--active > .md-nav__link {
+.md-nav--primary .md-nav__item--active>.md-nav__link {
   color: var(--aws-orange);
   font-weight: 500;
   background: rgba(255, 153, 0, 0.1);
-  border-right: 3px solid var(--aws-orange);
+  border-left: 3px solid var(--aws-orange);
+  border-radius: 0 4px 4px 0;
+  margin-left: 0;
 }
 
 .md-nav--primary .md-nav__link {
@@ -105,11 +107,11 @@
 }
 
 /* Compact navigation sections */
-.md-nav__item--nested > .md-nav__link {
+.md-nav__item--nested>.md-nav__link {
   font-weight: 500;
 }
 
-.md-nav__item--section > .md-nav__link {
+.md-nav__item--section>.md-nav__link {
   font-size: 0.8rem !important;
   font-weight: 500;
 }
@@ -623,15 +625,24 @@
 
 .md-sidebar {
   width: 12rem !important;
+  height: 100vh !important;
+  background: white;
+  border-right: 1px solid var(--aws-gray-dark);
 }
 
 .md-sidebar--primary {
   left: 0;
+  height: 100vh !important;
+  background: white;
+  border-right: 1px solid var(--aws-gray-dark);
 }
 
 .md-sidebar--secondary {
   right: 0;
   width: 10rem !important;
+  height: 100vh !important;
+  background: white;
+  border-left: 1px solid var(--aws-gray-dark);
 }
 
 /* Remove default Material Design constraints */
@@ -666,18 +677,16 @@ body {
   color: var(--aws-gray);
 }
 
-/* Subtle scroll indicators */
+/* Hide scrollbars completely */
 .md-sidebar__scrollwrap::-webkit-scrollbar {
-  width: 4px;
+  display: none;
 }
 
-.md-sidebar__scrollwrap::-webkit-scrollbar-thumb {
-  background: var(--aws-gray-dark);
-  border-radius: 2px;
-}
-
-.md-sidebar__scrollwrap::-webkit-scrollbar-thumb:hover {
-  background: var(--aws-orange);
+.md-sidebar__scrollwrap {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Improve search results */
@@ -733,6 +742,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -782,6 +792,7 @@ body {
   font-weight: 600;
   color: var(--md-code-fg-color);
 }
+
 /*
 AGGRESSIVE PADDING REMOVAL - Override all content padding */
 .md-content__inner {
@@ -843,7 +854,9 @@ AGGRESSIVE PADDING REMOVAL - Override all content padding */
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
   }
-}/* AWS
+}
+
+/* AWS
  Logo styling */
 .md-header__button.md-logo {
   padding: 0.2rem;
@@ -865,7 +878,9 @@ AGGRESSIVE PADDING REMOVAL - Override all content padding */
 [data-md-color-scheme="slate"] .md-header__button.md-logo img,
 [data-md-color-scheme="slate"] .md-header__button.md-logo svg {
   filter: none;
-}/* Fix AWS
+}
+
+/* Fix AWS
  Logo - Remove all filters to preserve original colors */
 .md-logo img,
 .md-logo svg,
@@ -882,7 +897,9 @@ AGGRESSIVE PADDING REMOVAL - Override all content padding */
 [data-md-color-scheme="slate"] .md-logo img,
 [data-md-color-scheme="slate"] .md-logo svg {
   filter: none !important;
-}/* Fix he
+}
+
+/* Fix he
 ader vertical alignment */
 .md-header__inner {
   display: flex;

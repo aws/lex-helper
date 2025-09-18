@@ -9,7 +9,7 @@ help: ## Show this help message
 docs-install: ## Install documentation dependencies
 	uv sync --group docs
 
-docs-serve: ## Start the documentation development server with live reload
+docs-serve: docs-install ## Start the documentation development server with live reload
 	@echo "Starting documentation development server..."
 	@echo "Visit http://127.0.0.1:8000 to view the documentation"
 	uv run python scripts/serve-docs.py
