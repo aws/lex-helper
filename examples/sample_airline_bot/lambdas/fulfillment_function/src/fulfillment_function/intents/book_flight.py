@@ -2,7 +2,7 @@
 Handler for the BookFlight intent.
 
 This intent handles comprehensive flight booking requests with sophisticated airport resolution.
-It collects trip type, origin/destination cities with IATA airport code resolution, 
+It collects trip type, origin/destination cities with IATA airport code resolution,
 departure/return dates, and passenger count before processing the booking.
 
 Key Features:
@@ -13,8 +13,9 @@ Key Features:
 - Localized messaging with get_message() fallbacks
 - Comprehensive error handling and validation
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +160,7 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
         except Exception as e:
             logger.error(f"Error resolving destination city: {e}")
             # Continue without resolution on error
-            pass    
+            pass
     
     if not departure_date:
         message = "On what date would you like to depart?"
@@ -230,10 +231,10 @@ def handle_fulfillment_hook(lex_request: LexRequest[AirlineBotSessionAttributes]
     
     # Store booking details in session attributes for potential future reference
     lex_request.sessionState.sessionAttributes.reservation_number = reservation_number
-    lex_request.sessionState.sessionAttributes.origin_city = origin_city 
-    lex_request.sessionState.sessionAttributes.destination_city = destination_city 
-    lex_request.sessionState.sessionAttributes.departure_date = departure_date 
-    lex_request.sessionState.sessionAttributes.return_date = return_date 
+    lex_request.sessionState.sessionAttributes.origin_city = origin_city
+    lex_request.sessionState.sessionAttributes.destination_city = destination_city
+    lex_request.sessionState.sessionAttributes.departure_date = departure_date
+    lex_request.sessionState.sessionAttributes.return_date = return_date
     
     # Get resolved IATA codes with fallbacks
     origin_code = lex_request.sessionState.sessionAttributes.origin_iata_code or origin_city or "N/A"

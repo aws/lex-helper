@@ -1,8 +1,9 @@
 """
 Handler for the Goodbye intent.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +35,8 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     
     # Close the dialog with the correct parameter order
     response = dialog.close(
-        messages=messages,  
-        lex_request=lex_request  
+        messages=messages,
+        lex_request=lex_request
 
     )
     

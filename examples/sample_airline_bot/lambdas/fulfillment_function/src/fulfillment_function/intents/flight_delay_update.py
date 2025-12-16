@@ -5,8 +5,9 @@ This intent provides flight delay information by collecting the flight number
 and departure airport, then returning mock delay data. In production, this would
 integrate with real flight tracking APIs.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 logger = logging.getLogger(__name__)
 

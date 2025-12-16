@@ -4,8 +4,9 @@ Handler for the Greeting intent.
 This intent handles user greetings and provides a welcoming introduction to the bot's
 capabilities. It tracks greeting count to provide different responses for repeat visitors.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 from ..session_attributes import AirlineBotSessionAttributes
 

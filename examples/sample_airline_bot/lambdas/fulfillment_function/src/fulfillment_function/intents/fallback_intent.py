@@ -1,8 +1,9 @@
 """
 Handler for the FallbackIntent.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 logger = logging.getLogger(__name__)
 

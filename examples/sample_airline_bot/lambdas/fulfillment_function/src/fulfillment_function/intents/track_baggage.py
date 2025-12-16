@@ -1,8 +1,9 @@
 """
 Handler for the TrackBaggage intent using MessageManager.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
         message = "DEFAULT: What is your reservation number?"  # Default fallback
         try:
             # Try to get localized message
-            message = get_message(key="track_baggage.elicit_reservation_number", locale=lex_request.bot.localeId)       
+            message = get_message(key="track_baggage.elicit_reservation_number", locale=lex_request.bot.localeId)
         except Exception as e:
             logger.warning(f"Failed to get localized message: {e}")
             # Keep default fallback message

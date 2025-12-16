@@ -4,8 +4,9 @@ Handler for the Authenticate intent.
 This intent demonstrates user authentication flow before allowing access to other intents.
 In a production environment, you would integrate with your actual authentication system.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     if invocation_source == InvocationSource.DIALOG_CODE_HOOK.value:
         return handle_dialog_hook(lex_request)
     
-    if (invocation_source == InvocationSource.FULFILLMENT_CODE_HOOK.value or 
+    if (invocation_source == InvocationSource.FULFILLMENT_CODE_HOOK.value or
         lex_request.sessionState.intent.state == "ReadyForFulfillment"):
         return handle_fulfillment_hook(lex_request)
     

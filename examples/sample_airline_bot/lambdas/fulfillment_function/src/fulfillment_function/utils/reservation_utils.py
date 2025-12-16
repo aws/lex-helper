@@ -4,10 +4,11 @@ Reservation utilities for flight booking operations.
 This module provides utilities for airport resolution, city-to-IATA code conversion,
 and other reservation-related operations used across multiple intents.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog,  get_message, invoke_bedrock_converse
-from lex_helper.core.bedrock_model_configs import BedrockModel
-import logging
 import json
+import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message, invoke_bedrock_converse
+from lex_helper.core.bedrock_model_configs import BedrockModel
 
 logger = logging.getLogger(__name__)
 import re
@@ -20,10 +21,10 @@ class ReservationUtils:
     
     @staticmethod
     def handle_city_resolution(
-        city: str, 
-        slot_name_city: str, 
-        slot_name_code: str, 
-        session_attr: str, 
+        city: str,
+        slot_name_city: str,
+        slot_name_code: str,
+        session_attr: str,
         lex_request: LexRequest[AirlineBotSessionAttributes]
     ) -> LexResponse[AirlineBotSessionAttributes]:
         """
@@ -79,7 +80,7 @@ class ReservationUtils:
                         "originalValue": city,
                         "resolvedValues": [iata_result["city"]],
                     }
-                }  
+                }
                 lex_request.sessionState.intent.slots[slot_name_code] = {
                     "value": {
                         "interpretedValue": iata_result["code"],
@@ -135,14 +136,14 @@ JSON ONLY."""
 
         messages = [
             {"role": "user", "content": [{"text": f"Find airports for: {city_input}"}]}
-        ] 
+        ]
         
         try:
             response = invoke_bedrock_converse(
-                messages=messages, 
-                model_id=BedrockModel.CLAUDE_3_HAIKU, 
-                max_tokens=300, 
-                temperature=0.0, 
+                messages=messages,
+                model_id=BedrockModel.CLAUDE_3_HAIKU,
+                max_tokens=300,
+                temperature=0.0,
                 system_prompt=system_prompt
             )
             logger.debug(f"Bedrock response for '{city_input}': {response}")
@@ -155,7 +156,7 @@ JSON ONLY."""
                     parsed_result = json.loads(text_content)
                     logger.debug(f"Parsed JSON result: {parsed_result}")
                     return parsed_result
-                except json.JSONDecodeError as json_err:
+                except json.JSONDecodeError:
                     # Fallback: parse natural language response
                     logger.warning(f"Non-JSON response from Bedrock: {text_content}")
                     return ReservationUtils._parse_natural_language_response(text_content, city_input)
@@ -193,7 +194,7 @@ JSON ONLY."""
             code = airport_codes[0]
             return {
                 "city": city_input.title(),
-                "status": "resolved", 
+                "status": "resolved",
                 "code": code
             }
         

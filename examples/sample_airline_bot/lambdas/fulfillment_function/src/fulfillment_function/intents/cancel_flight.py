@@ -1,8 +1,9 @@
 """
 Handler for the CancelFlight intent using MessageManager.
 """
-from lex_helper import LexRequest, LexResponse, LexPlainText, dialog, get_message
 import logging
+
+from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_message
 
 logger = logging.getLogger(__name__)
 
@@ -103,8 +104,8 @@ def _is_valid_reservation_number(reservation_number: str) -> bool:
         bool: True if valid format, False otherwise
     """
     # Simple validation: should be 6 characters, alphanumeric
-    return (reservation_number and 
-            len(reservation_number) == 6 and 
+    return (reservation_number and
+            len(reservation_number) == 6 and
             reservation_number.isalnum())
 
 
