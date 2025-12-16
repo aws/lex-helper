@@ -8,13 +8,14 @@ cancel_flight:
   cancellation_error: "I'm sorry, I couldn't find a reservation with number {reservation_number}. Please check the number and try again."
   invalid_reservation_format: "Please provide a valid reservation number. It should be in the format ABC123."
 
-# Book Flight Intent Messages
+# Book Flight Intent Messages  
 book_flight:
   authentication_required: "Before I can help with booking a flight, you will need to authenticate."
   elicit_trip_type: "Is this a one-way or round trip?"
   elicit_origin_city: "From which city would you like to depart?"
   elicit_destination_city: "To which city would you like to travel?"
   elicit_departure_date: "On what date would you like to depart?"
+  elicit_return_date: "On what date would you like to return?"
   elicit_passengers: "How many passengers will be traveling?"
   elicit_airport_code_selection: "I found more than one airport for {city}, please make a selection \n{options}."
   booking_success_roundtrip: "I've booked your round trip from {origin_city} to {destination_city}. Departing on {departure_date} and returning on {return_date} for {passengers} passenger(s). Your reservation number is {reservation_number}."
@@ -54,20 +55,3 @@ validation:
   invalid_city: "Please provide a valid city name like 'New York' or 'Los Angeles'."
   invalid_date: "Please provide a valid date in the format MM/DD/YYYY."
   invalid_passenger_count: "Please provide a valid number of passengers (1-9)."
-
-# Smart Disambiguation Messages
-disambiguation:
-  # Default disambiguation messages
-  two_options: "I can help you with either of these. Which would you like to do?"
-  multiple_options: "I can help you with several things. What would you like to do?"
-  fallback: "I'm not sure what you're looking for. Could you be more specific?"
-
-  # Airline-specific disambiguation messages
-  airline:
-    two_options: "I can help you with a couple of things. Which would you like to do?"
-    multiple_options: "I can help you with several things. What would you like to do?"
-    booking_options: "I can help you with flight bookings. Would you like to book, change, or cancel a flight?"
-    status_options: "I can help you check status information. Would you like flight updates or baggage tracking?"
-    book_or_change: "Would you like to book a new flight or change an existing one?"
-    change_or_cancel: "Would you like to change your flight or cancel it?"
-    flight_or_baggage: "Would you like to check flight status or track your baggage?"

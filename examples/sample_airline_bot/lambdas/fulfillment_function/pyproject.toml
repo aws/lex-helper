@@ -35,4 +35,4 @@ include = [
 allow-direct-references = true
 
 [tool.uv.sources]
-lex-helper = { path = "lex_helper-0.0.2-py3-none-any.whl" }
+lex-helper = { path = "lex_helper-0.0.3-py3-none-any.whl" }

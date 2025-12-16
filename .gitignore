@@ -1,6 +1,9 @@
 # Kiro
 .kiro/
 
+# Presentation files (local only)
+presentation/
+
 # Mkdocs
 site/
 
