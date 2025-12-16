@@ -1,0 +1,7 @@
+requests>=2.32.3
+aws-lambda-powertools[tracer]>=3.5.0
+pydantic>=2.10.6
+pydantic-core>=2.28.0
+cryptography>=44.0.0
+pydantic-settings>=2.7.1
+lex_helper-0.0.3-py3-none-any.whl

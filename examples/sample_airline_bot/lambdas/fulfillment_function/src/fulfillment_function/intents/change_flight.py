@@ -8,6 +8,7 @@ from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_messag
 
 logger = logging.getLogger(__name__)
 
+from ..classes.slot_enums import ChangeFlightSlot
 from ..session_attributes import AirlineBotSessionAttributes
 
 
@@ -28,8 +29,8 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
     session_attrs = lex_request.sessionState.sessionAttributes
 
     # Get slot values
-    reservation_number = dialog.get_slot(intent=intent, slot_name="ReservationNumber") or ""
-    new_departure_date = dialog.get_slot(intent=intent, slot_name="NewDepartureDate") or ""
+    reservation_number = dialog.get_slot(intent=intent, slot_name=ChangeFlightSlot.RESERVATIONNUMBER.value) or ""
+    new_departure_date = dialog.get_slot(intent=intent, slot_name=ChangeFlightSlot.NEWDEPARTUREDATE.value) or ""
     logger.debug(f"Slot values: reservation_number={reservation_number}, new_departure_date={new_departure_date}")
 
     # Store values in session attributes
@@ -45,14 +46,18 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting ReservationNumber slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=ChangeFlightSlot.RESERVATIONNUMBER.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     if not new_departure_date:
         message = "What is your new departure date?"
         logger.debug(f"Eliciting NewDepartureDate slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="NewDepartureDate", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=ChangeFlightSlot.NEWDEPARTUREDATE.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     # Create the response message

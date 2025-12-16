@@ -12,6 +12,7 @@ from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_messag
 
 logger = logging.getLogger(__name__)
 
+from ..classes.slot_enums import FlightDelayUpdateSlot
 from ..session_attributes import AirlineBotSessionAttributes
 
 
@@ -33,8 +34,8 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
 
     # Get current slot values
     intent = dialog.get_intent(lex_request)
-    flight_number = dialog.get_slot(intent=intent, slot_name="FlightNumber") or ""
-    departure_airport = dialog.get_slot(intent=intent, slot_name="DepartureAirport") or ""
+    flight_number = dialog.get_slot(intent=intent, slot_name=FlightDelayUpdateSlot.FLIGHTNUMBER.value) or ""
+    departure_airport = dialog.get_slot(intent=intent, slot_name=FlightDelayUpdateSlot.DEPARTUREAIRPORT.value) or ""
 
     logger.debug(f"Current slot values: flight_number={flight_number}, departure_airport={departure_airport}")
 
@@ -52,7 +53,9 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting FlightNumber slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="FlightNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=FlightDelayUpdateSlot.FLIGHTNUMBER.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     if not departure_airport:
@@ -63,7 +66,9 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting DepartureAirport slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="DepartureAirport", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=FlightDelayUpdateSlot.DEPARTUREAIRPORT.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     # All required information collected - provide delay information

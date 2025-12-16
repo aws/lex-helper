@@ -11,6 +11,7 @@ from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_messag
 
 logger = logging.getLogger(__name__)
 
+from ..classes.slot_enums import AuthenticateSlot
 from ..session_attributes import AirlineBotSessionAttributes
 from ..utils.enums import InvocationSource
 
@@ -33,7 +34,9 @@ def handle_dialog_hook(lex_request: LexRequest[AirlineBotSessionAttributes]) -> 
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting AccountId slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="AccountId", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=AuthenticateSlot.ACCOUNTID.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     # All required slots filled, proceed to fulfillment
@@ -47,7 +50,7 @@ def handle_fulfillment_hook(
     logger.debug("Authenticate fulfillment hook called")
 
     intent = dialog.get_intent(lex_request)
-    account_id = dialog.get_slot(intent=intent, slot_name="AccountId")
+    account_id = dialog.get_slot(intent=intent, slot_name=AuthenticateSlot.ACCOUNTID.value)
 
     if account_id:
         # In production, validate account_id against your authentication system

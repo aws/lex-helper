@@ -37,7 +37,6 @@ class ChangeFlightSlot(Enum):
 
 LexSlot = TrackBaggageSlot | AuthenticateSlot | BookFlightSlot | FlightDelayUpdateSlot | CancelFlightSlot | ChangeFlightSlot
 
-
 LexSlot_Classes = {
     "TrackBaggageSlot": TrackBaggageSlot,
     "AuthenticateSlot": AuthenticateSlot,

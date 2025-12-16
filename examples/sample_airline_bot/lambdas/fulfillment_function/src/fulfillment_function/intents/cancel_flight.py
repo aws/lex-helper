@@ -8,6 +8,7 @@ from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_messag
 
 logger = logging.getLogger(__name__)
 
+from ..classes.slot_enums import CancelFlightSlot
 from ..session_attributes import AirlineBotSessionAttributes
 
 
@@ -31,7 +32,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
 
     # Extract slot values from the intent
     intent = dialog.get_intent(lex_request)
-    reservation_number = dialog.get_slot(intent=intent, slot_name="ReservationNumber")
+    reservation_number = dialog.get_slot(intent=intent, slot_name=CancelFlightSlot.RESERVATIONNUMBER.value)
 
     logger.debug(f"Slot values: reservation_number={reservation_number}")
 
@@ -47,7 +48,9 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Eliciting ReservationNumber slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=CancelFlightSlot.RESERVATIONNUMBER.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     # STEP 2: Input validation - check reservation number format
@@ -59,7 +62,9 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             logger.warning(f"Failed to get localized message: {e}")
         logger.debug(f"Invalid reservation format: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=CancelFlightSlot.RESERVATIONNUMBER.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     # STEP 3: Business logic - lookup reservation in system

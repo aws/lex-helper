@@ -8,6 +8,7 @@ from lex_helper import LexPlainText, LexRequest, LexResponse, dialog, get_messag
 
 logger = logging.getLogger(__name__)
 
+from ..classes.slot_enums import TrackBaggageSlot
 from ..session_attributes import AirlineBotSessionAttributes
 
 
@@ -25,7 +26,7 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
 
     # Get intent and slots
     intent = dialog.get_intent(lex_request)
-    reservation_number = dialog.get_slot(intent=intent, slot_name="ReservationNumber")
+    reservation_number = dialog.get_slot(intent=intent, slot_name=TrackBaggageSlot.RESERVATIONNUMBER.value)
 
     logger.debug(f"Slot values: reservation_number={reservation_number}")
 
@@ -43,7 +44,9 @@ def handler(lex_request: LexRequest[AirlineBotSessionAttributes]) -> LexResponse
             # Keep default fallback message
         logger.debug(f"Eliciting ReservationNumber slot: {message}")
         return dialog.elicit_slot(
-            slot_to_elicit="ReservationNumber", messages=[LexPlainText(content=message)], lex_request=lex_request
+            slot_to_elicit=TrackBaggageSlot.RESERVATIONNUMBER.value,
+            messages=[LexPlainText(content=message)],
+            lex_request=lex_request,
         )
 
     # STEP 2: Business logic - mock baggage lookup
