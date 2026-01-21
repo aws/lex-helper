@@ -64,3 +64,24 @@ examples/sample_airline_bot/cdk.out
 *.whl
 *.d.ts
 *.bak
+
+# Generator test outputs (should not be committed)
+test-lambda-generator/
+test-lambda-generator-check-balance-bot/
+lex-fulfill-lambda-generator/
+
+# Lambda Layer artifacts (build outputs, not source)
+lex-helper-layer/
+lex-helper-layer.zip
+
+# MCP Lambda deployment artifacts
+lex-fulfill-lambda-generator/deployment/mcp-lambda.zip
+lex-fulfill-lambda-generator/deployment/mcp-lambda-package/
+lex-fulfill-lambda-generator/deployment/lambda-target-config.json
+lex-fulfill-lambda-generator/deployment/lambda-target-payload.json
+lex-fulfill-lambda-generator/deployment/.deployment_credentials
+
+# Sensitive credentials (NEVER commit these!)
+**/GATEWAY_CREDENTIALS.sh
+**/.deployment_credentials
+**/DEPLOYMENT_SUCCESS.md
