@@ -502,10 +502,6 @@ If you encounter issues not covered here:
    - Steps to reproduce the issue
    - Virtual environment details (`pip freeze`)
 
-4. **For urgent issues:**
-   - Check [Stack Overflow](https://stackoverflow.com/questions/tagged/lex-helper) for community solutions
-   - Join our [Discord community](https://discord.gg/lex-helper) for real-time help
-
 ### Diagnostic Script
 
 Run this diagnostic script to gather information for bug reports:
