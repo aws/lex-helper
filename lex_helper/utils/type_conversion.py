@@ -48,7 +48,10 @@ def safe_int(value: Any, default: int | None = None) -> int | None:
         if isinstance(value, int | float):
             return int(value)
         if isinstance(value, str):
-            return int(float(value))
+            try:
+                return int(value)
+            except ValueError:
+                return int(float(value))
         return default
     except (ValueError, TypeError):
         return default
