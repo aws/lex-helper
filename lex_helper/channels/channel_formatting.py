@@ -97,4 +97,6 @@ def _format_image_card(
     options_provided: list[str],
     formatted_messages: list[Any],
 ) -> list[Any]:
+    if isinstance(channel, SMSChannel):
+        return add_to_list(lst=formatted_messages, item=channel.format_image_card(message))
     return add_to_list(lst=formatted_messages, item=message)
