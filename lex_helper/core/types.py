@@ -61,7 +61,7 @@ LexMessages = Sequence[LexBaseResponse | PlainText]
 
 
 def parse_lex_response(data: dict[str, Any]) -> LexBaseResponse:
-    return TypeAdapter(LexBaseResponse).validate_python(data)
+    return TypeAdapter[LexBaseResponse](cast(Any, LexBaseResponse)).validate_python(data)
 
 
 # Lex Payload, this is what is sent to the actual fulfillment lambda
