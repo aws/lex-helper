@@ -52,8 +52,7 @@ def substitute_keys_in_text(text: str, substitutions: dict[str, str]) -> str:
     """
     result = text
     for key, value in substitutions.items():
-        pattern = r"\{" + re.escape(key) + r"\}"
-        result = re.sub(pattern, str(value), result)
+        result = result.replace("{" + key + "}", str(value))
     return result
 
 
