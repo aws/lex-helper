@@ -129,7 +129,8 @@ def close[T: SessionAttributes](lex_request: LexRequest[T], messages: LexMessage
     """
     intent, active_contexts, session_attributes, _ = get_request_components(lex_request)
 
-    lex_request.sessionState.activeContexts = remove_inactive_context(lex_request)
+    active_contexts = remove_inactive_context(lex_request)
+    lex_request.sessionState.activeContexts = active_contexts
     lex_request.sessionState.intent.state = "Fulfilled"
     session_attributes.previous_dialog_action_type = "Close"
     response = LexResponse(
