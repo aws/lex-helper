@@ -11,7 +11,7 @@ from typing import (
     cast,
 )
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from lex_helper.formatters.buttons import Button
 
@@ -61,14 +61,7 @@ LexMessages = Sequence[LexBaseResponse | PlainText]
 
 
 def parse_lex_response(data: dict[str, Any]) -> LexBaseResponse:
-    content_type = data.get("contentType")
-
-    if content_type == "PlainText":
-        return LexPlainText(**data)
-    elif content_type == "ImageResponseCard":
-        return LexImageResponseCard(**data)
-    else:
-        raise ValidationError("Invalid contentType", LexBaseResponse)
+    return TypeAdapter(LexBaseResponse).validate_python(data)
 
 
 # Lex Payload, this is what is sent to the actual fulfillment lambda
