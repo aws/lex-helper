@@ -94,8 +94,8 @@ class LexChannel(Channel):
         content = payload.content
         if isinstance(content, dict):
             if "text" in content:
-                return str(content["text"])  # type: ignore
+                return LexCustomPayload(content=str(content["text"]))
             if "message" in content:
-                return str(content["message"])  # type: ignore
+                return LexCustomPayload(content=str(content["message"]))
             return LexCustomPayload(content=str(content))
         return LexCustomPayload(content=str(content))
