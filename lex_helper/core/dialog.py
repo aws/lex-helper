@@ -424,8 +424,12 @@ def set_subslot(
     """
 
     # Ensure the composite slot and its subSlots dictionary exist
-    if composite_slot_name.value not in intent.slots:
-        intent.slots[composite_slot_name.value] = {"subSlots": {}}
+    slot = intent.slots.get(composite_slot_name.value)
+    if slot is None:
+        slot = {}
+        intent.slots[composite_slot_name.value] = slot
+    if slot.get("subSlots") is None:
+        slot["subSlots"] = {}
 
     # Determine the value to set for the subslot
     if subslot_value is None:
