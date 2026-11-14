@@ -71,8 +71,8 @@ class MessageManager:
             filenames = [f"messages_{locale}.yaml", "messages.yaml"]
 
             yaml_path = None
-            for base_dir in base_dirs:
-                for filename in filenames:
+            for filename in filenames:
+                for base_dir in base_dirs:
                     path = base_dir / filename
                     if path.exists():
                         yaml_path = path
