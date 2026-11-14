@@ -843,6 +843,8 @@ def parse_lex_request[T: SessionAttributes](
     """
     # Create a copy of the data to modify
     data_copy = data.copy()
+    if "sessionState" in data_copy:
+        data_copy["sessionState"] = data_copy["sessionState"].copy()
 
     # If there are session attributes in the event, convert them to the proper model
     if data_copy.get("sessionState", {}).get("sessionAttributes"):
