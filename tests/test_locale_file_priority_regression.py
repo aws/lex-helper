@@ -18,3 +18,14 @@ def test_locale_file_is_selected_before_default_fallback(monkeypatch, tmp_path, 
     (localized_dir / f"messages_{locale}.yaml").write_text(f"greeting: {locale}", encoding="utf-8")
 
     assert MessageManager.get_message("greeting", locale=locale) == locale
+
+
+def test_explicit_custom_directory_still_overrides_standard_locations(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(MessageManager, "_messages", {})
+    custom_dir = tmp_path / "override"
+    custom_dir.mkdir()
+    monkeypatch.setenv("MESSAGES_YAML_PATH", str(custom_dir))
+    (custom_dir / "messages.yaml").write_text("greeting: custom", encoding="utf-8")
+    (tmp_path / "messages_es_ES.yaml").write_text("greeting: standard", encoding="utf-8")
+    assert MessageManager.get_message("greeting", locale="es_ES") == "custom"
