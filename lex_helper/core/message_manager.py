@@ -64,21 +64,14 @@ class MessageManager:
 
             # Check environment variable for custom directory
             custom_path = os.environ.get("MESSAGES_YAML_PATH")
-            if custom_path:
-                base_dirs.insert(0, Path(custom_path))
 
             # Try locale-specific file first, then fallback to default
             filenames = [f"messages_{locale}.yaml", "messages.yaml"]
 
-            yaml_path = None
-            for base_dir in base_dirs:
-                for filename in filenames:
-                    path = base_dir / filename
-                    if path.exists():
-                        yaml_path = path
-                        break
-                if yaml_path:
-                    break
+            candidates = [base_dir / filename for filename in filenames for base_dir in base_dirs]
+            if custom_path:
+                candidates = [Path(custom_path) / filename for filename in filenames] + candidates
+            yaml_path = next((path for path in candidates if path.exists()), None)
 
             if yaml_path:
                 with open(yaml_path, encoding="utf-8") as file:
