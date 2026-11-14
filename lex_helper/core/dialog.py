@@ -205,13 +205,13 @@ def elicit_slot[T: SessionAttributes](
     session_attributes.options_provided = get_provided_options(messages)
     session_attributes.previous_intent = intent.name
     session_attributes.previous_message = json.dumps(messages, cls=PydanticEncoder)
-    # session_attributes.previous_dialog_action_type = "ElicitSlot"
+    session_attributes.previous_dialog_action_type = "ElicitSlot"
     slot_name = slot_to_elicit
 
     if not isinstance(slot_to_elicit, str):
         slot_name = slot_to_elicit.value
 
-    session_attributes.previous_slot_to_elicit = (intent.name.replace("_", "") + "Slot") + "." + str(slot_name).upper()
+    session_attributes.previous_slot_to_elicit = str(slot_name)
 
     if "." in str(slot_name):
         raise Exception("SLOT PARSED INCORRECTLY")
